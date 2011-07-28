@@ -1,0 +1,4 @@
+﻿/* IE6/7 hacks */
+a.rss-text, a.facebook, a.twitter {margin-right:4px}
+.additionalContent header a.rss {margin-left:9px}
+.thumbnails ul {margin-bottom:13px}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.facebook.com/2008/fbml">
+  <head>
+    <meta charset=utf-8 />
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+    <title>{% block title %}Imagepush{% endblock %}</title>
+    {# <?php include_http_metas() ?>
+    <?php if (has_slot("og_title")): ?>
+      <title><?php echo get_slot("og_title"); ?></title>
+      <meta name="title" content="<?php echo get_slot("og_title"); ?>" />
+      <meta name="description" content="<?php echo get_slot("og_title"); ?>" />
+    <?php else: ?>
+      <title>Best images hourly</title>
+      <meta name="title" content="Imagepush.to - Best images hourly" />
+      <meta name="description" content="Imagepush.to - Best images hourly" />
+    <?php endif; ?>
+
+    <?php if (has_slot("meta_keywords")): ?>
+      <meta name="keywords" content="<?php echo get_slot("meta_keywords"); ?>" />
+    <?php endif; ?>
+
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <?php //include_stylesheets() ?>
+    <?php //include_javascripts() ?>
+    <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://feeds.feedburner.com/imagepush" />
+    <meta name="google-site-verification" content="tT08cSzzAI9CaHWx62miVpZuZc9dI0sC5I6AD7AMKbo" />
+
+    <?php if (has_slot("image_src")): ?>
+      <link rel="image_src" href="<?php echo get_slot("image_src"); ?>" />
+      <meta name="medium" content="image" />
+    <?php endif; ?>
+
+    <meta property="og:site_name" content="Imagepush.to - Best images hourly" />
+    <meta property="fb:admins" content="676763506" />
+    <meta property="fb:app_id" content="118412418235312" />
+
+    <?php if ("@homepage" == $current_uri): ?>
+      <meta property="og:type" content="website" />
+      <link rel="canonical" href="http://imagepush.to/" />
+    <?php elseif (has_slot("og_title")): ?>
+      <meta property="og:title" content="<?php echo get_slot("og_title"); ?>" />
+      <meta property="og:type" content="article" />
+    <?php endif; ?>
+
+    <?php if (has_slot("og_image")): ?>
+      <meta property="og:image" content="<?php echo get_slot("og_image"); ?>" />
+    <?php endif; ?>
+
+    <?php if (has_slot("og_url")): ?>
+      <meta property="og:url" content="<?php echo get_slot("og_url"); ?>" />
+      <link rel="canonical" href="<?php echo get_slot("og_url"); ?>" />
+    <?php endif; ?> #}
+
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+
+    {# <?php a_include_stylesheets(); ?> #}
+
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
+    <script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+
+    <!--[if lt IE 8]>
+		<link rel="stylesheet" href="{{ asset('css/ie67.css') }}" />
+	<![endif]-->
+    <!--[if lt IE 9]>
+      <script src="/js/html5.js"></script>
+	  <link rel="stylesheet" href="{{ asset('css/ie678.css') }}" />
+	<![endif]-->
+
+    {#
+    <? /*
+      <script src="http://cdn.socket.io/stable/socket.io.js"></script>
+      <!-- script>WEB_SOCKET_SWF_LOCATION = 'http://imagepush.to/js/WebSocketMain.swf';</script -->
+      <script src="/js/socket.js"></script>
+      <script src="/js/jquery.lazyload.mini.js"></script>
+     */ ?>
+    #}
+
+    {# <?php include_html_code('google_analytics'); ?> #}
+  </head>
+  <body>
+    <div id="body">
+      <header class="clearfix">
+        <div class="logo"><a href="{{ path('index') }}" title="Imagepush"><img src="{{ asset('images/imagepush-logo.png') }}" alt="Imagepush" /></a></div>
+        <div class="search_box">
+          {# <?php include_html_code('google_site_search_form', true); ?> #}
+        </div>
+        {# <?php include_component("image", "trendingNow"); ?> #}
+      </header>
+
+      {#
+      <?php /* ?>
+        <section id="banners" style="text-align: center;">
+        <?php include_html_code('wide_728x90'); ?>
+        <? /*<figure>
+        <?php //include_html_code('wide_230x90'); ?>
+        </figure> ?>
+        </section>
+        <?php */ ?>
+      #}
+
+      <div id="content">{% block content %}{% endblock %}</div>
+
+      <aside id="asideInfo">
+        <p><span class="h2">Imagepush.to</span> aggregates images from the most popular sites on the web, arranges them by categories, and pushes the best of the best to you hourly.</p>
+        {# <p>If you have a site or blog, you can take our free widgets. <a href="#" class="more">Read more</a></p> #}
+        <section id="subscribe">
+          <form action="http://feedburner.google.com/fb/a/mailverify" method="post" target="fbpopupwindow" onsubmit="window.open('http://feedburner.google.com/fb/a/mailverify?uri=imagepush', 'fbpopupwindow', 'scrollbars=yes,width=550,height=520');return true">
+            <h3> <a href="http://feeds.feedburner.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" title="Subscribe to our RSS-feed" style="vertical-align: top;" class="share-rss-16"></a>&nbsp; Subscribe to our daily updates:</h3>
+            <p>
+              <input type="email" name="email" placeholder="Enter your E-mail" />
+              <input type="hidden" value="imagepush" name="uri"/>
+              <input type="hidden" name="loc" value="en_US"/>
+              <input type="submit" value="Subscribe" /></p>
+            <p>
+            <p style="margin-bottom: 0;">
+              <a class="share-twitter-alt" href="http://twitter.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Twitter"></a>
+              <a class="share-fb" href="http://www.facebook.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Facebook"></a>
+              <a class="share-follow-digg" href="http://digg.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow me on Digg"></a>
+              <br />
+              <a class="share-netvibes" href="http://www.netvibes.com/subscribe.php?module=UWA&moduleUrl=http%3A%2F%2Fimagepush.to%2Fnetvibes%2Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
+              <a class="share-google" href="http://www.google.com/ig/add?moduleurl=http%3A%2F%2Fnvmodules.netvibes.com%2Fwidget%2Fgspec%3FuwaUrl%3Dhttp%253A%252F%252Fimagepush.to%252Fnetvibes%252Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
+
+              {#
+              <a class="share-digg" href="http://digg.com/imagepush" target="_blank" rel="me external nofollow" title="Follow us on Digg"></a>
+              <a class="share-gbuzz" href="https://profiles.google.com/imagepush.to/buzz" target="_blank" rel="me external nofollow" title="Follow us on Google Buzz"></a>
+              <a class="share-tumblr" href="http://imagepush.tumblr.com" target="_blank" rel="me external nofollow" title="Follow us on Tumblr"></a>
+              <a class="share-lj" href="http://imagepush.livejournal.com/" target="_blank" rel="me external nofollow" title="Follow us on Livejournal"></a>
+              <a class="share-myspace" href="http://myspace.com/imagepush" target="_blank" rel="me external nofollow" title="Follow us on MySpace"></a>
+              <a href="http://www.delicious.com/imagepush" target="_blank" title="Follow us on Delicious"><img src="/images/icons/32/del.icio.us.png" alt="" height="32" /></a>
+              <a href="http://www.stumbleupon.com/stumbler/imagepush/" target="_blank" title="Follow us on StumbleUpon"><img src="/images/icons/32/StumbleUpon.png" alt="" height="32" /></a>
+              #}
+            </p>
+            {# <? /* <p class="more"><a href="#">View more subscribing options</a></p> */ ?> #}
+          </form>
+        </section>
+        <figure>
+          {# <?php include_html_code('right_300x250'); ?> #}
+        </figure>
+
+        {# <?php include_html_code('facebook_likebox', true); ?> #}
+
+      </aside>
+      <div class="footerFix"></div>
+      {# <?php include_slot("verticalShare"); ?> #}
+
+    </div>
+
+
+    <footer>
+      <menu>
+        <li><a href="/about">About</a> |</li>
+        <li><a href="/about#advert" title="Advertising on this site">Advertising here</a></li>
+        {# <? /* <li><a href="#" title="Resources for sites owners">Resources</a> |</li>
+        <li><a href="#" title="Resources for developers">For developers</a></li> */ ?> #}
+      </menu>
+      <div class="copyright">&copy; 2011 &mdash; Created and sponsored by <a href="http://www.web-developer.no/" target="_blank">Anton Babenko</a></div>
+    </footer>
+
+    {# <? /* <script type="text/javascript" src="/js/base.js"></script> */ ?> #}
+    {% raw %}
+    <script type="text/javascript">
+      var addthis_share = {
+        templates: {
+          twitter: '{{title}} {{url}} via @imagepush'
+        },
+        url_transforms: {
+          clean: true,
+          shorten: {
+            twitter: 'bitly'
+          }
+        },
+        shorteners: {
+          bitly: { username: 'antonbabenko', apiKey: 'R_5962066cd056895f0f0c5b62c1bd6341' }
+        }
+      };
+      var addthis_config = { data_ga_property: 'UA-20823942-1', data_track_clickback: true, ui_508_compliant: true, services_exclude: 'print' };
+    </script>
+    <script src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
+    {% endraw %}
+    {# <?php a_include_javascripts(); ?> #}
+
+  </body>
+</html>
