@@ -1,0 +1,4 @@
+﻿/* IE6/7/8 hacks */
+#mainContent {border-color:#dad9d2}
+input.submit {border:1px solid #ddd}
+.thumbnails .imgWrapper .imgDescription {background:#000}
