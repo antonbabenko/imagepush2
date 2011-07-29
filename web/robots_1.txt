@@ -1,0 +1,14 @@
+User-Agent: msnbot
+Crawl-Delay: 20
+
+User-agent: *
+Disallow: /js
+Disallow: /images
+Disallow: /upcoming
+Disallow: /tag/*/upcoming
+
+User-agent: Mediapartners-Google
+Disallow:
+
+Sitemap: http://imagepush.to/sitemap.xml
+
