@@ -28,14 +28,6 @@ class County
   private $name;
 
   /**
-   * @return string $name
-   */
-  public function __toString()
-  {
-    return $this->name;
-  }
-
-  /**
    * Get id
    *
    * @return integer $id

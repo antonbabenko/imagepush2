@@ -1,0 +1,19 @@
+<div class="cse-branding-bottom">
+  <div class="cse-branding-form">
+    <form action="http://imagepush.to/search" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-0337708139578593:6468289146" />
+        <input type="hidden" name="cof" value="FORID:11" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="40" value="{{ app.request.get('q')|default('') }}" />
+        <input type="submit" name="sa" value="Search" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    Custom Search
+  </div>
+</div>

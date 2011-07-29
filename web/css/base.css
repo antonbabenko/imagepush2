@@ -152,15 +152,15 @@ body {font:13px Trebuchet MS, Tahoma, Verdana; color:#454545; height:100%}
 #verticalShare {position:fixed; text-align:center; display:none; left:-68px; margin-left:-68px; top:112px; width:68px; padding:5px 0 0; border:1px solid #e5f3f6; background:#ecf5fa; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px}
 	#verticalShare a {margin:10px auto 5px; display:block}
 
-#horisontalShare {color:#000; font-size:12px; font-weight:bold; min-height:1%; text-transform:uppercase; background:#e4f3f6; padding:5px 8px; margin:0 0 15px; border-radius:6px; -moz-border-radius:6px; -webkit-border-radius:6px}
-	#horisontalShare ul, #horisontalShare li {padding:0; margin:0; list-style:none; line-height:normal}
-	#horisontalShare li {float:right; margin:0px 0 0 15px}
-	#horisontalShare li:first-child {float:left; margin:0}
+#horizontalShare {color:#000; font-size:12px; font-weight:bold; min-height:1%; text-transform:uppercase; background:#e4f3f6; padding:5px 8px; margin:0 0 15px; border-radius:6px; -moz-border-radius:6px; -webkit-border-radius:6px}
+	#horizontalShare ul, #horizontalShare li {padding:0; margin:0; list-style:none; line-height:normal}
+	#horizontalShare li {float:right; margin:0px 0 0 15px}
+	#horizontalShare li:first-child {float:left; margin:0}
 
-#horisontalShareSmall {color:#000; font-size:12px; font-weight:bold; min-height:1%; text-transform:uppercase; margin:0; width:470px; padding-bottom: 10px;}
-	#horisontalShareSmall ul, #horisontalShareSmall li {padding:0; margin:0; list-style:none; line-height:normal}
-	#horisontalShareSmall li {float:right; margin:0 0 0 7px}
-	#horisontalShareSmall li:first-child {float:left; margin:0}
+#horizontalShareSmall {color:#000; font-size:12px; font-weight:bold; min-height:1%; text-transform:uppercase; margin:0; width:470px; padding-bottom: 10px;}
+	#horizontalShareSmall ul, #horizontalShareSmall li {padding:0; margin:0; list-style:none; line-height:normal}
+	#horizontalShareSmall li {float:right; margin:0 0 0 7px}
+	#horizontalShareSmall li:first-child {float:left; margin:0}
 
 /* Digg button: hide yellow counter field */
 .db-compact .db-count, .db-compact .db-copy {display:none;}
@@ -242,7 +242,7 @@ img.fright {margin:0 0 5px 20px}
 .fclear {display:block; clear:both; font-size:0; line-height:0; height:0; overflow:hidden}
 .clear {clear:both}
 .clearfix {min-height:1%}
-.clearfix:after, #banners:after, #subscribe p:after, .headerMeta:after, #horisontalShare:after, #horisontalShareSmall:after, #mainContent footer:after, .thumbnails:after, .thumbnails ul:after, pp_nav:after {display:block; height:0; line-height:0; font-size:0; clear:both; content:"."; visibility:hidden}
+.clearfix:after, #banners:after, #subscribe p:after, .headerMeta:after, #horizontalShare:after, #horizontalShareSmall:after, #mainContent footer:after, .thumbnails:after, .thumbnails ul:after, pp_nav:after {display:block; height:0; line-height:0; font-size:0; clear:both; content:"."; visibility:hidden}
 .show {display:block}
 .hide {display:none}
 .error {color:#c00}

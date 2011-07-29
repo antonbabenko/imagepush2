@@ -1,9 +1,16 @@
+{# {% spaceless %} #}
+
+{% import "ImagepushBundle:Helpers:siteHelper.html.twig" as siteHelper %}
+{% import "ImagepushBundle:Helpers:shareHelper.html.twig" as shareHelper %}
+
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.facebook.com/2008/fbml">
   <head>
     <meta charset=utf-8 />
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+    <link rel="icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" /> 
+    
     <title>{% block title %}Imagepush{% endblock %}</title>
+    
     {# <?php include_http_metas() ?>
     <?php if (has_slot("og_title")): ?>
       <title><?php echo get_slot("og_title"); ?></title>
@@ -53,8 +60,6 @@
 
     <meta name="viewport" content="initial-scale=1.0, width=device-width">
 
-    {# <?php a_include_stylesheets(); ?> #}
-
     <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
     <script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
@@ -78,14 +83,15 @@
      */ ?>
     #}
 
-    {# <?php include_html_code('google_analytics'); ?> #}
+    {{ siteHelper.html('google_analytics') }}
+
   </head>
   <body>
     <div id="body">
       <header class="clearfix">
         <div class="logo"><a href="{{ path('index') }}" title="Imagepush"><img src="{{ asset('images/imagepush-logo.png') }}" alt="Imagepush" /></a></div>
         <div class="search_box">
-          {# <?php include_html_code('google_site_search_form', true); ?> #}
+          {{ siteHelper.html('google_site_search_form', true) }}
         </div>
         {# <?php include_component("image", "trendingNow"); ?> #}
       </header>
@@ -133,14 +139,14 @@
               <a href="http://www.stumbleupon.com/stumbler/imagepush/" target="_blank" title="Follow us on StumbleUpon"><img src="/images/icons/32/StumbleUpon.png" alt="" height="32" /></a>
               #}
             </p>
-            {# <? /* <p class="more"><a href="#">View more subscribing options</a></p> */ ?> #}
+            {# <p class="more"><a href="#">View more subscribing options</a></p> #}
           </form>
         </section>
         <figure>
-          {# <?php include_html_code('right_300x250'); ?> #}
+          {{ siteHelper.html('right_300x250') }}
         </figure>
 
-        {# <?php include_html_code('facebook_likebox', true); ?> #}
+        {{ siteHelper.html('facebook_likebox') }}
 
       </aside>
       <div class="footerFix"></div>
@@ -184,3 +190,4 @@
 
   </body>
 </html>
+{# {% endspaceless %} #}

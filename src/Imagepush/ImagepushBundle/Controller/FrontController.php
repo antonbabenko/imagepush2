@@ -6,10 +6,35 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Doctrine\ORM\EntityRepository;
 
 class FrontController extends Controller
 {
+
+  /**
+   * @Route("/", name="index")
+   * @Template()
+   */
+  public function indexAction()
+  {
+    
+    $images = $this->get('imagepush.images')->getLatestImages(7);
+    //\D::dump($images);
+    
+    return array("images" => $images);
+  }
+
+  /**
+   * @Route("/upcoming", name="viewUpcoming")
+   * @Template()
+   */
+  public function viewUpcomingAction()
+  {
+    
+    $images = $this->get('imagepush.images')->getLatestImages(7);
+    \D::dump($images);
+    
+    return array("images" => $images);
+  }
 
   /**
    * @Route("/vis/{id}", name="viewProperty")
@@ -47,46 +72,6 @@ class FrontController extends Controller
     //\D::dump($parts[0]->getTypeId());
 
     return array("property" => $property, "propertyAvailability" => new PropertyAvailability);
-  }
-
-  /**
-   * @Route("/", name="index")
-   * @Template()
-   */
-  public function indexAction()
-  {
-/*
-    $searchForm = $this->createFormBuilder()
-      //->add('name', 'text')
-      ->add('county', 'entity', array(
-        'class' => 'NeBundle:County',
-        'query_builder' => function(EntityRepository $er)
-        {
-          return $er->createQueryBuilder('c')->orderBy('c.id', 'ASC');
-        },
-        'multiple' => true,
-        'expanded' => true,
-      ))
-      ->add('type', 'entity', array(
-        'class' => 'NeBundle:PropertyType',
-        'query_builder' => function(EntityRepository $er)
-        {
-          return $er->createQueryBuilder('t')->where('t.id <= 4')->orderBy('t.id', 'ASC');
-        },
-        'property' => 'name',
-        'multiple' => true,
-        'expanded' => true,
-      ))
-      ->add('from_size', 'integer', array(
-        'required' => false,
-      ))
-      ->add('to_size', 'integer', array(
-        'required' => false,
-      ))
-      ->getForm();
-
-    return array('search' => $searchForm->createView());*/
-    return array();
   }
 
   /**
