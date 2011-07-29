@@ -39,16 +39,16 @@ function rawurlencode (str) {
 Imagepush.Share = function() {
   /*
   var verticalShare = jQuery("#verticalShare");
-  var horisontalShare = jQuery("#horisontalShare");
+  var horizontalShare = jQuery("#horizontalShare");
   var bodyContainer = jQuery("#body");
 
   if (bodyContainer.offset().left > verticalShare.width()) {
     verticalShare.css("left", bodyContainer.offset().left).show();
-    horisontalShare.hide();
+    horizontalShare.hide();
   }
   else {
     verticalShare.hide();
-    horisontalShare.show();
+    horizontalShare.show();
   }
   jQuery(document).scrollTop(jQuery(document).scrollTop() + 1);
   jQuery(document).scrollTop(jQuery(document).scrollTop() - 1);

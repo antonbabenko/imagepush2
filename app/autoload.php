@@ -15,6 +15,9 @@ $loader->registerNamespaces(array(
     'Assetic'          => __DIR__.'/../vendor/assetic/src',
     'Metadata'         => __DIR__.'/../vendor/metadata/src',
   
+    'Snc'              => __DIR__.'/../vendor/bundles',
+    'Predis'           => __DIR__.'/../vendor/predis/lib',
+  
     'Imagepush'        => __DIR__.'/../src',
 
 ));

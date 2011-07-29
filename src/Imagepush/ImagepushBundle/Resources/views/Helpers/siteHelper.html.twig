@@ -1,0 +1,7 @@
+{% macro html(key, always_show) %}
+
+{% if always_show|default(false) %}
+  {% include 'ImagepushBundle:Helpers:_' ~ key ~ '.html.twig' %}
+{% endif %}
+
+{% endmacro %}

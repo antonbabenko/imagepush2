@@ -2,6 +2,79 @@
 
 {% block content %}
 
-<a href="{{ path('viewProperty', {'id': 717}) }}">View property</a>
+{% if images %}
+
+  <section class="additionalContent"><div class="contentWrapper">
+      <aside class="related">
+        <div class="relatedBg"></div>
+        <section class="thumbnails">
+          <h3>LATEST HITS</h3>
+          <ul id="prev_images">
+            {% for image in images %} 
+            {% if loop.index > 1 and loop.index <= 4 %}
+            <li>
+              <div class="thumbWrapper">
+                <details class="no_vote"> {# open="open" #}
+                  <span class="imgDescription">{{image.title}}</span>
+                </details>
+                <a href="{{image._view_url}}" title="{{image.title}}" class="imgWrapper">
+                  <img src="{{image._thumb_img}}" width="140" height="140" alt="{{image.title}}" />
+                  <span class="imgDescription"><span>{{image.title}}</span></span>
+                </a>
+              </div>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+          </ul>
+          <a href="{{ path('viewUpcoming') }}" class="btn-more">View upcoming images</a>
+        </section>
+      </aside>
+       
+      <div id="main_image">
+      <header>
+        <div class="category">
+          <div class="addthis_toolbox addthis_default_style" addthis:url="{{images.0._share_url}}" addthis:title="{{images.0.title}}" addthis:description="{{images.0.title}}">
+          <a class="addthis_button_facebook_like" fb:like:href="http://imagepush.to" fb:like:layout="button_count" fb:like:show_faces="false" fb:like:width="80" fb:like:font="trebuchet+ms" fb:like:action="like"></a><br>
+          </div>
+        </div>
+        <ul>
+          <li><h1 id="main_image_title">{{images.0.title}}</h1></li>
+        </ul>
+      </header>
+      <a href="{{images.0._view_url}}" id="main_image_link">
+        <figure class="bigImg">
+          <img src="{{images.0._main_img}}" alt="{{images.0.title}}" id="main_image_img" width="{{images.0.m_width < 463 ? images.0.m_width : 463}}" />
+        </figure>
+      </a>
+
+      {{ shareHelper.horizontal(images.0, 'small') }}
+        
+      </div>
+      <div class="fclear"></div>
+
+    </div></section>
+  <!-- # end of latest images -->
+
+
+{% else %}
+  <p>There are no images to show.
+{% endif %}
+
+{#
+<div style="margin: 15px 0;">
+  <?php include_html_code('digg_widget_wide', true); ?>
+</div>
+
+<div style="text-align: center">
+<figure>
+  <?php include_html_code('wide_468x60'); ?>
+</figure>
+</div>
+#}
+
+<?php include_component("image", "thumbBox", array("with_ads" => 1)); ?>
+
+{# <a href="{{ path('viewProperty', {'id': 717}) }}">View property</a> #}
 
 {% endblock %}

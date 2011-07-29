@@ -58,8 +58,28 @@ jms_security_extra:
     secure_controllers:  true
     secure_all_services: false
 
-
+# Redis DB
+snc_redis:
+    connections:
+        default:
+            alias: default
+            host: 127.0.0.1
+            port: 6379
+            database: 0
+            #password: HeReisTHEMegasuperPuperPassw0rd8595$$@ssssdg7&&.,m!!m
+            connection_timeout: 5
+            read_write_timeout: 30
+            logging: %kernel.debug%
+    clients:
+        default:
+            alias: default
+            connection: default
+            
 services:
+    imagepush.images:
+        class: Imagepush\ImagepushBundle\Services\Images
+        arguments: [@snc_redis.default_client]
+
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:

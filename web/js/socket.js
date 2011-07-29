@@ -46,7 +46,7 @@ $(document).ready(function() {
         <a href="'+obj._view_url+'" id="main_image_link"><img src="'+obj._main_img+'" alt="'+obj.title+'" id="main_image_img" /></a>\
       </figure>';
 
-        main_image += '<section id="horisontalShareSmall">\
+        main_image += '<section id="horizontalShareSmall">\
   <ul>\
     <li style="width: 70px;">Share this</li>\
     <li>\

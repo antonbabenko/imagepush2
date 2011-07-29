@@ -27,8 +27,6 @@ class PropertyFile
   private $property;
   /**
    * @var string $type
-   * 
-   * Type can be image or document
    *
    * @ORM\Column(name="type", type="string", length=20)
    */

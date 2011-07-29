@@ -186,15 +186,4 @@ class PropertyPart
     return $this->property;
   }
 
-  /**
-   * Set correct type id.
-   * In legacy database we had some ids, which in new should be grouped in one ("Annet" = id 11)
-   *
-   * @return integer $typeId
-   */
-  public function setCorrectTypeId($typeId)
-  {
-    $this->typeId = ($typeId <= 4 ? $typeId : 11);
-  }
-
 }
