@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
+<head>
+    <title>Imagepush.to - Best images hourly</title>
+
+    <meta name="author" content="Anton Babenko (Imagepush.to)" />
+    <meta name="description" content="Every hour we publish best image from the web" />
+    <meta name="keywords" content="best, images, fun, offbeat, odd news, lifestyle" />
+    <meta name="inline" content="true" />
+    <meta name="apiVersion" content="1.0" />
+    <meta name="debugMode" content="false" />
+
+    <link rel="icon" href="http://imagepush.to/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="http://www.netvibes.com/themes/uwa/style.css" />
+    <script type="text/javascript" src="http://www.netvibes.com/js/UWA/load.js.php?env=Standalone"></script>
+
+    <style type="text/css" media="screen">
+    .imagepush img {
+        border: none;
+        width: 100%;
+        -ms-interpolation-mode: bicubic;
+    }
+    .imagepush a, .imagepush a:hover {
+        border: none;
+    }
+    </style>
+
+    <script type="text/javascript">
+
+    var Imagepush = {}
+
+    Imagepush.load = function() {
+       UWA.Data.getFeed("http://feeds.feedburner.com/imagepush_rss2", Imagepush.onDataResponse);
+    }
+
+    Imagepush.onDataResponse = function(feed) {
+      
+      var text = feed.items[0].content;
+      text = text.replace(/ width="\d+"/, '');
+      text = text.replace(/ height="\d+"/, '');
+      text = text.replace(/<\/a>.*/, '</a>');
+      //alert(text);
+      widget.setBody(text);
+
+      widget.setTitle(feed.items[0].title + " - Best images hourly");
+
+      widget.body.style.padding = "0";
+
+    }
+
+    widget.onLoad = function() {
+        widget.body.addClassName('imagepush');
+        Imagepush.load();
+    }
+
+    /**
+     * The widget onRefresh method is called at each interval defined by "autoRefresh" property
+     * or when the user has clicked the refresh button in the widget title.
+     **/
+    widget.onRefresh = function() {
+        Imagepush.load();
+    }
+
+    /**
+     * The widget onResize method is called when the widget dimensions has changed
+     * (browser resized, columns resized, sidebar opened/closed)
+     **/
+    widget.onResize = function() {
+       var elements = widget.body.getElementsByTagName("img");
+       var image = elements[0];
+       if (image) {
+            image.width = 1;
+            image.width = widget.body.getDimensions().width;
+        }
+    }
+
+    </script>
+</head>
+<body>
+    <p>Loading...</p>
+</body>
+</html>
