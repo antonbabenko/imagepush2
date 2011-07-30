@@ -5,16 +5,16 @@
     <section class="additionalContent"><div class="contentWrapper">
     <header>
       <h3>
-        {% if _tags is none %}
+        {% if _tags|length == 0 %}
         LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag}) }}">{{group.tag}}</a>
         {% else %}
         RELATED IMAGES BY {{group.used_tags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
-
+        
         {% for tag in group.used_tags %}
         {% set tag = tag|replace({"\n": " "})|lower %}
         <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>
         {% endfor %}
-        
+
         {% endif %}
       </h3>
       <!-- <a href="#" class="rss">Subscribe to RSS</a> -->

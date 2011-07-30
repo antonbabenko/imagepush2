@@ -150,6 +150,21 @@ class FrontController extends Controller
     
     //\D::dump($_tags);
     
+    /*
+    if (isset($this->_tags) && is_array($this->_tags)) { // images on the same tags as main one
+      if (count($this->_tags)) {
+        $tags = $this->_tags;
+        $group_by_tags = false;
+      } else {
+        return array();
+      }
+    } else {
+      $tags = Tags::getLatestTrends(100);
+      $group_by_tags = true;
+    }
+*/
+    
+    //\D::dump($_tags);
     if (count($_tags)) {
       $tags = $_tags;
       $group_by_tags = false;
@@ -200,6 +215,7 @@ class FrontController extends Controller
       }
     }
     
+    // Images related to other images by tags are not grouped
     if (!$group_by_tags && count($all_images)) {
       $all_images_list = $used_tags = array();
       foreach ($all_images as $images) {
