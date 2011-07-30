@@ -1,0 +1,21 @@
+{# <? /* <div id="fb-root"></div>
+<script src="http://connect.facebook.net/en_US/all.js#appId=118412418235312&amp;xfbml=1"></script>
+<fb:comments href="<?php echo $href; ?>" num_posts="3" width="635" notify="true"></fb:comments>
+*/ ?>
+#}
+
+{% if settings.show_comments %}
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({appId: '118412418235312', status: true, cookie: true, xfbml: true});
+  };
+  (function() {
+    var e = document.createElement('script'); e.async = true;
+    e.src = document.location.protocol +
+      '//connect.facebook.net/en_US/all.js';
+    document.getElementById('fb-root').appendChild(e);
+  }());
+</script>
+<fb:comments href="{{href}}" num_posts="20" width="635"></fb:comments>
+{% endif %}

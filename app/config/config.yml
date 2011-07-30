@@ -20,6 +20,12 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
+    
+    # Settings to use in templates
+    globals:
+      settings:
+        show_banners_and_static_helpers: true
+        show_comments: true
 
 # Assetic Configuration
 assetic:
@@ -74,11 +80,17 @@ snc_redis:
         default:
             alias: default
             connection: default
+            options:
+              profile: 2.2
             
 services:
     imagepush.images:
         class: Imagepush\ImagepushBundle\Services\Images
-        arguments: [@snc_redis.default_client]
+        arguments: [@kernel, @snc_redis.default_client]
+
+    imagepush.tags:
+        class: Imagepush\ImagepushBundle\Services\Tags
+        arguments: [@kernel, @snc_redis.default_client]
 
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug

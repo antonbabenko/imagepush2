@@ -93,7 +93,9 @@
         <div class="search_box">
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>
-        {# <?php include_component("image", "trendingNow"); ?> #}
+        
+        {% render "ImagepushBundle:Front:_trendingNow" with {'max': 20} %}
+        
       </header>
 
       {#
@@ -186,6 +188,7 @@
     </script>
     <script src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
     {% endraw %}
+    
     {# <?php a_include_javascripts(); ?> #}
 
   </body>
