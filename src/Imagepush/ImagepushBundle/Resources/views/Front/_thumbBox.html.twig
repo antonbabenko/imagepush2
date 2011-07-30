@@ -1,0 +1,44 @@
+{% if all_images is defined %}
+  {% for group in all_images %}
+    {% if group.images is defined %}
+
+    <section class="additionalContent"><div class="contentWrapper">
+    <header>
+      <h3>
+        {% if _tags is none %}
+        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag}) }}">{{group.tag}}</a>
+        {% else %}
+        RELATED IMAGES BY {{group.used_tags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
+
+        {% for tag in group.used_tags %}
+        {% set tag = tag|replace({"\n": " "})|lower %}
+        <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>
+        {% endfor %}
+        
+        {% endif %}
+      </h3>
+      <!-- <a href="#" class="rss">Subscribe to RSS</a> -->
+    </header>
+    <section class="thumbnails">
+      <ul>
+        {% for image in group.images %}
+        <li>
+          <div class="thumbWrapper">
+            <details class="no_vote">
+              <span class="imgDescription">{{image.title}}</span>
+            </details>
+            <a href="{{image._view_url}}" title="{{image.title}}" class="imgWrapper">
+              <img src="{{image._thumb_img}}" width="140" height="140" alt="{{image.title}}" />
+              <span class="imgDescription"><span>{{image.title}}</span></span>
+            </a>
+          </div>
+        </li>
+
+        {% endfor %}
+      </ul>
+    </section>
+    </div></section>
+
+    {% endif %}
+  {% endfor %}
+{% endif %}

@@ -16,9 +16,7 @@ class FrontController extends Controller
    */
   public function indexAction()
   {
-    
-    $images = $this->get('imagepush.images')->getLatestImages(7);
-    //\D::dump($images);
+    $images = $this->get('imagepush.images')->getCurrentImages(7);
     
     return array("images" => $images);
   }
@@ -29,190 +27,192 @@ class FrontController extends Controller
    */
   public function viewUpcomingAction()
   {
-    
-    $images = $this->get('imagepush.images')->getLatestImages(7);
-    \D::dump($images);
-    
     return array("images" => $images);
   }
 
   /**
-   * @Route("/vis/{id}", name="viewProperty")
+   * @Route("/upcoming/{tag}", name="viewUpcomingByTag")
    * @Template()
    */
-  public function viewPropertyAction($id)
+  public function viewUpcomingByTagAction()
   {
-    // Access legacy DB:
-    /*
-      $property = $this->get('doctrine')
-      ->getEntityManager('legacy')
-      ->getRepository('NeLegacyBundle:Property')
-      ->findOneById($id);
-     */
-
-    // Access correct DB:
-    $property = $this->get('doctrine')
-      ->getEntityManager()
-      ->getRepository('NeBundle:Property')
-      ->findOneByPropertyId($id);
-
-    if (!$property)
-    {
-      throw new NotFoundHttpException('The property does not exist.');
-    }
-
-    //$descriptions = $property->getDescriptions();
-    //$a = $descriptions[0]->getName();
-    //$parts = $property->getParts();
-    //$a = $parts[0]->getName();
-    //$images = $property->getImages();
-    //\D::dump($images);
-    //$a = $images[0]->getFilename();
-    //\D::dump($parts[0]->get);
-    //\D::dump($parts[0]->getTypeId());
-
-    return array("property" => $property, "propertyAvailability" => new PropertyAvailability);
+    return array("images" => $images);
   }
 
   /**
-   * @Route("/search", name="searchResult")
+   * @Route("/tag/{tag}", name="viewByTag")
    * @Template()
    */
-  public function searchResultAction()
+  public function viewByTagAction($tag)
   {
+    $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => $tag));
+    
+    return $response;
+  }
+  
+  /**
+   * @Template()
+   */
+  public function viewMultipleAction($tag, $type = "current")
+  {
+    
+    //\D::dump($tag);
+    //return array();
+    
+    $params = array();
 
-    $propertyFinder = $this->get('foq_elastica.finder.website.property');
-    $municipalityFinder = $this->get('foq_elastica.finder.website.municipality');
+    //$this->tag = $request->getParameter("tag");
+    //$this->page_type = $request->getParameter("type", "current");
+    $redis = $this->get('snc_redis.default_client');
 
-    $form = $this->get('request')->get('form');
+    $another_page_type_count = 0;
 
-    $queryFields = array();
+    if (!is_null($tag)) {
+      $params = array("tag" => $tag);
 
-    if (!empty($form["county"]))
-    {
+      $tag_key = $this->get('imagepush.tags')->getTagKey($tag);
 
-      $counties = array_filter(
-        array_map(
-          function($value)
-          {
-            return (is_int($value) && $value >= 1 && $value <= 19 ? "countyId:" . $value : false);
-          }, array_keys($form["county"])
-        )
-      );
+      // if tag has been ever created
+      $count = $redis->zscore("tag_usage", $tag_key);
+      if (!$count) {
+        $this->createNotFoundException(sprintf('There are no images to show by tag: %s', $tag));
+      }
 
-      // Get all municipalities in specified counties
-      if (!empty($counties))
+      // if there are images to show in opposite page_type (f.eg: show "upcoming" link when view "current" page).
+      if ($type == "current") {
+        $tag_set = "upcoming_image_list:".$tag_key;
+      } else {
+        $tag_set = "image_list:".$tag_key;
+      }
+
+      $another_page_type_count = $redis->zcard($tag_set);//, $tag_key);
+      
+    }
+
+    if ($type == "current") {
+      $images = $this->get('imagepush.images')->getCurrentImages(30, $params);
+    } else {
+      $images = $this->get('imagepush.images')->getUpcomingImages(30, $params);
+    }
+    //\D::dump($images);
+    
+    return array("images" => $images, "type" => $type, "tag" => $tag, "another_page_type_count" => $another_page_type_count);
+  }
+
+  /**
+   * @Route("/i/{id}/{slug}", name="viewImage")
+   * @Template()
+   */
+  public function viewImageAction($id)
+  {
+    $image = $this->get('imagepush.images')->getOneImage($id);
+
+    if (!$image) {
+      $this->createNotFoundException('Image doesn\'t exist');
+    }
+
+    $next_image = $this->get('imagepush.images')->getOneImageRelatedToTimestamp("next", $image["timestamp"]);
+    $prev_image = $this->get('imagepush.images')->getOneImageRelatedToTimestamp("prev", $image["timestamp"]);
+
+    return array("image" => $image, "next_image" => $next_image, "prev_image" => $prev_image);
+  }
+
+  /**
+   * Display top box with trending tags
+   * 
+   * @Template()
+   */
+  public function _trendingNowAction($max = 20)
+  {
+    $tags = $this->get('imagepush.tags')->getLatestTrends($max);
+    //\D::dump($tags);
+      
+    return array("tags" => $tags);
+  }
+
+  /**
+   * Display comment box
+   * 
+   * @Template()
+   */
+  public function _commentsAction($href)
+  {
+    return array("href" => $href);
+  }
+
+  /**
+   * Display thumb box
+   * 
+   * @Template()
+   */
+  public function _thumbBoxAction($_tags = array(), $skip_image_id = false)
+  {
+    
+    //\D::dump($_tags);
+    
+    if (count($_tags)) {
+      $tags = $_tags;
+      $group_by_tags = false;
+    } else {
+      $tags = $this->get('imagepush.tags')->getLatestTrends(100);
+      $group_by_tags = true;
+    }
+
+    if (!count($tags)) {
+      return;
+    }
+
+    $total_images = 0;
+    $all_images = $used_images = array();
+
+    // skip main image
+    if (isset($skip_image_id)) {
+      $used_images[] = $skip_image_id;
+    }
+
+    foreach ($tags as $tag) {
+
+      if (count($all_images) >= 10) break;
+
+      $tag_images = array();
+
+      $images = $this->get('imagepush.images')->getCurrentImages(20, array("tag" => $tag));
+
+      //\D::dump($images);
+      if (count($images) >= 2) // 4
       {
-        //\D::dump($counties);
+        // make sure that each image is shown just once in all tags, if image belongs to multiple tags
+        foreach ($images as $image) {
 
-        $countiesQueryString = implode(' ', $counties);
+          if (count($tag_images) == 4) break;
 
-        $q = new Elastica_Query(new Elastica_Query_QueryString($countiesQueryString));
-        $q->setSize(99999);
-
-        $municipalities = $municipalityFinder->find($q);
-
-        //\D::dump($q->getQuery());
-        //\D::dump($municipalities);
-
-        if (count($municipalities))
-        {
-          foreach ($municipalities as $oneMunicipality) {
-            $municipalityIds[] = $oneMunicipality->getMunicipalityId();
+          if (!in_array($image["id"], $used_images)) {
+            $tag_images[] = $image;
+            $used_images[] = $image["id"];
           }
-          //\D::dump($municipalityIds);
         }
+
+        if (count($tag_images) >= 3) {
+          $all_images[] = array("tag" => $tag, "images" => $tag_images);
+        }
+
+        $total_images += count($tag_images);
       }
     }
-
-    // Property types
-    if (!empty($form["type"]))
-    {
-
-      $types = array_filter(array_map(function($value)
-          {
-            return (is_int($value) && $value >= 1 && $value <= 15 ? $value : false);
-          }, array_keys($form["type"])));
-
-      //\D::dump($types);
-    }
-
-
-    //\D::dump($queryFields);
-
-
-    $queryString = new \Elastica_Query_MatchAll();
-    //$queryString->setDefaultOperator("AND");
-    //$queryString->setQueryString('name:Oslo'); //implode(' OR ', $municipalityFields));//  . " AND name:Oslo");
-
-    $filter = new \Elastica_Filter_And();
-    if (!empty($municipalityIds))
-    {
-      $filter1 = new \Elastica_Filter_Or();
-      foreach ($municipalityIds as $municipalityId) {
-        $municipalityFilter = new \Elastica_Filter_Term(array('municipalityId' => $municipalityId));
-        $filter1->addFilter($municipalityFilter);
-      }
-      $filter->addFilter($filter1);
-    }
-
-    if (!empty($types))
-    {
-      $filter2 = new \Elastica_Filter_Or();
-      foreach ($types as $type) {
-        $typeFilter = new \Elastica_Filter_Term(array('searchPartTypes' => $type));
-        $filter2->addFilter($typeFilter);
-      }
-      $filter->addFilter($filter2);
-    }
-
-    $query = new \Elastica_Query();
-    $query->setQuery($queryString);
     
-    if (!empty($filter1) || !empty($filter2)) {
-      $query->setFilter($filter);
+    if (!$group_by_tags && count($all_images)) {
+      $all_images_list = $used_tags = array();
+      foreach ($all_images as $images) {
+        $used_tags[] = $images["tag"];
+        $all_images_list = array_merge($all_images_list, $images["images"]);
+      }
+      unset($all_images);
+      $all_images[] = array("used_tags" => $used_tags, "images" => $all_images_list);
     }
 
-    //\D::dump($query->getQuery());
+    //\D::dump($all_images);
 
-    //$query->setQuery($queryString);
-    //$query->setFilter($typeFilter);
-    //$query->setSize(3);
-    //$query->setSort(array("createdAt" => "asc"));
-//$query->setExplain(true);
-
-
-    $facet = new \Elastica_Facet_Range('price');
-    $facet->setField("price");
-    $facet->setGlobal(false);
-    $facet->setRanges(array(
-      array("from" => 0, "to" => 2000000),
-      array("from" => 2000001, "to" => 5000000),
-      array("from" => 5000001, "to" => 10000000),
-      array("from" => 10000001, "to" => 20000000),
-      array("from" => 20000001, "to" => 30000000),
-      array("from" => 30000001, "to" => 40000000),
-      array("from" => 40000001),
-    ));
-    
-    // totalSize is from 20 to 20000, if no size has been defined
-
-    $query->addFacet($facet);
-
-    //\D::dump($query->toArray());
-    //$results = $propertyFinder->find('name:oslo', 20);
-
-    $results = $propertyFinder->find($query);
-    $count = $this->get('foq_elastica.index.website.property')->count($query);
-
-    $search = $this->get('foq_elastica.index.website.property')->search($query);
-
-    //\D::dump($facet->toArray());
-    //\D::dump($search->getFacets());
-    //\D::dump($results);
-    //\D::dump($search->getResults());
-
-    return array("results" => $results, "count" => $count, "facets" => $search->getFacets());
+    return array("all_images" => $all_images, "_tags" => $_tags, "skip_image_id" => $skip_image_id);
   }
 
 }

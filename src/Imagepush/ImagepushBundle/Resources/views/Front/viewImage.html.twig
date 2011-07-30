@@ -1,0 +1,123 @@
+{% extends "ImagepushBundle::layoutFront.html.twig" %}
+
+{% block content %}
+{#
+<?php
+//D::dump($image);
+
+$raw_image = $sf_data->getRaw("image");
+if (!empty($raw_image["_tags"]))
+{
+  $raw_tags = str_replace('"', "'", implode(",", array_map("prepare_tag", $raw_image["_tags"])));
+  slot("meta_keywords", $raw_tags);
+}
+?>
+<?php slot("image_src", $image["_main_img"]); ?>
+<?php slot("og_title", $image["title"]); ?>
+<?php slot("og_image", $image["_thumb_img"]); ?>
+<?php slot("og_url", $image["_share_url"]); ?>
+#}
+
+<section id="mainContent">
+  <div class="contentWrapper">
+    <article>
+      <header>
+        {# <?/*
+        <div class="category">
+          <div class="addthis_toolbox addthis_default_style addthis_32x32_style" addthis:url="<?php echo $image["_share_url"]; ?>" addthis:title="<?php echo $image["title"]; ?>" addthis:description="<?php echo $image["title"]; ?>">
+          <!-- a class="addthis_button_expanded"></a -->
+          <a class="addthis_counter addthis_bubble_style"></a>
+          </div>
+          <a href="http://twitter.com/share" class="twitter-share-button" data-url="<?php echo $image["_share_url"]; ?>" data-text="<?php echo $image["title"]; ?>" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+          &nbsp;<iframe src="http://www.facebook.com/plugins/like.php?href=<?php echo rawurlencode($image["_share_url"]); ?>&amp;layout=button_count&amp;show_faces=false&amp;width=50&amp;font=trebuchet+ms&amp;action=like&amp;colorscheme=light&amp;height=20" style="border:none; overflow:hidden; width:50px; height:20px;"></iframe>
+
+        </div>
+           */ ?> #}
+        <ul>
+          <li><a href="{{ path('index') }}">Home</a> /</li>
+          <li><h1>{{image.title}}</h1></li>
+        </ul>
+        <div class="headerMeta">
+          <time datetime="{{image.timestamp|date(constant('DATE_ATOM'))}}">
+            <strong>Published:</strong> {{image.timestamp|date('Y/m/d \\a\\t H:i')}}
+          </time>
+          <nav>
+            {% if prev_image != none %}
+            <a href="{{ path('viewImage', {'id': prev_image.id, 'slug': prev_image.slug}) }}" class="prev">Previous image</a>
+            {% else %}
+            <a href="#" onclick="return false;" class="prev disabled">Previous image</a>
+            {% endif %}
+            |
+            {% if next_image != none %}
+            <a href="{{ path('viewImage', {'id': next_image.id, 'slug': next_image.slug}) }}" class="next">Next image</a>
+            {% else %}
+            <a href="#" onclick="return false;" class="next disabled">Next image</a>
+            {% endif %}
+          </nav>
+        </div>
+      </header>
+      
+      {{ shareHelper.horizontal(image, 'large') }}
+      
+      <div style="text-align:center;">
+        <figure class="bigImg">
+          <img src="{{image._article_img}}" alt="{{image.title}}" width="{{ image.a_width < 625 ? image.a_width : 625}}" />
+        </figure>
+
+        {% render "ImagepushBundle:Front:_comments" with {'href': image._share_url} %}
+        
+      </div>
+
+      <footer>
+        <br><div class="source">Fetched from <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image._original_host|replace({'www.': ''}) }}</a></div>
+        {# <?php /* if (!empty($image["_tags"])): ?>
+        <div class="tags">Tags:
+          <?php foreach ($image["_tags"] as $tag): ?>
+          <a href="#" title="<?php echo addslashes(mb_strtolower($tag)); ?>"><?php echo mb_strtolower($tag); ?></a>
+          <?php endforeach; ?>
+        </div> ?>
+        <?php endif; */ ?> #}
+      </footer>
+    </article>
+{#
+    <?php /* ?>
+    <div id="collapsable_comments" style="display:none;">
+    <hr />
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    var disqus_shortname = 'imagepush';
+    var disqus_identifier = '<?php echo "image_".$image["id"]; ?>';
+    var disqus_url = '<?php echo $image["_share_url"]; ?>';
+    var disqus_title = '<?php echo $image["title"]; ?>';
+    //var disqus_developer = 1;
+
+    // DON'T EDIT BELOW THIS LINE
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    </div>
+
+    <p><a href="#" id="show_comments_link" onmousedown="if(document.getElementById('collapsable_comments').style.display == 'none'){ document.getElementById('collapsable_comments').style.display = 'block'; document.getElementById('show_comments_link').style.display = 'none'; }">Add comment</a>
+    <?php */?> #}
+  </div>
+</section>
+
+{#
+<?php /*
+<div style="text-align: center">
+<figure>
+  <?php include_html_code('wide_468x60'); ?>
+</figure>
+</div>
+*/ ?>
+
+<?php include_component("image", "thumbBox", array("_tags" => $image["_tags"], "skip_image_id" => $image["id"], "with_ads" => 1)); ?>
+#}
+
+
+{% render "ImagepushBundle:Front:_thumbBox" with {'_tags': image._tags, 'skip_image_id': image.id} %}
+
+{% endblock %}

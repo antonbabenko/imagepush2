@@ -1,6 +1,6 @@
 {% macro html(key, always_show) %}
 
-{% if always_show|default(false) %}
+{% if settings.show_banners_and_static_helpers or always_show|default(false) %}
   {% include 'ImagepushBundle:Helpers:_' ~ key ~ '.html.twig' %}
 {% endif %}
 

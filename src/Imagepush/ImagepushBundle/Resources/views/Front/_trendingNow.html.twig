@@ -1,0 +1,16 @@
+{% if tags %}
+<div class="slogan"><a href="{{ path('viewUpcoming') }}" title="Upcoming images" class="active">Trending now:</a></div>
+<nav>
+  <ul>
+    {# <li><a href="<?php echo url_for("@homepage"); ?>" title="Home" class="active">Home</a></li> #}
+    {% for tag in tags %}
+
+    {% set tag = tag|replace({"\n": " "})|lower %}
+
+    <li>
+      <a href="{{ path('viewUpcomingByTag', {'tag': tag}) }}" {{ app.request.get('tag') == tag ? 'class="active"' : '' }}>{{ tag }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
