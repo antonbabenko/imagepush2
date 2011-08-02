@@ -5,9 +5,7 @@ namespace Imagepush\ImagepushBundle\Services;
 class Images
 {
   
-  private $router;
-  private $redis;
-  private $tags;
+  private $router, $redis, $tags;
   
   public function __construct(\AppKernel $kernel) {
     
@@ -19,36 +17,73 @@ class Images
     
   }
   
+  /**
+   * Get image key for db lookup
+   * @return string
+   */
   public function getImageKey($id = "")
   {
     return "image_id:" . ($id == "" ? $this->getImageId() : $id);
   }
   
+  /**
+   * Get next image id
+   * @return integer
+   */
   public function getImageId()
   {
     return (int)$this->redis->get('image_id');
   }
-
-  public function getCurrentImages($limit = 20, $params = array()) {
-
+  
+  /*
+   * @return array()
+   */
+  public function getImages($type, $limit = 20, $params = array()) {
+    
+    if (!in_array($type, array("current", "upcoming"))) {
+      throw new \ErrorException(sprintf("Incorrect image type: %s", $type));
+    }
+    
+    if (!is_array($params)) {
+      throw new \ErrorException(sprintf("Params should be an array, but %s given", gettype($params)));
+    }
+    
+    if ($type == "current") {
+      $fieldName = "image_list";
+      $filterDislikedImages = false;
+    } else {
+      $fieldName = "upcoming_image_list";
+      $filterDislikedImages = true;
+    }
+    
     extract($params);
 
-    $tag_key = (isset($tag) ? $this->tags->getTagKey($tag) : '');
+    if (isset($tag)) {
+      $fieldName .= ':'.$this->tags->getTagKey($tag);
+    }
 
-    $image_keys = $this->redis->zrevrangebyscore('image_list'.($tag_key ? ":".$tag_key : ""), "+inf", "-inf", array("LIMIT" => array(0, $limit)));
+    $image_keys = $this->redis->zrevrangebyscore($fieldName, "+inf", "-inf", array("LIMIT" => array(0, $limit)));
     //\D::dump($image_keys);
 
     $images = array();
     
+    if ($filterDislikedImages) {
+      $image_keys = $this->filterDislikedImages($image_keys);
+    }
+
     foreach ($image_keys as $key) {
       $image = $this->redis->hgetall($key);
       $images[] = $this->normalizeImage($image);
     }
 
+    
     return $images;
-
+    
   }
   
+  /*
+   * @return array()|false
+   */
   public function getOneImage($id) {
 
     $key = $this->getImageKey($id);
@@ -63,6 +98,9 @@ class Images
 
   }
 
+  /*
+   * @return array()|false
+   */
   public function getOneImageRelatedToTimestamp($direction, $timestamp) {
 
     if (!$timestamp || !in_array($direction, array("next", "prev"))) return false;
@@ -82,6 +120,23 @@ class Images
 
   }
 
+  /*
+   * Filter out images current user disliked
+   * @return array()
+   */
+  public function filterDislikedImages($image_keys = array()) {
+
+    $user = $_SERVER["REMOTE_ADDR"];
+
+    $disliked = $this->redis->smembers("user_dislikes:".$user);
+
+    if (count($disliked)) {
+      $image_keys = array_diff($image_keys, $disliked);
+    }
+
+    return $image_keys;
+
+  }
   
   /////
   public static function getFileUrl($image, $format = "thumb") {

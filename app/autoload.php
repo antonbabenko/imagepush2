@@ -17,6 +17,7 @@ $loader->registerNamespaces(array(
   
     'Snc'              => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
+    'Zend'             => __DIR__.'/../vendor/zendframework2/library',
   
     'Imagepush'        => __DIR__.'/../src',
 
@@ -49,3 +50,11 @@ AnnotationRegistry::registerFile(__DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/M
 require_once __DIR__.'/../vendor/swiftmailer/lib/classes/Swift.php';
 Swift::registerAutoload(__DIR__.'/../vendor/swiftmailer/lib/swift_init.php');
 
+
+/**
+ * Fix for Zend Framework 1.x
+ */
+set_include_path(implode(PATH_SEPARATOR, array(
+    __DIR__.'/../vendor/zendframework2/library',
+    get_include_path()
+)));
