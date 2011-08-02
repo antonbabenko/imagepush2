@@ -1,6 +1,21 @@
 {% extends "ImagepushBundle::layoutFront.html.twig" %}
 
+{% block og_title %}
+<meta property="og:title" content="{{image.title}}" />
+<meta property="og:type" content="article" />
+{% endblock %}
+
+{% block og_image %}
+<meta property="og:image" content="{{image._thumb_img}}" />
+{% endblock %}
+
+{% block og_url %}
+<meta property="og:url" content="{{image._share_url}}" />
+<link rel="canonical" href="{{image._share_url}}" />
+{% endblock %}
+
 {% block content %}
+
 {#
 <?php
 //D::dump($image);

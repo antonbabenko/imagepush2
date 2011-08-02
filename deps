@@ -63,6 +63,9 @@
 
 
 
+[zendframework2]
+    git=git://github.com/zendframework/zf2.git
+
 [SncRedisBundle]
     git=git://github.com/snc/SncRedisBundle.git
     target=/bundles/Snc/RedisBundle

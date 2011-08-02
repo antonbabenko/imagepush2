@@ -2,6 +2,16 @@
 
 {% block content %}
 
+{% block og_title %}
+<meta property="og:title" content="{{'Best images hourly - ' ~ (page_type == 'upcoming' ? 'Upcoming' : 'Published') ~ (tag is none ? '' : ':' ~ tag)}}" />
+<meta property="og:type" content="article" />
+{% endblock %}
+
+{% block og_url %}
+<meta property="og:url" content="{{share_data._share_url}}" />
+<link rel="canonical" href="{{share_data._share_url}}" />
+{% endblock %}
+
 {#
 <?php
 
@@ -77,11 +87,10 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
                 </ul>
 
                 {% if image._tags|length %}
-                <span>Tags:
+                <p class="details">Tags:
                 {% for tag in image._tags %}
                   <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>&nbsp;
                 {% endfor %}
-                </span>
                 {% endif %}
 
               </header>

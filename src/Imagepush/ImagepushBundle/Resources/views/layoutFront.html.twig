@@ -26,9 +26,6 @@
       <meta name="keywords" content="<?php echo get_slot("meta_keywords"); ?>" />
     <?php endif; ?>
 
-    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
-    <?php //include_stylesheets() ?>
-    <?php //include_javascripts() ?>
     <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://feeds.feedburner.com/imagepush" />
     <meta name="google-site-verification" content="tT08cSzzAI9CaHWx62miVpZuZc9dI0sC5I6AD7AMKbo" />
 
@@ -40,24 +37,23 @@
     <meta property="og:site_name" content="Imagepush.to - Best images hourly" />
     <meta property="fb:admins" content="676763506" />
     <meta property="fb:app_id" content="118412418235312" />
+#}
 
-    <?php if ("@homepage" == $current_uri): ?>
+
+    {% if app.request.attributes.get('_route') == 'index' %}
       <meta property="og:type" content="website" />
+    {% else %}
+      {% block og_title %}{% endblock %}
+    {% endif %}
+
+    {% block og_image %}{% endblock %}
+    
+    {% block og_url %}
+      {% if app.request.attributes.get('_route') == 'index' %}
       <link rel="canonical" href="http://imagepush.to/" />
-    <?php elseif (has_slot("og_title")): ?>
-      <meta property="og:title" content="<?php echo get_slot("og_title"); ?>" />
-      <meta property="og:type" content="article" />
-    <?php endif; ?>
-
-    <?php if (has_slot("og_image")): ?>
-      <meta property="og:image" content="<?php echo get_slot("og_image"); ?>" />
-    <?php endif; ?>
-
-    <?php if (has_slot("og_url")): ?>
-      <meta property="og:url" content="<?php echo get_slot("og_url"); ?>" />
-      <link rel="canonical" href="<?php echo get_slot("og_url"); ?>" />
-    <?php endif; ?> #}
-
+      {% endif %}
+    {% endblock %}
+    
     <meta name="viewport" content="initial-scale=1.0, width=device-width">
 
     <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
