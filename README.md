@@ -15,6 +15,16 @@ cd redis-2.2.12
 make
 
 ---
+Install PEAR Digg Services:
+pear install -a -f -B pear.php.net/Services_Digg2-0.3.2
+pear install -a -f pear.php.net/HTTP_Request2-0.6.0
+pear install -a -f -B pear.php.net/HTTP_OAuth-0.1.18
+---
+
+1) Ссылки на картинки и на сайты беруться с digg и сохраняются в модели "DiggSource"
+2) "DiggSource" парсится периодически и публикуется в Images.
+
+---
 Helpful about DI:
 http://www.martinsikora.com/symfony2-and-dependency-injection
 

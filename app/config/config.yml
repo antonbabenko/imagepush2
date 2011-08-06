@@ -86,11 +86,19 @@ snc_redis:
 services:
     imagepush.images:
         class: Imagepush\ImagepushBundle\Services\Images
-        arguments: [@kernel, @snc_redis.default_client]
+        arguments: [@kernel]
 
     imagepush.tags:
         class: Imagepush\ImagepushBundle\Services\Tags
-        arguments: [@kernel, @snc_redis.default_client]
+        arguments: [@kernel]
+
+    imagepush.fetcher.digg:
+        class: Imagepush\ImagepushBundle\Services\Digg\DiggFetcher
+        arguments: [@kernel]
+
+    imagepush.fetcher.digg_services:
+        class: Imagepush\ImagepushBundle\Services\Digg\ImagepushServicesDigg2
+        #arguments: [@kernel]
 
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
