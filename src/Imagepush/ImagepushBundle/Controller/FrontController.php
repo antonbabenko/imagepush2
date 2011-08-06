@@ -34,7 +34,7 @@ class FrontController extends Controller
   }
 
   /**
-   * @Route("/upcoming/{tag}", name="viewUpcomingByTag")
+   * @Route("/tag/{tag}/upcoming", name="viewUpcomingByTag")
    * @Template()
    */
   public function viewUpcomingByTagAction($tag)
@@ -99,8 +99,15 @@ class FrontController extends Controller
     $images = $this->get('imagepush.images')->getImages($type, 30, $params);
 
     //\D::dump($images);
+    
+    //$share_url = $this->get('request')->getUri();
 
-    return array("images" => $images, "type" => $type, "tag" => $tag, "another_page_type_count" => $another_page_type_count);
+    return array(
+      "images" => $images,
+      "type" => $type,
+      "tag" => $tag,
+      "another_page_type_count" => $another_page_type_count);
+      //"share_url" => $share_url);
   }
 
   /**
@@ -120,6 +127,15 @@ class FrontController extends Controller
     $prev_image = $this->get('imagepush.images')->getOneImageRelatedToTimestamp("prev", $image["timestamp"]);
 
     return array("image" => $image, "next_image" => $next_image, "prev_image" => $prev_image);
+  }
+
+  /**
+   * @Route("/about", name="about")
+   * @Template()
+   */
+  public function aboutAction()
+  {
+    return array();
   }
 
   /**

@@ -63,6 +63,9 @@
 
 
 
+[digg]
+    git=git://github.com/digg/Services_Digg2.git
+
 [zendframework2]
     git=git://github.com/zendframework/zf2.git
 

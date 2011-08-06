@@ -1,16 +1,16 @@
 {% extends "ImagepushBundle::layoutFront.html.twig" %}
 
-{% block content %}
-
 {% block og_title %}
-<meta property="og:title" content="{{'Best images hourly - ' ~ (page_type == 'upcoming' ? 'Upcoming' : 'Published') ~ (tag is none ? '' : ':' ~ tag)}}" />
+<meta property="og:title" content="{{'Best images hourly - ' ~ (type == 'upcoming' ? 'Upcoming' : 'Published') ~ (tag is none ? '' : ':' ~ tag)}}" />
 <meta property="og:type" content="article" />
 {% endblock %}
 
 {% block og_url %}
-<meta property="og:url" content="{{share_data._share_url}}" />
-<link rel="canonical" href="{{share_data._share_url}}" />
+<meta property="og:url" content="{{app.request.getUri}}" />
+<link rel="canonical" href="{{app.request.getUri}}" />
 {% endblock %}
+
+{% block content %}
 
 {#
 <?php

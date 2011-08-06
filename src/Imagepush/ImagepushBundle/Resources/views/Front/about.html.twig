@@ -1,0 +1,55 @@
+{% extends "ImagepushBundle::layoutFront.html.twig" %}
+
+{% block content %}
+
+<section id="mainContent">
+  <div class="contentWrapper">
+    <article>
+      <header>
+        <ul>
+          <li><a href="/">Home</a> /</li>
+          <li><h1>About</h1></li>
+        </ul>
+      </header>
+
+      <h2>What is Imagepush.to?</h2>
+      <p>Imagepush.to is a service which helps users to stay updated with best quality images from the web based on community voices.
+        {#
+          <p>Each user can like or dislike any upcoming images, but only the most liked images publish on web-site permanently. Imagepush.to is trying to not publish images contains nude/porn or related content (yes, we do our best to prevent this). There is a limit of image dimensions (min. width: 450, min. height: 280, min. ratio: 0.3, max. ratio: 2.5).
+          <p>This site has been started with idea to make a service for users and for developers, who can interact with site's content via API.
+          <p>This site is running PHP, Symfony framework, Redis, Node.js, Socket.io, Apache HTTP Server, Debian Linux, Git and some other cool stuff.
+         #}
+      <p>Imagepush.to has been started in January 2011 by Anton Babenko and sponsored by <a href="http://www.web-developer.no/" target="_blank">web-developer.no</a>.
+      <p>All images placed on this site are copyrighted and the rights belong to their legal owners. If you are an owner of the site we took the content from and you want it to be removed, then don't put your images to the web next time. Our robot fetches just public images it can find online.
+
+        {#
+      <h2><a name="advert"></a> Advertising on the site</h2>
+      <p>There is one banner place of 300x250px. If your banner is not ugly or boring, then fill in the form below and we can discuss a deal.
+
+        
+        <?php use_helper("customErrors"); ?>
+        <?php if ($sf_user->getFlash("mail_sent")): ?>
+        <div class="messageBox"><span class="h2">Thank you! Your message has been successfully sent.</span></div>
+      <?php else: ?>
+            <form action="<?php echo url_for('@about') ?>" method="post" enctype="multipart/form-data">
+        <?php echo $form['_csrf_token'] ?>
+        <?php echo displayAllErrors($form); ?>
+            <dl>
+              <dt>Your name (required):</dt>
+              <dd><?php echo $form['name']->render(array("style" => "width:370px", "size" => 60)); ?></dd>
+              <dt>Your e-mail (required):</dt>
+              <dd><?php echo $form['email']->render(array("style" => "width:370px", "size" => 60)); ?></dd>
+              <dt>Subject:</dt>
+              <dd><?php echo $form['subject']->render(array("style" => "width:370px", "size" => 60)); ?></dd>
+              <dt>Message (required):</dt>
+              <dd><?php echo $form['message']->render(array("style" => "width:90%", "cols" => 90, "rows" => 8)); ?></dd>
+            </dl>
+            <input type="submit" value="Send" class="submit" />
+          </form>
+      <?php endif; ?>
+        #}
+    </article>
+  </div>
+</section>
+
+{% endblock %}

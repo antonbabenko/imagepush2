@@ -6,6 +6,12 @@
 front:
     resource: "@ImagepushBundle/Controller/FrontController.php"
     type:     annotation
+
+robot:
+    resource: "@ImagepushBundle/Controller/RobotController.php"
+    prefix:   /robot
+    type:     annotation
+    
 #
 #_imagine:
 #    resource: .

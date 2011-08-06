@@ -1,0 +1,1 @@
+curl --silent http://imagepush.to/robot.php/fetcher/releaseBestUpcomingImage

@@ -8,7 +8,7 @@
     {% set tag = tag|replace({"\n": " "})|lower %}
 
     <li>
-      <a href="{{ path('viewUpcomingByTag', {'tag': tag}) }}" {{ app.request.get('tag') == tag ? 'class="active"' : '' }}>{{ tag }}</a>
+      <a href="{{ path('viewUpcomingByTag', {'tag': tag|url_encode}) }}" {{ app.request.get('tag') == tag ? 'class="active"' : '' }}>{{ tag }}</a>
     </li>
     {% endfor %}
   </ul>
