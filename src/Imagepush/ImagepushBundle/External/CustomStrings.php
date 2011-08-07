@@ -16,67 +16,12 @@ class CustomStrings
 
   static protected $url_pattern =
     '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
+  
+  static protected $remove_start = '
+    The Underfold
+';
 
-  /**
-   * Modifies a string to remove all non ASCII characters and spaces.
-   */
-  static public function slugify($text)
-  {
-    // replace non letter or digits by -
-    $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
-    $text = trim($text, '-');
-
-    // transliterate
-    if (function_exists('iconv'))
-    {
-      $text = iconv('utf-8', 'us-ascii//TRANSLIT//IGNORE', $text);
-    }
-
-    // lowercase
-    if (function_exists('mb_strtolower')) {
-      $text = mb_strtolower($text, 'UTF-8');
-    } else {
-      $text = strtolower($text);
-    }
-
-    // remove unwanted characters
-    $text = preg_replace('~[^-\w]+~', '', $text);
-    if (empty($text))
-    {
-      return 'n-a';
-    }
-
-    return $text;
-  }
-
-  /*
-   * Check if text has words like "nsfw".
-   * | title here (nsfw) , for example, will return true
-   */
-  public static function isForbiddenTitle($text) {
-
-    return (bool)preg_match(self::$forbidden_endings_pattern, trim($text));
-    
-  }
-
-  public static function makeSafeRegexFromArray($values = array()) {
-    $result = array();
-    foreach ($values as $value) {
-      $value = trim($value);
-      if ($value != "") {
-        $result[] = str_replace("|", "\|", $value);
-      }
-    }
-    return $result;
-  }
-
-  /**
-   * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
-   */
-  static public function cleanTitle($text)
-  {
-
-    $ends = <<<EOF
+  static protected $remove_end = '
     The Oatmeal
     TheJourneyPoint
     Catastrophe Monitor
@@ -145,14 +90,71 @@ class CustomStrings
     Blogvibe
     State Gardienz
     koikoikoi.com - Visual Arts Magazine, graphic design, illustration, photography, interviews, inspiration, tutorials
-EOF;
+';
 
-    $starts = <<<EOF
-    The Underfold
-EOF;
+    
+  /**
+   * Modifies a string to remove all non ASCII characters and spaces.
+   */
+  static public function slugify($text)
+  {
+    // replace non letter or digits by -
+    $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+    $text = trim($text, '-');
 
-    $starts_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", $starts)));
-    $ends_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", $ends)));
+    // There is a bug on php 5.3.6 on mamp with iconv, which always returns empty string
+    // transliterate
+    if (function_exists('iconv') && PHP_VERSION != '5.3.6' && PHP_OS != 'Darwin')
+    {
+      $text = iconv('UTF-8', 'US-ASCII//TRANSLIT//IGNORE', $text);
+    }
+
+    // lowercase
+    if (function_exists('mb_strtolower')) {
+      $text = mb_strtolower($text, 'UTF-8');
+    } else {
+      $text = strtolower($text);
+    }
+
+    // remove unwanted characters
+    $text = preg_replace('~[^-\\pL\d]+~u', '', $text);
+    if ($text === "")
+    {
+      return 'n-a';
+    }
+
+    return $text;
+  }
+
+  /*
+   * Check if text has words like "nsfw".
+   * | title here (nsfw) , for example, will return true
+   */
+  public static function isForbiddenTitle($text) {
+
+    return (bool)preg_match(self::$forbidden_endings_pattern, trim($text));
+    
+  }
+
+  public static function makeSafeRegexFromArray($values = array()) {
+    $result = array();
+    foreach ($values as $value) {
+      $value = trim($value);
+      if ($value != "") {
+        $result[] = str_replace("|", "\|", $value);
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
+   */
+  static public function cleanTitle($text)
+  {
+
+    $starts_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$remove_start))));
+    $ends_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$remove_end))));
     
     // just url
     $patterns[] = '@^'.self::$url_pattern . '$@ui';

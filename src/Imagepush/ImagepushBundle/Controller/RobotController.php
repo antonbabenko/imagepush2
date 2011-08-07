@@ -26,6 +26,13 @@ class RobotController extends Controller
         $content = $this->get('imagepush.fetcher.digg')->run();
         break;
       
+      /**
+       * Process source = get html pages, find images
+       */
+      case "processSource":
+        $content = $this->get('imagepush.process.source')->run();
+        break;
+      
       default:
         $content = sprintf("Error: Action '%s' is not implemented yet.", $action);
         break;
