@@ -30,7 +30,7 @@ class RobotController extends Controller
        * Process source = get html pages, find images
        */
       case "processSource":
-        $content = $this->get('imagepush.process.source')->run();
+        $content = $this->get('imagepush.processor')->run();
         break;
       
       default:

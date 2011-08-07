@@ -96,8 +96,9 @@ services:
         class: Imagepush\ImagepushBundle\Services\Fetchers\DiggFetcher
         arguments: [@kernel]
 
-    #imagepush.fetcher.digg_services:
-    #    class: Imagepush\ImagepushBundle\Services\Digg\ImagepushServicesDigg2
+    imagepush.source:
+        class: Imagepush\ImagepushBundle\Model\AbstractSource
+        arguments: [@kernel]
 
     imagepush.processor:
         class: Imagepush\ImagepushBundle\Services\Processors\Processor

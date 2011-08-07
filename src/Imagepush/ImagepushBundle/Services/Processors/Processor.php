@@ -4,7 +4,7 @@ namespace Imagepush\ImagepushBundle\Services\Processors;
 
 /**
  * @todo: Other classes are:
- *   Processors\processor - super-class which handles all other processors relations
+ *   Processors\processor - super-class which handles all other processors relations and contains business logic
  *   Processors\source - get image by the source link, which is the most suitable
  *   Processors\tags - get tags for the link
  *   Processors\images - make thumbs, save images
@@ -25,12 +25,7 @@ class ContentBrowser extends sfWebBrowser
 class Processor
 {
 
-  static $redis;
-  static $debug_mode, $show_messages;
-
-  public $kernel, $router, $redis, $images, $tags, $logger, $allServices;
-  
-  public static $isDebug;
+  public $kernel, $router, $redis, $images, $tags, $logger;
   
   public function __construct(\AppKernel $kernel) {
     
@@ -43,27 +38,9 @@ class Processor
     $this->tags = $kernel->getContainer()->get('imagepush.tags');
     $this->logger = $kernel->getContainer()->get('logger');
     
-    $this->allServices = array(
-      "kernel" => $this->kernel,
-      "router" => $this->router,
-      "redis" => $this->redis,
-      "images" => $this->images,
-      "tags" => $this->tags,
-      "logger" => $this->logger,
-    );
-    
-    self::$isDebug = $this->kernel->isDebug();
-    
   }
-  public function __construct($debug_mode = false, $show_messages = false)
-  {
-    self::$redis = sfRedis::getClient();
-
-    self::$debug_mode = $debug_mode;
-    self::$show_messages = $show_messages;
-  }
-
-
+  
+  //////////////////
   static $allowed_image_types = array("image/gif", "image/jpeg", "image/jpg", "image/png");
   static $min_width = 450;
   static $min_height = 180;
@@ -81,80 +58,16 @@ class Processor
   /*
    * ContentBrowser
    */
-  protected $b;
+  //protected $b;
 
   public function isBlockedDomain()
   { // if porn/nudes - skip it
     return false;
   }
-
-  /*
-   * Handles all manipulation for one object (check size, resize thumbs, save Image object)
-   */
-
-  protected function processAsSingleImage(ContentBrowser $b = null)
-  {
-
-    if (empty($b))
-    {
-      $b = $this->b;
-    }
-
-    $saved = false;
-
-    $content = $b->getResponseText();
-    $content_type = $b->getResponseHeader("Content-Type");
-
-    // if the same image has been already processed (but from another place), then remove it now
-    if (Images::isUniqueImageHash($content)) {
-      Images::removeKey($this->key, $this->link);
-
-      $message = "Link: " . $this->link . " - Such image hash has been already processed.";
-      sfContext::getInstance()->getLogger()->info($message);
-
-      return $saved;
-    }
-
-    $image = new ImageManipulation();
-    $image->setImageAsString($content, $content_type);
-    $image->setImageId($this->id);
-
-    if ($image->getImage()->getWidth() >= self::$min_width && $image->getImage()->getHeight() >= self::$min_height)
-    {
-
-      $message = "Link: " . $this->link . " (" . $image->getImage()->getWidth() . "x" . $image->getImage()->getHeight() . ") - Make thumbs";
-      sfContext::getInstance()->getLogger()->info($message);
-
-      $thumbs_data = $image->storeThumbs();
-      //D::dump($thumbs_data);
-
-      if ($thumbs_data)
-      {
-        Images::saveUniqueImageHash($content);
-        Images::saveAsProcessed($this->key, array_merge($this->working_link, $thumbs_data));
-        $saved = true;
-      } else
-      {
-        if ($this->removeKeyIfImageIsSmallOrError)
-        {
-          Images::removeKey($this->key, $this->link);
-        }
-
-        $message = "Link: " . $this->link . " - Didn't make thumbs, so link will be removed (key: " . $this->key . ")";
-        sfContext::getInstance()->getLogger()->info($message);
-      }
-    } else
-    { // very small image
-      if ($this->removeKeyIfImageIsSmallOrError)
-      {
-        Images::removeKey($this->key, $this->link);
-      }
-
-      $message = "Link: " . $this->link . " (" . $image->getImage()->getWidth() . "x" . $image->getImage()->getHeight() . ") - Small image, remove link";
-      sfContext::getInstance()->getLogger()->info($message);
-    }
-
-    return $saved;
+  
+  public function initUnprocessedSource() {
+    $source = $this->kernel->getContainer()->get('imagepush.source');
+    $link = $source->getAndInitLatestUnprocessedLink();
   }
 
   public function run()
@@ -170,12 +83,14 @@ class Processor
     // 6) try to make thumbs from large image
     // 7) try to find category/tags for the page
 
-    $this->working_link = Images::getAndInitLatestUnprocessedLink();
-    $this->id = $this->working_link["id"];
-    $this->link = $this->working_link["link"];
+    $this->initUnprocessedSource();
+    
+    $this->workingLink = Images::getAndInitLatestUnprocessedLink();
+    $this->id = $this->workingLink["id"];
+    $this->link = $this->workingLink["link"];
     $this->key = Images::getImageKey($this->id);
 
-    D::dump($this->working_link);
+    \D::dump($this->working_link);
 
     // nothing to do if no link or link is blocked
     if (!$this->link || self::isBlockedDomain($this->link))
@@ -273,6 +188,75 @@ class Processor
     }
 
     return (isset($result) && $result ? $this->key : false);
+  }
+
+  /*
+   * Handles all manipulation for one object (check size, resize thumbs, save Image object)
+   */
+
+  protected function processAsSingleImage(ContentBrowser $b = null)
+  {
+
+    if (empty($b))
+    {
+      $b = $this->b;
+    }
+
+    $saved = false;
+
+    $content = $b->getResponseText();
+    $content_type = $b->getResponseHeader("Content-Type");
+
+    // if the same image has been already processed (but from another place), then remove it now
+    if (Images::isUniqueImageHash($content)) {
+      Images::removeKey($this->key, $this->link);
+
+      $message = "Link: " . $this->link . " - Such image hash has been already processed.";
+      sfContext::getInstance()->getLogger()->info($message);
+
+      return $saved;
+    }
+
+    $image = new ImageManipulation();
+    $image->setImageAsString($content, $content_type);
+    $image->setImageId($this->id);
+
+    if ($image->getImage()->getWidth() >= self::$min_width && $image->getImage()->getHeight() >= self::$min_height)
+    {
+
+      $message = "Link: " . $this->link . " (" . $image->getImage()->getWidth() . "x" . $image->getImage()->getHeight() . ") - Make thumbs";
+      sfContext::getInstance()->getLogger()->info($message);
+
+      $thumbs_data = $image->storeThumbs();
+      //D::dump($thumbs_data);
+
+      if ($thumbs_data)
+      {
+        Images::saveUniqueImageHash($content);
+        Images::saveAsProcessed($this->key, array_merge($this->working_link, $thumbs_data));
+        $saved = true;
+      } else
+      {
+        if ($this->removeKeyIfImageIsSmallOrError)
+        {
+          Images::removeKey($this->key, $this->link);
+        }
+
+        $message = "Link: " . $this->link . " - Didn't make thumbs, so link will be removed (key: " . $this->key . ")";
+        sfContext::getInstance()->getLogger()->info($message);
+      }
+    } else
+    { // very small image
+      if ($this->removeKeyIfImageIsSmallOrError)
+      {
+        Images::removeKey($this->key, $this->link);
+      }
+
+      $message = "Link: " . $this->link . " (" . $image->getImage()->getWidth() . "x" . $image->getImage()->getHeight() . ") - Small image, remove link";
+      sfContext::getInstance()->getLogger()->info($message);
+    }
+
+    return $saved;
   }
 
   public function getBestImageFromDom($dom)

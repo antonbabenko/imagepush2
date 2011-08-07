@@ -26,25 +26,20 @@ class AbstractSource
   public $title = "";
   public $slug = "";
   
-  /**
-   * @services
-   */
-  public $router, $redis, $images, $tags, $logger;
-  
   /*
    * @string
    */
   public $sourceType;
 
-  /*
-   * @params array $allServices
+  /**
+   * @services
    */
-  public function __construct($allServices) {
-    $this->router = $allServices["redis"];
-    $this->redis = $allServices["redis"];
-    $this->images = $allServices["images"];
-    $this->tags = $allServices["tags"];
-    $this->logger = $allServices["logger"];
+  public $kernel;
+  
+  public function __construct(\AppKernel $kernel) {
+    
+    $this->kernel = $kernel;
+    
   }
   
   /**
@@ -167,7 +162,9 @@ class AbstractSource
       throw new \Exception("Source id, sourceType, link and timestamp can't be empty");
     }
     
-    $pipe = $this->redis->pipeline();
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    
+    $pipe = $redis->pipeline();
     
     // save temporary data
     $pipe->hmset($this->imageKey, $this->toArray());
