@@ -5,15 +5,11 @@ namespace Imagepush\ImagepushBundle\Services;
 class Images
 {
   
-  private $router, $redis, $tags;
+  public $kernel;
   
   public function __construct(\AppKernel $kernel) {
     
-    //\D::dump($this->getServiceIds());
-    
-    $this->router = $kernel->getContainer()->get('router');
-    $this->redis = $kernel->getContainer()->get('snc_redis.default_client');
-    $this->tags = $kernel->getContainer()->get('imagepush.tags');
+    $this->kernel = $kernel;
     
   }
   
@@ -32,7 +28,8 @@ class Images
    */
   public function getImageId()
   {
-    return (int)$this->redis->get('image_id');
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    return (int)$redis->get('image_id');
   }
   
   /*
@@ -59,10 +56,12 @@ class Images
     extract($params);
 
     if (isset($tag)) {
-      $fieldName .= ':'.$this->tags->getTagKey($tag);
+      $tags = $this->kernel->getContainer()->get('imagepush.tags');
+      $fieldName .= ':'.$tags->getTagKey($tag);
     }
 
-    $image_keys = $this->redis->zrevrangebyscore($fieldName, "+inf", "-inf", array("LIMIT" => array(0, $limit)));
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    $image_keys = $redis->zrevrangebyscore($fieldName, "+inf", "-inf", array("LIMIT" => array(0, $limit)));
     //\D::dump($image_keys);
 
     $images = array();
@@ -72,7 +71,7 @@ class Images
     }
 
     foreach ($image_keys as $key) {
-      $image = $this->redis->hgetall($key);
+      $image = $redis->hgetall($key);
       $images[] = $this->normalizeImage($image);
     }
 
@@ -87,9 +86,11 @@ class Images
   public function getOneImage($id) {
 
     $key = $this->getImageKey($id);
+    
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
-    if ($this->redis->sismember('available_images', $key)) {
-      $image = $this->redis->hgetall($key);
+    if ($redis->sismember('available_images', $key)) {
+      $image = $redis->hgetall($key);
       $image = $this->normalizeImage($image);
       return $image;
     } else {
@@ -105,15 +106,17 @@ class Images
 
     if (!$timestamp || !in_array($direction, array("next", "prev"))) return false;
     
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    
     if ($direction == "next") {
-      $key = $this->redis->zrangebyscore('image_list', $timestamp, "+inf", array("LIMIT" => array(1, 1)));
+      $key = $redis->zrangebyscore('image_list', $timestamp, "+inf", array("LIMIT" => array(1, 1)));
     } else {
-      $key = $this->redis->zrevrangebyscore('image_list', $timestamp, "-inf", array("LIMIT" => array(1, 1)));
+      $key = $redis->zrevrangebyscore('image_list', $timestamp, "-inf", array("LIMIT" => array(1, 1)));
     }
     
     if (!empty($key[0]))
     {
-      $image = $this->redis->hgetall($key[0]);
+      $image = $redis->hgetall($key[0]);
     }
 
     return isset($image) ? $image : false;
@@ -127,8 +130,10 @@ class Images
   public function filterDislikedImages($image_keys = array()) {
 
     $user = $_SERVER["REMOTE_ADDR"];
+    
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
-    $disliked = $this->redis->smembers("user_dislikes:".$user);
+    $disliked = $redis->smembers("user_dislikes:".$user);
 
     if (count($disliked)) {
       $image_keys = array_diff($image_keys, $disliked);
@@ -165,17 +170,20 @@ class Images
     
     if (!count($image)) return false;
 
+    $router = $this->kernel->getContainer()->get('router');
+    $tags = $this->kernel->getContainer()->get('imagepush.tags');
+    
     $image["_thumb_img"] = $this->getFileUrl($image, "thumb");
     $image["_main_img"] = $this->getFileUrl($image, "m");
     $image["_article_img"] = $this->getFileUrl($image, "a");
-    $image["_tags"] = (isset($image["tags"]) && json_decode($image["tags"]) ? $this->tags->getHumanTags(json_decode($image["tags"])) : "");
-    $image["_view_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]));
-    $image["_share_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]), true);
+    $image["_tags"] = (isset($image["tags"]) && json_decode($image["tags"]) ? $tags->getHumanTags(json_decode($image["tags"])) : "");
+    $image["_view_url"] = $router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]));
+    $image["_share_url"] = $router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]), true);
     $image["_original_host"] = @parse_url($image["link"], PHP_URL_HOST);
     $image["_date"] = date(DATE_W3C, $image["timestamp"]);
 
     return $image;
     
   }
-
+  
 }

@@ -41,12 +41,14 @@ class DiggFetcher extends AbstractFetcher
   {
 
     if (isset($item->title) && !CustomStrings::isForbiddenTitle($item->title) && parent::isWorthToSave($item)) {
-
+      
+      $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+      
       $result = (
         isset($item->diggs) &&
         $item->diggs >= $this->minDiggs &&
-        !$this->redis->sismember('indexed_links', $item->link) &&
-        !$this->redis->sismember('failed_links', $item->link)
+        !$redis->sismember('indexed_links', $item->link) &&
+        !$redis->sismember('failed_links', $item->link)
       );
 
       /*if ($result) {
@@ -99,16 +101,18 @@ class DiggFetcher extends AbstractFetcher
       return false;
     }
     
+    $images = $this->kernel->getContainer()->get('imagepush.images');
+    $tags = $this->kernel->getContainer()->get('imagepush.tags');
+    
     foreach ($this->data as $item) {
       
       if (!$this->isWorthToSave($item))
         continue;
       
-
-      $id = $this->images->getImageId();
-      $imageKey = $this->images->getImageKey($id);
+      $id = $images->getImageId();
+      $imageKey = $images->getImageKey($id);
       
-      $source = new DiggSource($this->allServices);
+      $source = new DiggSource($this->kernel);
       $source->setId($id);
       $source->setImageKey($imageKey);
       
@@ -118,7 +122,7 @@ class DiggFetcher extends AbstractFetcher
       $source->setSlugFromTitle();
       
       if (!empty($item->topic->name)) {
-         $this->tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
+         $tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
       }
 
       try {
@@ -141,9 +145,11 @@ class DiggFetcher extends AbstractFetcher
   public function run()
   {
     
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    
     // check status and time
-    $this->lastStatus = $this->redis->get("digg_last_status");
-    $this->lastAccess = $this->redis->get("digg_last_access");
+    $this->lastStatus = $redis->get("digg_last_status");
+    $this->lastAccess = $redis->get("digg_last_access");
     //echo $this->lastAccess;
     
     if ($this->lastStatus == "OK" && time() < $this->lastAccess + self::$minDelay)
@@ -170,8 +176,8 @@ class DiggFetcher extends AbstractFetcher
         self::$output[] = sprintf("[DiggFetcher] %s: Digg replied with error: %s. Code: %s", date(DATE_RSS), $status["message"], $status["code"]);
       }
 
-      $this->redis->set("digg_last_status", ($status === true ? "OK" : "FAIL"));
-      $this->redis->set("digg_last_access", time());
+      $redis->set("digg_last_status", ($status === true ? "OK" : "FAIL"));
+      $redis->set("digg_last_access", time());
     }
 
     return self::$output;
