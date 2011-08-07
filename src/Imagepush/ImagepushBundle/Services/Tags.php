@@ -30,7 +30,7 @@ class Tags
     if ($isCleaned) {
       return "tag_" . md5( $tag );
     } else {
-      return "tag_" . md5( CustomStrings::cleanTag($tag) );
+      return "tag_" . md5( $this->customStrings->cleanTag($tag) );
     }
   }
 

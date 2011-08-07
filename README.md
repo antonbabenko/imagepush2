@@ -19,6 +19,12 @@ Install PEAR Digg Services:
 pear install -a -f -B pear.php.net/Services_Digg2-0.3.2
 pear install -a -f pear.php.net/HTTP_Request2-0.6.0
 pear install -a -f -B pear.php.net/HTTP_OAuth-0.1.18
+
+Install PEAR Phpunit:
+pear channel-discover pear.phpunit.de
+pear channel-discover components.ez.no
+pear channel-discover pear.symfony-project.com
+pear install phpunit/PHPUnit
 ---
 
 1) Ссылки на картинки и на сайты беруться с digg и сохраняются в модели "DiggSource"

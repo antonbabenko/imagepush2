@@ -93,13 +93,16 @@ services:
         arguments: [@kernel]
 
     imagepush.fetcher.digg:
-        class: Imagepush\ImagepushBundle\Services\Digg\DiggFetcher
+        class: Imagepush\ImagepushBundle\Services\Fetchers\DiggFetcher
         arguments: [@kernel]
 
-    imagepush.fetcher.digg_services:
-        class: Imagepush\ImagepushBundle\Services\Digg\ImagepushServicesDigg2
-        #arguments: [@kernel]
+    #imagepush.fetcher.digg_services:
+    #    class: Imagepush\ImagepushBundle\Services\Digg\ImagepushServicesDigg2
 
+    imagepush.processor:
+        class: Imagepush\ImagepushBundle\Services\Processors\Processor
+        arguments: [@kernel]
+        
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:

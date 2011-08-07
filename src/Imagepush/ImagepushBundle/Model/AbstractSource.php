@@ -7,7 +7,7 @@ use Imagepush\ImagepushBundle\External\CustomStrings;
 /**
  * Imagepush\ImagepushBundle\Model\AbstractSource
  * 
- * This class describes setters and getters for sources fetched.
+ * This class describes setters and getters for fetched sources.
  */
 class AbstractSource
 {

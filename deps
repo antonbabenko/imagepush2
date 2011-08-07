@@ -64,14 +64,15 @@
 
 
 [digg]
-    git=git://github.com/digg/Services_Digg2.git
+    git=http://github.com/digg/Services_Digg2.git
 
 [zendframework2]
-    git=git://github.com/zendframework/zf2.git
+    git=http://github.com/zendframework/zf2.git
 
 [SncRedisBundle]
-    git=git://github.com/snc/SncRedisBundle.git
+    git=http://github.com/snc/SncRedisBundle.git
     target=/bundles/Snc/RedisBundle
 
 [predis]
-    git=git://github.com/nrk/predis.git
+    git=http://github.com/nrk/predis.git
+    #version=v0.6.6
