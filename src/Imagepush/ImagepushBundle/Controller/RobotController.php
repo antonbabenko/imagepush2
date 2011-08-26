@@ -33,6 +33,15 @@ class RobotController extends Controller
         $content = $this->get('imagepush.processor')->run();
         break;
       
+      /**
+       * Just for test
+       */
+      case "testMakeThumbs":
+        $fileContent = file_get_contents("http://dev-anton.imagepush.to/test_images/1.jpg");
+        $fileContentType = "image/jpeg";
+        $content = $this->get('imagepush.processor.image')->testMakeThumbs($fileContent, $fileContentType);
+        break;
+      
       default:
         $content = sprintf("Error: Action '%s' is not implemented yet.", $action);
         break;

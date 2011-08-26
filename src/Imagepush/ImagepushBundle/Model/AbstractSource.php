@@ -183,5 +183,35 @@ class AbstractSource
     return true;
     
   }
+  
+  /**
+   * Get latest unprocessed source and set it "in progress"
+   * @return array|false Source as array or false if there is no unprocessed link
+   */
+  public function getAndInitUnprocessed() {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    $imageKeys = $redis->zrevrangebyscore('link_list_to_process', "+inf", "-inf");
+    //\D::dump($imageKeys);
+    
+    if (count($imageKeys))
+    {
+
+      foreach ($imageKeys as $key) {
+        if (!$redis->sismember("link_list_in_progress", $key)) {
+          // uncomment for prod usage:
+          //$redis->sadd("link_list_in_progress", $key);
+          
+          return $redis->hgetall($key);
+        }
+      }
+
+    }
+
+    return false;
+
+  }
+
 
 }

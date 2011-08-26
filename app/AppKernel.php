@@ -19,6 +19,8 @@ class AppKernel extends Kernel
             new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
             
             new Snc\RedisBundle\SncRedisBundle(),
+            new Sonata\GoutteBundle\SonataGoutteBundle(),
+            new Avalanche\Bundle\ImagineBundle\AvalancheImagineBundle(),
             
             new Imagepush\ImagepushBundle\ImagepushBundle(),
 
