@@ -2,6 +2,6 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processors;
 
-class Source
+class Tag
 {
 }

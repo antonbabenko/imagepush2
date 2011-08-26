@@ -12,7 +12,6 @@ robot:
     prefix:   /robot
     type:     annotation
     
-#
-#_imagine:
-#    resource: .
-#    type:     imagine
+_imagine:
+    resource: .
+    type:     imagine

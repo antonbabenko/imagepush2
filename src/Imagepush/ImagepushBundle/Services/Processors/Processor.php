@@ -5,7 +5,7 @@ namespace Imagepush\ImagepushBundle\Services\Processors;
 /**
  * @todo: Other classes are:
  *   Processors\processor - super-class which handles all other processors relations and contains business logic
- *   Processors\source - get image by the source link, which is the most suitable
+ *   Processors\content - get image by the source link, which is the most suitable
  *   Processors\tags - get tags for the link
  *   Processors\images - make thumbs, save images
  */
@@ -25,29 +25,25 @@ class ContentBrowser extends sfWebBrowser
 class Processor
 {
 
-  public $kernel, $router, $redis, $images, $tags, $logger;
+  public $source;
+  
+  public $id;
+  public $link;
+  public $imageKey;
+  
+  /*
+   * @services
+   */
+  public $kernel;
   
   public function __construct(\AppKernel $kernel) {
     
-    //var_dump($this->getServiceIds());
     $this->kernel = $kernel;
-    
-    $this->router = $kernel->getContainer()->get('router');
-    $this->redis = $kernel->getContainer()->get('snc_redis.default_client');
-    $this->images = $kernel->getContainer()->get('imagepush.images');
-    $this->tags = $kernel->getContainer()->get('imagepush.tags');
-    $this->logger = $kernel->getContainer()->get('logger');
     
   }
   
   //////////////////
-  static $allowed_image_types = array("image/gif", "image/jpeg", "image/jpg", "image/png");
-  static $min_width = 450;
-  static $min_height = 180;
-  static $min_ratio = 0.3;
-  static $max_ratio = 2.5;
-  static $min_filesize = 20480;   // 20KB in bytes
-  static $max_filesize = 4194304; // 4MB in bytes
+  static $allowedImageContentTypes = array("image/gif", "image/jpeg", "image/jpg", "image/png");
   static $result;
 
   /*
@@ -60,16 +56,35 @@ class Processor
    */
   //protected $b;
 
+  /*
+   * @todo if porn/nudes domain - return true
+   */
   public function isBlockedDomain()
-  { // if porn/nudes - skip it
+  {
     return false;
   }
   
-  public function initUnprocessedSource() {
-    $source = $this->kernel->getContainer()->get('imagepush.source');
-    $link = $source->getAndInitLatestUnprocessedLink();
+
+  public function contentIsImage() {
+    
+    return (!empty($this->data["Content-type"]) && in_array($this->data["Content-type"], self::$allowedImageContentTypes));
+    
   }
 
+  public function contentIsXMLLike() {
+    
+    return (!empty($this->data["Content-type"]) && (preg_match('/(x|ht)ml/i', $this->data["Content-type"])));
+    
+  }
+  
+  public function isAlreadyProcessedImageHash($hashValue) {
+    
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    return $redis->sismember('processed_image_hash', $hashValue);
+    
+  }
+  
   public function run()
   {
 
@@ -83,18 +98,31 @@ class Processor
     // 6) try to make thumbs from large image
     // 7) try to find category/tags for the page
 
-    $this->initUnprocessedSource();
+    $source = $this->kernel->getContainer()->get('imagepush.source');
+    $images = $this->kernel->getContainer()->get('imagepush.images');
+    $processorContent = $this->kernel->getContainer()->get('imagepush.processor.content');
+    $processorImage = $this->kernel->getContainer()->get('imagepush.processor.image');
     
-    $this->workingLink = Images::getAndInitLatestUnprocessedLink();
-    $this->id = $this->workingLink["id"];
-    $this->link = $this->workingLink["link"];
-    $this->key = Images::getImageKey($this->id);
+    $this->source = $source->getAndInitUnprocessed();
+    
+    if ($this->source === false) {
+      throw new \Exception("There is no unprocessed source to work on");
+    }
+    
+    $this->id = $this->source["id"];
+    $this->link = $this->source["link"];
+    $this->imageKey = $images->getImageKey($this->id);
 
-    \D::dump($this->working_link);
-
+    \D::dump($this->source);
+    
+    if ($this->isBlockedDomain()) {
+      throw new \Exception(sprintf("%s is blacklisted domain (porn, spam, etc)", $this->link));
+    }
+    
     // nothing to do if no link or link is blocked
-    if (!$this->link || self::isBlockedDomain($this->link))
-      return false;
+    //if (!$this->link || self::isBlockedDomain($this->link))
+      //return false;
+    
     /*
       $this->link = "http://www.web-developer.no/img/portfolio/flynytt.jpg";
       $this->link = "http://dev.local.imagepush.to/test-images/test1.jpg";
@@ -115,6 +143,54 @@ class Processor
     // parse url problem
     // $this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
 
+    $this->data = $processorContent->get($this->link);
+    
+    if (!is_array($this->data)) {
+      $this->kernel->getContainer()->get('logger')->warn(sprintf("ID: %d. Link %s returned status code %d", $this->id, $this->link, $this->data));
+      return false;
+    }
+    
+    if ($this->contentIsImage()) {
+      
+      if ($this->isAlreadyProcessedImageHash($this->data["Content-md5"])) {
+        $this->kernel->getContainer()->get('logger')->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $this->id, $this->link));
+        return false;
+      }
+      
+      $result = $processorImage->makeThumbs($this->data["Content"], $this->data["Content-type"]);
+    
+    } elseif ($this->contentIsXMLLike()) {
+      
+      /**
+       * Try to find <link rel="image_src" />
+       */
+      $imageSrcUri = $processorContent->getFullImageSrc($this->data["Content"]);
+      
+      if ($imageSrcUri !== false) {
+        $imageSrcContent = $processorContent->get($imageSrcUri);
+        
+        if ($imageSrcContent && $this->contentIsImage($imageSrcContent)) {
+          $result = $processorImage->makeThumbs($imageSrcContent);
+          
+          if ($result) break;
+        }
+      }
+      
+      /*
+       * Large images inside h1, h2, h3, div
+       */
+      $result = $processorContent->getBestImageFromDom($this->data["Content"]);
+
+      if (!$result)
+      {
+        $images->removeKey($this->key, $this->link);
+      }
+      
+    }
+    
+    return (isset($result) && $result ? $this->key : false);
+    
+    /*
     try {
       $this->b = new ContentBrowser();
       if (!$this->b->get($this->link)->responseIsError())
@@ -129,18 +205,15 @@ class Processor
           $result = $this->processAsSingleImage();
         } elseif (preg_match('/(x|ht)ml/i', $content_type))
         {
-          /*
-           * Try to guess for main image
-           */
+          // Try to guess for main image
           $dom = $this->b->getResponseDom();
           $dom->preserveWhiteSpace = false;
 
           //Images::saveCachedDom($this->key, serialize($dom));
 
-          /*
-           * <link rel="image_src" />
-           * Most-likely image_url is not helpful, because it is tiny
-           */
+          // <link rel="image_src" />
+          // Most-likely image_url is not helpful, because it is tiny
+           
           if (false != $image_src = $this->getFullImageSrcFromDom($dom))
           {
             $b_image_src = new ContentBrowser();
@@ -155,9 +228,7 @@ class Processor
             }
           }
 
-          /*
-           * Large images inside h1, h2, h3, div
-           */
+          // Large images inside h1, h2, h3, div
           $result = $this->getBestImageFromDom($dom);
 
           if (!$result)
@@ -188,6 +259,8 @@ class Processor
     }
 
     return (isset($result) && $result ? $this->key : false);
+    */
+    
   }
 
   /*
