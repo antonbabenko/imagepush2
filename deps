@@ -67,10 +67,6 @@
 [zend]
     git=http://github.com/zendframework/zf2.git
 
-//[goutte]
-//    git=https://github.com/igorw/Goutte.git
-//    git=https://github.com/fabpot/Goutte.git
-
 [SonataGoutteBundle]
     git=http://github.com/sonata-project/SonataGoutteBundle.git
     target=/bundles/Sonata/GoutteBundle

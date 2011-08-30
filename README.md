@@ -44,3 +44,11 @@ http://www.martinsikora.com/symfony2-and-dependency-injection
 
 In general:
 http://miller.limethinking.co.uk/2011/06/14/symfony2-moving-away-from-the-base-controller/
+
+
+---
+from deps:
+[goutte]
+    git=https://github.com/igorw/Goutte.git
+//    git=https://github.com/fabpot/Goutte.git
+
