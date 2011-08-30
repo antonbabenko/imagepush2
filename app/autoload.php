@@ -3,6 +3,9 @@
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
+// Goutte - web browser (should be included before Zend namespace is defined)
+require_once __DIR__.'/../vendor/goutte/goutte.phar';
+
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
     'Symfony'          => array(__DIR__.'/../vendor/symfony/src', __DIR__.'/../vendor/bundles'),
@@ -16,11 +19,10 @@ $loader->registerNamespaces(array(
     'Metadata'         => __DIR__.'/../vendor/metadata/src',
   
     'Snc'              => __DIR__.'/../vendor/bundles',
-    'Sonata'           => __DIR__.'/../vendor/bundles',
     'Imagine'          => __DIR__.'/../vendor/imagine/lib',
     'Avalanche'        => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
-    //'Zend'             => __DIR__.'/../vendor/zendframework2/library',
+    'Zend'             => __DIR__.'/../vendor/zend/library', // for feeds, but doesn't work for goutte, if goute.phar is included after this
   
     'Imagepush'        => __DIR__.'/../src',
 
@@ -59,7 +61,7 @@ Swift::registerAutoload(__DIR__.'/../vendor/swiftmailer/lib/swift_init.php');
  */
 /*
 set_include_path(implode(PATH_SEPARATOR, array(
-    __DIR__.'/../vendor/zendframework2/library',
+    __DIR__.'/../vendor/zend/library',
     get_include_path()
 )));
 */

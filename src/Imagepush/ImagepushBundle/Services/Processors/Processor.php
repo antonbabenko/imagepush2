@@ -85,6 +85,14 @@ class Processor
     
   }
   
+  public function saveProcessedImageHash($hashValue) {
+    
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    return $redis->sadd('processed_image_hash', $hashValue);
+    
+  }
+  
   public function run()
   {
 
@@ -111,6 +119,7 @@ class Processor
     
     $this->id = $this->source["id"];
     $this->link = $this->source["link"];
+    //$this->link = 'http://i.imgur.com/QGdKg.jpg';
     $this->imageKey = $images->getImageKey($this->id);
 
     \D::dump($this->source);
@@ -157,7 +166,12 @@ class Processor
         return false;
       }
       
-      $result = $processorImage->makeThumbs($this->data["Content"], $this->data["Content-type"]);
+      $thumbs = $processorImage->makeThumbs($this->id, $this->data);
+      if ($thumbs !== false) {
+        // comment these lines if testing
+        //$this->saveProcessedImageHash($this->data["Content-md5"]);
+        //$images->saveAsProcessed($this->imageKey, array_merge($this->source, $thumbs));
+      }
     
     } elseif ($this->contentIsXMLLike()) {
       

@@ -64,9 +64,12 @@
 [digg]
     git=http://github.com/digg/Services_Digg2.git
 
-# Uncomment to not fix every time Hostname.php line 622 where iconv_strlen is used. Bug in mamp php
-#[zendframework2]
-#    git=http://github.com/zendframework/zf2.git
+[zend]
+    git=http://github.com/zendframework/zf2.git
+
+[goutte]
+    git=https://github.com/igorw/Goutte.git
+//    git=https://github.com/fabpot/Goutte.git
 
 [SonataGoutteBundle]
     git=http://github.com/sonata-project/SonataGoutteBundle.git
@@ -78,7 +81,7 @@
 
 [predis]
     git=http://github.com/nrk/predis.git
-#    using this version - v0.6.6
+//    using this version - v0.6.6
 
 [imagine]
     git=http://github.com/avalanche123/Imagine.git
