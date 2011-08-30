@@ -2,7 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processors;
 
-use Symfony\Component\BrowserKit\Client;
+use Goutte\Client;
 
 class Content
 {
@@ -24,12 +24,12 @@ class Content
   public function get($uri)
   {
     
-    $client = $this->kernel->getContainer()->get('goutte')
-            ->getNamedClient('curl');
-
+    $client = new Client();
+    
     $crawler = $client->request('GET', $uri);
 
     $response = $client->getResponse();
+    //\D::dump($response->getContent());
     
     if (200 == $response->getStatus()) {
       return array(
@@ -47,4 +47,23 @@ class Content
   }
   
   
+  public function getFullImageSrc($dom)
+  {
+
+    \D::dump($dom);
+    $dom_link = $dom->documentElement->getElementsByTagName("link");
+    if ($dom_link_count = $dom_link->length)
+    {
+      for ($i = 0; $i < $dom_link_count; $i++) {
+        if ($dom_link->item($i)->getAttribute("rel") == "image_src")
+        {
+          $image_src = $dom_link->item($i)->getAttribute("href");
+          $full_image_src = dirname($this->link) . "/" . $image_src;
+          break;
+        }
+      }
+    }
+
+    return (!empty($full_image_src) ? $full_image_src : false);
+  }
 }

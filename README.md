@@ -26,7 +26,15 @@ pear channel-discover components.ez.no
 pear channel-discover pear.symfony-project.com
 pear install phpunit/PHPUnit
 ---
+ImageMagick:
+1) Install ImageMagick via MacPorts (don't use Mac OS X Binary Release from official ImageMagick)
+2) download stable imagick pecl sources (like 3.0.1)
+3) ./configure --with-imagick=/opt/local
+4) make
+5) make install
+6) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://mikepuchol.com/2010/08/26/getting-mamp-1-9-to-work-with-image-magick-imagick-so-and-other-flora/
 
+---
 1) Ссылки на картинки и на сайты беруться с digg и сохраняются в модели "DiggSource"
 2) "DiggSource" парсится периодически и публикуется в Images.
 

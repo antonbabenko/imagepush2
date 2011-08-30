@@ -164,6 +164,31 @@ class Images
   }
 
   /*
+   * Save link as processed (with thumbs)
+   */
+  public function saveAsProcessed($key, $data)
+  {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    // save final data
+    $redis->hmset($key, $data);
+
+    // and save data about link to process
+    $redis->zrem('link_list_to_process', $key);
+
+    // remove link from in progress list
+    $redis->srem('link_list_in_progress', $key);
+
+    // save image to the list and make it available (was: image_list)
+    $redis->zadd('upcoming_image_list', $data["timestamp"], $key);
+
+    // was: saving to available_images, but correct -> upcoming_images
+    $redis->sadd('upcoming_images', $key);
+
+  }
+
+  /*
    * Verify that image has all required fields and define correct url fields
    */
   public function normalizeImage($image) {
