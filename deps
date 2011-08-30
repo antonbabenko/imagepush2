@@ -67,12 +67,8 @@
 [zend]
     git=http://github.com/zendframework/zf2.git
 
-[SonataGoutteBundle]
-    git=http://github.com/sonata-project/SonataGoutteBundle.git
-    target=/bundles/Sonata/GoutteBundle
-
 [SncRedisBundle]
-    git=http://github.com/snc/SncRedisBundle.git
+    git=http://github.com/snc/SncRedisBundle.git123
     target=/bundles/Snc/RedisBundle
 
 [predis]
