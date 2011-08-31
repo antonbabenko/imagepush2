@@ -3,7 +3,7 @@
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
-// Goutte - web browser (should be included before Zend namespace is defined) 
+// Goutte - web browser (should be included before Zend namespace is defined)
 require_once __DIR__.'/../src/goutte.phar';
 
 $loader = new UniversalClassLoader();
