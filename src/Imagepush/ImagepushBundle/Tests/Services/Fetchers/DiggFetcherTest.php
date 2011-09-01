@@ -27,7 +27,7 @@ class DiggFetcherTest extends WebTestCase
   public function testFetchRealDataFromDigg()
   {
 
-    $client = $this->createClient();s
+    $client = $this->createClient();
     $kernel = $client->getKernel();
 
     $digg = new DiggFetcher($kernel);
