@@ -50,7 +50,7 @@ class DiggFetcherTest extends WebTestCase
   public function testDiggResponseHasAllRequiredProperies()
   {
 
-    $data = DiggFixture::getData();
+    $data = DiggFixture::getData();sdfhdsfh
     
     //var_dump($data);
     $this->assertInternalType("array", $data);
