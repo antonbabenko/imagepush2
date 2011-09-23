@@ -6,6 +6,7 @@ use Predis\Client as RedisClient;
 use Imagepush\ImagepushBundle\Model\Tag;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 use Imagepush\ImagepushBundle\External\Inflect;
+use Imagepush\ImagepushBundle\Services\Processor\Config;
 
 class Tags
 {
@@ -14,12 +15,14 @@ class Tags
   private $redis;
   private $images;
   
+  private static $customStrings;
+  
   public function __construct(\AppKernel $kernel) {
     
     $this->router = $kernel->getContainer()->get('router');
     $this->redis = $kernel->getContainer()->get('snc_redis.default_client');
     //$this->images = $kernel->getContainer()->get('imagepush.images');
-    $this->customStrings = new CustomStrings();
+    self::$customStrings = new CustomStrings();
     
   }
 
@@ -30,8 +33,19 @@ class Tags
     if ($isCleaned) {
       return "tag_" . md5( $tag );
     } else {
-      return "tag_" . md5( $this->customStrings->cleanTag($tag) );
+      return "tag_" . md5( self::$customStrings->cleanTag($tag) );
     }
+  }
+  
+  /**
+   * Get tag keys for array
+   */
+  public function getTagKeys($tags, $isCleaned = false) {
+    $tagKeys = array();
+    foreach ($tags as $tag) {
+      $tagKeys[] = $this->getTagKey($tag, $isCleaned);
+    }
+    return $tagKeys;
   }
 
   public function getLatestTrends($limit = 20) {
@@ -41,7 +55,7 @@ class Tags
     $trends = array();
     if ($tags)
     {
-      $tags = array_diff($tags, array_map(array($this, "getTagKey"), Tag::$HIDDEN_TRENDS));
+      $tags = array_diff($tags, array_map(array($this, "getTagKey"), Config::$hiddenTrends));
       $tags = array_merge($tags);
 
       if ($limit > 0) {
@@ -113,7 +127,7 @@ class Tags
     return array_keys($fixedTags);
   }
 
-  public function saveRawTags($imageKey, $tagsSrc, $tags)
+  /*public function saveRawTags($imageKey, $tagsSrc, $tags)
   {
 
     if (empty($imageKey) || empty($tagsSrc) || empty($tags))
@@ -130,6 +144,6 @@ class Tags
       }
       $pipe->execute();
     }
-  }
+  }*/
 
 }

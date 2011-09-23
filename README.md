@@ -51,3 +51,6 @@ from deps:
     git=https://github.com/igorw/Goutte.git
 //    git=https://github.com/fabpot/Goutte.git
 
+        /**
+         * @todo: split $uselessTags into $whitelistedTags and $blacklistedTags for each source and global. Some tags are irrelevant to show on the site, but very good to use as twitter hashtags.
+         */

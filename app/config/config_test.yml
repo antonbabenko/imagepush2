@@ -19,3 +19,9 @@ monolog:
             type:  stream
             path:  %kernel.logs_dir%/%kernel.environment%.log
             level: debug
+            
+
+services:
+    imagepush.source:
+        class: Imagepush\ImagepushBundle\Tests\Model\AbstractSourceTest
+        arguments: [@kernel]

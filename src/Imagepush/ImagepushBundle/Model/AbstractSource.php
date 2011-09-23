@@ -3,6 +3,7 @@
 namespace Imagepush\ImagepushBundle\Model;
 
 use Imagepush\ImagepushBundle\External\CustomStrings;
+use Imagepush\ImagepushBundle\Services\Processor\Config;
 
 /**
  * Imagepush\ImagepushBundle\Model\AbstractSource
@@ -123,6 +124,22 @@ class AbstractSource
   }
   
   /**
+   * Set tags
+   * @param array $tags
+   */
+  public function setTags($tags = array()) {
+    $this->tags = (array)$tags;
+  }
+  
+  /**
+   * Get tags
+   * @param array $tags
+   */
+  public function getTags() {
+    return $this->tags;
+  }
+  
+  /**
    * Set slug from title
    * @param string $slug
    */
@@ -149,6 +166,7 @@ class AbstractSource
       "timestamp" => $this->timestamp,
       "title" => $this->title,
       "slug" => $this->link,
+      "tags" => $this->tags,
     );
   }
   
@@ -200,8 +218,9 @@ class AbstractSource
 
       foreach ($imageKeys as $key) {
         if (!$redis->sismember("link_list_in_progress", $key)) {
-          // uncomment for prod usage:
-          //$redis->sadd("link_list_in_progress", $key);
+          if (Config::$modifyDB) {
+            $redis->sadd("link_list_in_progress", $key);
+          }
           
           return $redis->hgetall($key);
         }
@@ -212,6 +231,44 @@ class AbstractSource
     return false;
 
   }
+
+  /**
+   * Remove image key with all data completely
+   */
+  public static function removeKey($key, $link="")
+  {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    // remove data
+    // todo: verify that key is correct to not delete all if *
+    $redis->del($key);
+
+    // remove link from set of indexed links
+    if (!empty ($link)) {
+      $redis->srem('indexed_links', $link);
+      $redis->sadd('failed_links', $link);
+    }
+
+    // remove link from process list
+    $redis->zrem('link_list_to_process', $key);
+
+    // remove link from in progress list
+    $redis->srem('link_list_in_progress', $key);
+
+    // remove image from all sets to make it available for user
+    $redis->zrem('image_list', $key);
+    $redis->srem('available_images', $key);
+    $redis->srem('upcoming_images', $key);
+    $redis->zrem('upcoming_image_list', $key);
+
+    self::removeUpcomingImageTags($key);
+
+    // remove cached dom object
+    $redis->del("cached_dom_".$key);
+
+  }
+
 
 
 }
