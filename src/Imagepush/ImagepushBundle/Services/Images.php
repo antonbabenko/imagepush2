@@ -102,6 +102,17 @@ class Images
   /*
    * @return array()|false
    */
+  public function getImageByKey($key) {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    return $redis->hgetall($key);
+
+  }
+
+  /*
+   * @return array()|false
+   */
   public function getOneImageRelatedToTimestamp($direction, $timestamp) {
 
     if (!$timestamp || !in_array($direction, array("next", "prev"))) return false;
@@ -172,7 +183,7 @@ class Images
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
     // save final data
-    $redis->hmset($key, $data);
+    $this->saveImageData($key, $data);
 
     // and save data about link to process
     $redis->zrem('link_list_to_process', $key);
@@ -185,6 +196,111 @@ class Images
 
     // was: saving to available_images, but correct -> upcoming_images
     $redis->sadd('upcoming_images', $key);
+
+  }
+
+  /**
+   * Save image data for the key
+   * @param string $key
+   * @param array $data
+   */
+  public function saveImageData($key, $data)
+  {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    
+    $redis->hmset($key, $data);
+
+  }
+  
+  /**
+   * Save image tags for the key
+   * @param string $key
+   * @param array $tags
+   */
+  public function saveImageTags($key, $tags)
+  {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    $tag = $this->kernel->getContainer()->get('imagepush.tags');
+    
+    $data = $redis->hgetall($key);
+    $tags = $tag->getTagKeys($tags);
+    $data["tags"] = json_encode($tags);
+    
+    //\D::dump($data);
+    
+    $this->saveImageData($key, $data);
+
+  }
+  
+  /**
+   * Remove key with all data completely
+   */
+  public function removeKey($key, $link="")
+  {
+
+    \D::dump($key);
+    \D::dump($link);
+    return;
+    
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    // remove data
+    $redis->del($key);
+
+    // remove link from set of indexed links
+    if (!empty ($link)) {
+      $redis->srem('indexed_links', $link);
+    //} else {
+      $redis->sadd('failed_links', $link);
+    }
+
+    // remove link from process list
+    $redis->zrem('link_list_to_process', $key);
+
+    // remove link from in progress list
+    $redis->srem('link_list_in_progress', $key);
+
+    // remove image from all sets to make it available for user
+    $redis->zrem('image_list', $key);
+    $redis->srem('available_images', $key);
+    $redis->srem('upcoming_images', $key);
+    $redis->zrem('upcoming_image_list', $key);
+
+    $this->removeUpcomingImageTags($key);
+
+    // remove cached dom object
+    $redis->del("cached_dom_".$key);
+
+  }
+
+  /**
+   * Move tagged image from upcoming to available, or remove from upcoming only
+   */
+  public function removeUpcomingImageTags($key, $make_available = false) {
+
+    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+
+    // save final data
+    $data = $redis->hgetall($key);
+    //D::dump($data);
+
+    $tags = @json_decode($data["tags"]);
+
+    if (count($tags)) {
+      foreach($tags as $tag_key) {
+        $redis->zrem('upcoming_image_list:'.$tag_key, $key);
+
+        if ($make_available) {
+          $redis->zadd('image_list:'.$tag_key, $data["timestamp"], $key);
+        }
+      }
+      
+      if ($make_available) {
+        $redis->sadd('available_images', $key);
+      }
+    }
 
   }
 

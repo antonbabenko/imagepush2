@@ -106,7 +106,11 @@ services:
         arguments: [@kernel]
 
     imagepush.fetcher.digg:
-        class: Imagepush\ImagepushBundle\Services\Fetchers\DiggFetcher
+        class: Imagepush\ImagepushBundle\Services\Fetcher\Digg\DiggFetcher
+        arguments: [@kernel]
+
+    imagepush.fetcher.content:
+        class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@kernel]
 
     imagepush.source:
@@ -114,21 +118,24 @@ services:
         arguments: [@kernel]
 
     imagepush.processor:
-        class: Imagepush\ImagepushBundle\Services\Processors\Processor
+        class: Imagepush\ImagepushBundle\Services\Processor\Processor
         arguments: [@kernel]
 
     imagepush.processor.content:
-        class: Imagepush\ImagepushBundle\Services\Processors\Content
+        class: Imagepush\ImagepushBundle\Services\Processor\Content
         arguments: [@kernel]
         
     imagepush.processor.image:
-        class: Imagepush\ImagepushBundle\Services\Processors\Image
+        class: Imagepush\ImagepushBundle\Services\Processor\Image
         arguments: [@kernel]
         
-#    imagine.filter.loader.thumbnail:
-#        class: %imagine.filter.loader.thumbnail.class%
-#        tags:
-#            - { name: imagine.filter.loader , filter: thumbnail }
+    imagepush.processor.html:
+        class: Imagepush\ImagepushBundle\Services\Processor\Html
+        arguments: [@kernel]
+        
+    imagepush.processor.tag:
+        class: Imagepush\ImagepushBundle\Services\Processor\Tag
+        arguments: [@kernel]
         
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug

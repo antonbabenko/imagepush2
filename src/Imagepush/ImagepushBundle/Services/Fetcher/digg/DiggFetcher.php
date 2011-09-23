@@ -1,10 +1,11 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services\Fetchers;
+namespace Imagepush\ImagepushBundle\Services\Fetcher\Digg;
 
-use Imagepush\ImagepushBundle\External\CustomStrings;
 use Imagepush\ImagepushBundle\Model\Tag;
 use Imagepush\ImagepushBundle\Model\DiggSource;
+use Imagepush\ImagepushBundle\Services\Fetcher\AbstractFetcher;
+use Imagepush\ImagepushBundle\External\CustomStrings;
 
 class DiggFetcher extends AbstractFetcher
 {
@@ -66,11 +67,18 @@ class DiggFetcher extends AbstractFetcher
 
   }
 
+  public function getDiggInstance() {
+    
+    $digg = new ImagepushDigg();
+    $digg->setVersion('2.0');
+    
+    return $digg;
+  }
+  
   public function fetchData()
   {
 
-    $digg = new ImagepushDigg();
-    $digg->setVersion('2.0');
+    $digg = $this->getDiggInstance();
 
     try {
       $response = $digg->search->search(array(
@@ -122,7 +130,8 @@ class DiggFetcher extends AbstractFetcher
       $source->setSlugFromTitle();
       
       if (!empty($item->topic->name)) {
-         $tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
+        $source->setTags($item->topic->name);
+         //$tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
       }
 
       try {

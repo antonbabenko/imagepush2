@@ -1,8 +1,8 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services\Fetchers;
+namespace Imagepush\ImagepushBundle\Services\Fetcher\Digg;
 
-require_once dirname(__FILE__).'/../../../../../vendor/digg/Services/Digg2.php';
+require_once dirname(__FILE__).'/../../../../../../vendor/digg/Services/Digg2.php';
 
 class ImagepushDigg extends \Services_Digg2
 {

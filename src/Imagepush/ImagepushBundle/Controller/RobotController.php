@@ -27,7 +27,7 @@ class RobotController extends Controller
         break;
       
       /**
-       * Process source = get html pages, find images
+       * Process source = get source, find images, make thumbs, find related tags
        */
       case "processSource":
         $content = $this->get('imagepush.processor')->run();

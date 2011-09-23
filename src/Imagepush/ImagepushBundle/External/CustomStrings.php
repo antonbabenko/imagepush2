@@ -5,23 +5,23 @@ namespace Imagepush\ImagepushBundle\External;
 class CustomStrings
 {
 
-  static protected $separator_pattern =
+  static $separator_pattern =
     '[|\-«»—~:\@]+';
 
-  static protected $general_endings_pattern =
+  static $general_endings_pattern =
     '@[{(\[][\d\s]*(pic|pics|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]$@ui';
 
-  static protected $forbidden_endings_pattern =
+  static $forbidden_endings_pattern =
     '@[{(\[]\s*(nsfw)+\s*[)\]}]@ui';
 
-  static protected $url_pattern =
+  static $url_pattern =
     '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
   
-  static protected $remove_start = '
+  static $remove_start = '
     The Underfold
 ';
 
-  static protected $remove_end = '
+  static $remove_end = '
     The Oatmeal
     TheJourneyPoint
     Catastrophe Monitor
@@ -194,7 +194,7 @@ class CustomStrings
   /**
    * Remove useless chars, spaces, newlines, singularize, etc and return it.
    */
-  public function cleanTag($tag)
+  public static function cleanTag($tag)
   {
 
     $tag = mb_strtolower($tag, 'UTF-8');

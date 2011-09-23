@@ -1,13 +1,12 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services\Fetchers;
+namespace Imagepush\ImagepushBundle\Services\Fetcher;
 
 use Imagepush\ImagepushBundle\External\CustomStrings;
 
 /*
- * Universal class to fetch from Digg/RSS/YQL/etc
+ * Abstract class to fetch data from Digg/RSS/YQL/etc (via API) and from HTTP (via Goutte or other library) 
  */
-
 class AbstractFetcher
 {
 

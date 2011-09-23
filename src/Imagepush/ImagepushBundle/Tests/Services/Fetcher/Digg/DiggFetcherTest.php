@@ -1,11 +1,11 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Tests\Services\Fetchers;
+namespace Imagepush\ImagepushBundle\Tests\Services\Fetcher\Digg;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Imagepush\ImagepushBundle\Tests\Bootstrap\RedisConnection;
 use Imagepush\ImagepushBundle\Tests\Fixtures\DiggFixture;
-use Imagepush\ImagepushBundle\Services\Fetchers\DiggFetcher;
+use Imagepush\ImagepushBundle\Services\Fetcher\Digg\DiggFetcher;
 
 class DiggFetcherTest extends WebTestCase
 {
