@@ -8,6 +8,7 @@ use Imagepush\ImagepushBundle\Services\Processor\Config;
 /**
  * Imagepush\ImagepushBundle\Model\AbstractSource
  * 
+ * 
  * This class describes setters and getters for fetched sources.
  */
 class AbstractSource
