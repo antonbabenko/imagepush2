@@ -43,24 +43,27 @@ class Tag extends Html
   public function processTags()
   {
     $images = $this->kernel->getContainer()->get('imagepush.images');
+    $tags = $this->kernel->getContainer()->get('imagepush.tags');
 
-    $this->source["link"] = "http://www.flickr.com/photos/passiveaggressive/3642661392/sizes/o/";
+    //$this->source["link"] = "http://www.flickr.com/photos/passiveaggressive/3642661392/sizes/o/";
     
     if (!empty($this->source["tags"])) {
-      self::$tmpTags[Config::SRC_ORIGINAL] = $this->source["tags"];
+      $originalTags = $this->source["tags"];
+      if (is_string($originalTags)) {
+        $originalTags = (json_decode($originalTags) ? $tags->getHumanTags(json_decode($originalTags)) : array());
+        $originalTags = array_values(array_filter($originalTags, function($tag){return !is_null($tag);}));
+      }
+      self::$tmpTags[Config::SRC_ORIGINAL] = $originalTags;
     }
-    \D::dump(self::$tmpTags);
 
-    /*
-      self::$tmpTags[Config::SRC_STUMBLEUPON] = $this->findInStumbleUpon();
-      self::$tmpTags[Config::SRC_DELICIOUS] = $this->findInDelicious();
-      self::$tmpTags[Config::SRC_TWITTER] = $this->findInTwitter();
-      self::$tmpTags[Config::SRC_DIGG] = $this->findInDigg();
-      self::$tmpTags[Config::SRC_REDDIT] = $this->findInReddit();
+    self::$tmpTags[Config::SRC_STUMBLEUPON] = $this->findInStumbleUpon();
+    self::$tmpTags[Config::SRC_DELICIOUS] = $this->findInDelicious();
+    self::$tmpTags[Config::SRC_TWITTER] = $this->findInTwitter();
+    self::$tmpTags[Config::SRC_DIGG] = $this->findInDigg();
+    self::$tmpTags[Config::SRC_REDDIT] = $this->findInReddit();
 
-      //echo serialize(self::$tmpTags);
-     */
-    self::$tmpTags = unserialize('a:5:{i:3;a:2:{s:11:"Photography";i:1;s:6:"Comedy";i:1;}i:2;a:10:{s:5:"funny";i:51;s:5:"humor";i:35;s:6:"photos";i:28;s:9:"carnivore";i:24;s:5:"vegan";i:24;s:7:"awesome";i:20;s:6:"flickr";i:19;s:4:"food";i:17;s:6:"images";i:15;s:7:"culture";i:9;}i:5;a:0:{}i:1;a:0:{}i:4;a:12:{s:4:"pics";i:2;s:5:"funny";i:5;s:11:"Pantyfetish";i:1;s:3:"WTF";i:1;s:17:"reportthespammers";i:2;s:9:"treecipes";i:1;s:3:"veg";i:1;s:5:"vegan";i:6;s:19:"fffffffuuuuuuuuuuuu";i:5;s:11:"Supplements";i:1;s:13:"AdviceAnimals";i:1;s:10:"freeganism";i:1;}}');
+    //echo serialize(self::$tmpTags);
+    //self::$tmpTags = unserialize('a:5:{i:3;a:2:{s:11:"Photography";i:1;s:6:"Comedy";i:1;}i:2;a:10:{s:5:"funny";i:51;s:5:"humor";i:35;s:6:"photos";i:28;s:9:"carnivore";i:24;s:5:"vegan";i:24;s:7:"awesome";i:20;s:6:"flickr";i:19;s:4:"food";i:17;s:6:"images";i:15;s:7:"culture";i:9;}i:5;a:0:{}i:1;a:0:{}i:4;a:12:{s:4:"pics";i:2;s:5:"funny";i:5;s:11:"Pantyfetish";i:1;s:3:"WTF";i:1;s:17:"reportthespammers";i:2;s:9:"treecipes";i:1;s:3:"veg";i:1;s:5:"vegan";i:6;s:19:"fffffffuuuuuuuuuuuu";i:5;s:11:"Supplements";i:1;s:13:"AdviceAnimals";i:1;s:10:"freeganism";i:1;}}');
 
     $this->filterTagsNotWorthToBeSaved();
 
@@ -319,12 +322,22 @@ class Tag extends Html
     if (!count(self::$tmpTags) || !count(Config::$uselessTags))
       return false;
 
+    \D::dump(self::$tmpTags);
     foreach (self::$tmpTags as $tagGroup => $tags) {
+
+      if (!$tags) continue;
 
       // get value for each tag group
       $tagGroupValue = (isset(Config::$tagGroupValue[$tagGroup]) ? Config::$tagGroupValue[$tagGroup] : 1);
 
       foreach ($tags as $tag => $tagMentioned) {
+        
+        // If array of tags doesn't have tagMentioned value, but just text, then use value as key and set tagMentioned to 1
+        if (is_int($tag) && !is_int($tagMentioned)) {
+          $tag = $tagMentioned;
+          $tagMentioned = 1;
+        }
+
         $tag = CustomStrings::cleanTag($tag);
 
         if (mb_strlen($tag, "UTF-8") < 2 || in_array($tag, Config::$uselessTags))
@@ -346,9 +359,9 @@ class Tag extends Html
       }
     }
 
-    //\D::dump($finalTags);
+    \D::dump($finalTags);
     $finalTags = self::filterTagsByScore($finalTags, 20);
-    //\D::dump($finalTags);
+    \D::dump($finalTags);
 
     return self::$tmpTags = $finalTags;
 
@@ -393,6 +406,13 @@ class Tag extends Html
 
     $newTags = array();
     foreach ($tags as $tag => $score) {
+      
+      // If array of tags doesn't have score, but just text, then use value as key and set score to 1
+      if (is_int($tag) && !is_int($score)) {
+        $tag = $score;
+        $score = 1;
+      }
+      
       if (!count($newTags))
       {
         $newTags[] = $tag;
