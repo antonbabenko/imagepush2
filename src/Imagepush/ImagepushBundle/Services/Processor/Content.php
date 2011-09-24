@@ -46,7 +46,7 @@ class Content
 
   public function getContent()
   {
-    return self::$data["Content"];
+    return (array_key_exists("Content", self::$data) ? self::$data["Content"] : null);
   }
 
   public function isImage() {
@@ -85,6 +85,7 @@ class Content
     if (is_array($response)) {
       self::$data = $response;
       self::$isFetched = true;
+      //\D::dump(self::$data["Content-type"]);
     } else {
       self::$data = null;
       self::$isFetched = false;

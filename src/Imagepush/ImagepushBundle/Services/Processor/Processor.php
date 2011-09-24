@@ -78,10 +78,6 @@ class Processor
       throw new \Exception(sprintf("%s is blacklisted domain (porn, spam, etc)", $this->link));
     }
 
-    // nothing to do if no link or link is blocked
-    //if (!$this->link || self::isBlockedDomain($this->link))
-    //return false;
-
     /*
       $this->link = "http://www.web-developer.no/img/portfolio/flynytt.jpg";
       $this->link = "http://i.imgur.com/bCK24.jpg";
@@ -104,11 +100,16 @@ class Processor
     
     // skip top logo, because it has been indexed already
     //$this->link = "http://www.geekfill.com/2011/03/12/hold-still-sonny-comic/";
+    
+    // Hotlinking forbidden
+    //$this->link = "http://www.flickr.com/photos/mtaphotos/6086067175/";
 
     // ssl problem:
     //$this->link = "http://delaware.metromix.com/music/essay_photo_gallery/most-anticipated-albums-of/2389330/photo/2393050";
     // parse url problem
-    $this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
+    //$this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
+    //
+    //$this->link = "http://i.imgur.com/SsvPB.jpg";
 
     $result = false;
     
@@ -134,7 +135,7 @@ class Processor
       }
 
       $processorImage->setId($this->id);
-      $processorImage->setContent($content);
+      $processorImage->setData($content->getData());
 
       $result = $processorImage->makeThumbs();
 
@@ -163,14 +164,13 @@ class Processor
           continue;
 
         foreach ($imagesUrl as $imageUrl) {
-          $content->get($imageUrl["url"]);
-          \D::dump($imageUrl["url"]);
+          $content->fetch($imageUrl["url"]);
 
           if ($content->isImage() && !$content->isAlreadyProcessedImageHash() )
           {
-            //\D::dump($imageUrl["url"]);
+            //\D::dump($content->getData());
             $processorImage->setId($this->id);
-            $processorImage->setContent($content);
+            $processorImage->setData($content->getData());
 
             $result = $processorImage->makeThumbs();
 
@@ -189,16 +189,18 @@ class Processor
           }
         }
       }
-
-      // No images found - remove link and image key
-      if (!$result && Config::$modifyDB)
-      {
+    } // end of find image block
+    
+    \D::dump($result);
+    
+    // No images found - remove link and image key
+    if (!$result) {
+      $this->kernel->getContainer()->get('logger')->info(sprintf("ID: %d. No images found, so link %s should be removed.", $this->id, $this->link));
+      if (Config::$modifyDB) {
         $images->removeKey($this->imageKey, $this->link);
         return false;
       }
-      
     }
-  //} // end of find image block
     
     /**
      * FIND TAGS
