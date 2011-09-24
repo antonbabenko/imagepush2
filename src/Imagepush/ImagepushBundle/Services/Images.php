@@ -242,12 +242,9 @@ class Images
 
     \D::dump($key);
     \D::dump($link);
-    return;
+    //return;
     
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
-
-    // remove data
-    $redis->del($key);
 
     // remove link from set of indexed links
     if (!empty ($link)) {
@@ -270,8 +267,8 @@ class Images
 
     $this->removeUpcomingImageTags($key);
 
-    // remove cached dom object
-    $redis->del("cached_dom_".$key);
+    // remove image data
+    $redis->del($key);
 
   }
 

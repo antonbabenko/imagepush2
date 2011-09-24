@@ -89,7 +89,11 @@ class Image extends Content
 
     $imagine = new Imagine\Imagick\Imagine();
     
-    $image = $imagine->load($this->getContent());
+    if ($content = $this->getContent()) {
+      $image = $imagine->load($content);
+    } else {
+      return false;
+    }
 
     //$this->setId($id);
     $this->setImage($image);
