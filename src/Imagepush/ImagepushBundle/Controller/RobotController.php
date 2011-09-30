@@ -30,7 +30,14 @@ class RobotController extends Controller
        * Process source = get source, find images, make thumbs, find related tags
        */
       case "processSource":
-        $content = $this->get('imagepush.processor')->run();
+        $content = $this->get('imagepush.processor')->processSource();
+        break;
+      
+      /**
+       * Process source tags = find related tags for the upcoming images
+       */
+      case "processSourceTags":
+        $content = $this->get('imagepush.processor')->processSourceTags();
         break;
       
       /**

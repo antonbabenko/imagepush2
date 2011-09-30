@@ -6,20 +6,14 @@ use Imagepush\ImagepushBundle\Services\Processor\Config;
 use Imagepush\ImagepushBundle\Services\Processor\Content;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 
-class Html extends Content
+class HtmlContent extends Content
 {
 
   public $dom;
 
-  /*
-   * @services
-   */
-  public $kernel;
-
   public function __construct(\AppKernel $kernel)
   {
-
-    $this->kernel = $kernel;
+    parent::__construct($kernel);
   }
 
   public function initDom($reload = false)
@@ -107,7 +101,7 @@ class Html extends Content
       {
         continue;
       }
-
+      
       $imgUrl = self::generateFullUrl($src, $this->getLink());
 
       //\D::dump($imgUrl);

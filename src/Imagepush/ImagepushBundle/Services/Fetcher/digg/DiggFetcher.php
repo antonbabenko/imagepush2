@@ -2,8 +2,9 @@
 
 namespace Imagepush\ImagepushBundle\Services\Fetcher\Digg;
 
-use Imagepush\ImagepushBundle\Model\Tag;
-use Imagepush\ImagepushBundle\Model\DiggSource;
+//use Imagepush\ImagepushBundle\Model\Tag;
+//use Imagepush\ImagepushBundle\Model\AbstractSource;
+use Imagepush\ImagepushBundle\Entity\Image;
 use Imagepush\ImagepushBundle\Services\Fetcher\AbstractFetcher;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 
@@ -109,42 +110,38 @@ class DiggFetcher extends AbstractFetcher
       return false;
     }
     
-    $images = $this->kernel->getContainer()->get('imagepush.images');
-    $tags = $this->kernel->getContainer()->get('imagepush.tags');
+    //$images = $this->kernel->getContainer()->get('imagepush.images');
+    //$tags = $this->kernel->getContainer()->get('imagepush.tags');
     
     foreach ($this->data as $item) {
       
       if (!$this->isWorthToSave($item))
         continue;
       
-      $id = $images->getImageId();
-      $imageKey = $images->getImageKey($id);
-      
-      $source = new DiggSource($this->kernel);
-      $source->setId($id);
-      $source->setImageKey($imageKey);
-      
-      $source->setLink($item->link);
-      $source->setTimestamp($item->submit_date);
-      $source->setTitle($item->title);
-      $source->setSlugFromTitle();
+      $image = new Image($this->kernel);
+      $image->setSourceType("digg");
+      $image->setLink($item->link);
+      $image->setTimestamp($item->submit_date);
+      $image->setTitle($item->title);
+      $image->setSlugFromTitle();
       
       if (!empty($item->topic->name)) {
-        $source->setTags($item->topic->name);
+        $image->setOriginalTags($item->topic->name);
          //$tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
       }
 
       try {
-        if ($source->save()) {
+        
+        if ($image->saveAsSource()) {
           self::$savedCounter++;
         }
       } catch (\Exception $e) {
-        $this->logger->err(sprintf("ImageKey: %s has not been saved. Error was: %s", $imageKey, $e->getMessage()));
+        $this->logger->err(sprintf("Link: %s has not been saved. Error was: %s", $item->link, $e->getMessage()));
       }
       
-      if ($source->getTimestamp() > $this->recentSourceDate)
+      if ($image->timestamp > $this->recentSourceDate)
       {
-        $this->recentSourceDate = $source->getTimestamp();
+        $this->recentSourceDate = $image->timestamp;
       }
       
     }

@@ -2,6 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
+use Imagepush\ImagepushBundle\Entity\Image;
+
 /**
  * @todo: Other classes are:
  *   Processor\Processor - super-class which handles all other processors relations and contains business logic
@@ -14,68 +16,50 @@ namespace Imagepush\ImagepushBundle\Services\Processor;
 class Processor
 {
 
-  public $source;
-  public $id;
-  public $link;
-  public $imageKey;
-
-  /*
-   * @services
-   */
-  public $kernel;
-
   public function __construct(\AppKernel $kernel)
   {
 
     $this->kernel = $kernel;
+    $this->logger = $kernel->getContainer()->get('logger');
+    
   }
 
-  static $result;
-
-  /**
-   * @todo: Make a black list of domains, if porn/nudes domain - return true
-   */
-  public function isBlockedDomain()
+/**
+ * 
+ * 1) get one latest urls, which is unprocessed and not blocked by other working process
+ * 2) check what kind of site is it - blocked (nudes, porn) or good
+ * 3) get content from URL
+ * 4) check type of content - image or html
+ * 4a) if single image -> then it is "unsorted" category
+ * 4b) if html:
+ * 5) try to find large image(s)
+ * 6) try to make thumbs from large image
+ * //7) try to find category/tags for the page
+ */
+  public function processSource()
   {
-    return false;
-  }
+    
+    $result = false;
+    
+    //\D::dump($this->kernel->getContainer()->getParameter('contact_email'));
 
-  public function run()
-  {
-
-    // 1) get one latest urls, which is unprocessed and not blocked by other working process
-    // 2) check what kind of site is it - blocked (nudes, porn) or good
-    // 3) get content from URL
-    // 4) check type of content - image or html
-    // 4a) if single image -> then it is "unsorted" category
-    // 4b) if html:
-    // 5) try to find large image(s)
-    // 6) try to make thumbs from large image
-    // 7) try to find category/tags for the page
-
-    $source = $this->kernel->getContainer()->get('imagepush.source');
-    $images = $this->kernel->getContainer()->get('imagepush.images');
-    $content = $this->kernel->getContainer()->get('imagepush.processor.content');
-    $processorImage = $this->kernel->getContainer()->get('imagepush.processor.image');
-    $processorHtml = $this->kernel->getContainer()->get('imagepush.processor.html');
-    $processorTag = $this->kernel->getContainer()->get('imagepush.processor.tag');
-
-    $this->source = $source->getAndInitUnprocessed();
-
-    if ($this->source === false)
-    {
-      throw new \Exception("There is no unprocessed source to work on");
+    /**
+     * Create image object based on unprocessed source
+     */
+    $image = new Image($this->kernel);
+    
+    if ($image->initUnprocessedSource()) {
+      $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->id, $image->link));
+    } else {
+      $this->logger->info("There is no unprocessed source to work on");
+      return false;
     }
-
-    $this->id = $this->source["id"];
-    $this->link = $this->source["link"];
-    $this->imageKey = $images->getImageKey($this->id);
-
-    \D::dump($this->source);
-
-    if ($this->isBlockedDomain())
+    \D::dump($image);
+    
+    if ($image->sourceDomainIsBlocked())
     {
-      throw new \Exception(sprintf("%s is blacklisted domain (porn, spam, etc)", $this->link));
+      $this->logger->warn(sprintf("ID: %d. %s is blacklisted domain (porn, spam, etc)", $image->id, $image->link));
+      return false;
     }
 
     /*
@@ -110,41 +94,57 @@ class Processor
     //$this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
     //
     //$this->link = "http://i.imgur.com/SsvPB.jpg";
-
-    $result = false;
+    
+    //echo $image->link = "http://imgur.com/gallery/mRJT0";
     
     /**
-     * FIND IMAGE
+     * Get content from the link
      */
-    //if (false) { // begin of find image comments (to test tags only)
-    $content->initAndFetch($this->link);
+    $content = new Content($this->kernel);
+    $content->get($image->link);
     
-    if (!$content->isFetched())
+    \D::dump($content->isSuccessStatus());
+    
+    if (!$content->isSuccessStatus())
     {
-      $this->kernel->getContainer()->get('logger')->warn(sprintf("ID: %d. Link %s returned status code %d", $this->id, $this->link, $content->getData()));
+      $this->logger->warn(sprintf("ID: %d. Link %s returned status code %d", $image->id, $image->link, $content->getData()));
       return false;
     }
 
-    if ($content->isImage())
+    /**
+     * Content is image
+     */
+    if ($content->isImageType())
     {
 
       if ($content->isAlreadyProcessedImageHash())
       {
-        $this->kernel->getContainer()->get('logger')->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $this->id, $this->link));
+        $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $this->id, $this->link));
         return false;
       }
-
-      $processorImage->setId($this->id);
+      
+      $processorImage = new ImageContent($this->kernel);
+      $processorImage->setId($image->id);
       $processorImage->setData($content->getData());
 
       $result = $processorImage->makeThumbs();
 
-      if ($result && Config::$modifyDB)
-      {
-        $content->saveProcessedImageHash();
-        $images->saveAsProcessed($this->imageKey, array_merge($this->source, $result));
+      if ($result) {
+        if (Config::$modifyDB) {
+          $content->saveProcessedImageHash();
+          $image->saveAsProcessed($result);
+        }
+        
+        $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->id, $image->link));
+
       }
-    } elseif ($content->isHTMLLike())
+      
+    }
+    
+    /**
+     * Content is HTML/XML
+     */
+    if ($content->isHTMLType())
     {
 
       $functions = array(
@@ -152,52 +152,61 @@ class Processor
         "getBestImageFromDom" /* Try to find large images inside html DOM */
       );
 
+      $processorHtml = new HtmlContent($this->kernel);
+      $processorHtml->setLink($image->link);
+      $processorHtml->setData($content->getData());
+      
       foreach ($functions as $function) {
 
-        $processorHtml->setData($content->getData());
-        //\D::dump($content);
         $imagesUrl = $processorHtml->$function();
 
-        \D::dump($imagesUrl);
+        if ($imagesUrl)
+        {
 
-        if (!$imagesUrl)
-          continue;
+          //\D::dump($function);
+          //\D::dump($imagesUrl);
 
-        foreach ($imagesUrl as $imageUrl) {
-          $content->fetch($imageUrl["url"]);
+          foreach ($imagesUrl as $imageUrl) {
 
-          if ($content->isImage() && !$content->isAlreadyProcessedImageHash() )
-          {
-            //\D::dump($content->getData());
-            $processorImage->setId($this->id);
-            $processorImage->setData($content->getData());
+            $content->get($imageUrl["url"]);
 
-            $result = $processorImage->makeThumbs();
-
-            //\D::dump($result);
-            if ($result && Config::$modifyDB)
+            if ($content->isImageType() && !$content->isAlreadyProcessedImageHash())
             {
-              $content->saveProcessedImageHash();
-              $images->saveAsProcessed($this->imageKey, array_merge($this->source, $result));
-            }
+              $processorImage = new ImageContent($this->kernel);
+              $processorImage->setId($image->id);
+              $processorImage->setData($content->getData());
 
-            // Image has been found and saved. No need to search further.
-            if ($result) {
-              $this->kernel->getContainer()->get('logger')->info(sprintf("ID: %d. Link %s has been processed. Image url: %s", $this->id, $this->link, $imageUrl["url"]));
-              break 2;
+              $result = $processorImage->makeThumbs();
+
+              if ($result)
+              {
+                if (Config::$modifyDB)
+                {
+                  $content->saveProcessedImageHash();
+                  $image->saveAsProcessed($result);
+                }
+
+                $this->logger->info(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->id, $image->link, $function, $imageUrl["url"]));
+                
+                // Image has been found and saved. No need to search further.
+                break 2;
+              }
             }
           }
         }
       }
+      
     } // end of find image block
     
     \D::dump($result);
     
-    // No images found - remove link and image key
+    /**
+     * No images found - remove link and image key
+     */
     if (!$result) {
-      $this->kernel->getContainer()->get('logger')->info(sprintf("ID: %d. No images found, so link %s should be removed.", $this->id, $this->link));
+      $this->logger->info(sprintf("ID: %d. No images found, so link %s should be removed.", $image->id, $image->link));
       if (Config::$modifyDB) {
-        $images->removeKey($this->imageKey, $this->link);
+        $image->remove();
         return false;
       }
     }
@@ -205,7 +214,8 @@ class Processor
     /**
      * FIND TAGS
      */
-  //$result = true;
+  $result = false;
+    
     if ($result) {
       $processorTag->setImageKey($this->imageKey);
       $processorTag->setSource($this->source);
@@ -215,7 +225,7 @@ class Processor
     }
 
 
-    return (isset($result) && $result ? $this->id : false);
+    return (isset($result) && $result ? $image->id : false);
 
   }
 

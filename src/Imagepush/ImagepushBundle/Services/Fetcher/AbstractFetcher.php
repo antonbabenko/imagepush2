@@ -26,6 +26,7 @@ class AbstractFetcher
   public function __construct(\AppKernel $kernel) {
     
     $this->kernel = $kernel;
+    $this->logger = $kernel->getContainer()->get('logger');
     
   }
   

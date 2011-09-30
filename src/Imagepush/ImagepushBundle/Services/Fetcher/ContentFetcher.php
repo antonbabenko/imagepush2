@@ -16,7 +16,7 @@ class ContentFetcher
    * Send GET request
    * @return array|integer Array with data or status code
    */
-  public function get($uri)
+  public function getRequest($uri)
   {
     $this->requestType = "GET";
     return $this->makeRequest($uri);
@@ -26,7 +26,7 @@ class ContentFetcher
    * Send HEAD request
    * @return array|integer Array with data or status code
    */
-  public function head($uri)
+  public function headRequest($uri)
   {
     $this->requestType = "HEAD";
     return $this->makeRequest($uri);
@@ -40,7 +40,7 @@ class ContentFetcher
 
     $client = new Client();
     
-    $crawler = $client->request('GET', $uri);
+    $crawler = $client->request($this->requestType, $uri);
 
     $response = $client->getResponse();
     //\D::dump($response->getContent());
