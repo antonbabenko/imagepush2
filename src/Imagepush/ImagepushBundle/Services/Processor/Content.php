@@ -7,105 +7,106 @@ use Imagepush\ImagepushBundle\Services\Processor\Config;
 class Content
 {
 
-  public static $data;
-  
-  public static $isFetched = false;
-  
-  public static $link;
-  
+  public $data;
+  public $status = false;
+  public $link;
+
   /*
    * @services
    */
-  public $kernel;
-  
-  public function __construct(\AppKernel $kernel) {
-    
+  protected $kernel;
+
+  public function __construct(\AppKernel $kernel)
+  {
     $this->kernel = $kernel;
-    
   }
 
-  public function isFetched() {
-    return self::$isFetched;
+  /**
+   * Get status code (if 2xx => true; else => false)
+   * @return boolean
+   */
+  public function isSuccessStatus()
+  {
+    return $this->status !== false && $this->status / 100 == 2;
   }
 
-  public function setLink($link) {
-    self::$link = $link;
+  public function setLink($link)
+  {
+    $this->link = $link;
   }
 
-  public function getLink() {
-    return self::$link;
+  public function getLink()
+  {
+    return $this->link;
   }
 
-  public function setData($data) {
-    self::$data = $data;
+  public function setData($data)
+  {
+    $this->data = $data;
   }
-  
-  public function getData() {
-    return self::$data;
+
+  public function getData()
+  {
+    return $this->data;
   }
 
   public function getContent()
   {
-    return (array_key_exists("Content", self::$data) ? self::$data["Content"] : null);
+    return (array_key_exists("Content", $this->data) ? $this->data["Content"] : null);
   }
 
-  public function isImage() {
-    
-    return (!empty(self::$data["Content-type"]) && in_array(self::$data["Content-type"], Config::$allowedImageContentTypes));
-    
+  public function isImageType()
+  {
+
+    return (!empty($this->data["Content-type"]) && in_array($this->data["Content-type"], Config::$allowedImageContentTypes));
   }
 
-  public function isHTMLLike() {
-    
-    return (!empty(self::$data["Content-type"]) && (preg_match('/(x|ht)ml/i', self::$data["Content-type"])));
-    
+  public function isHTMLType()
+  {
+
+    return (!empty($this->data["Content-type"]) && (preg_match('/(x|ht)ml/i', $this->data["Content-type"])));
   }
-  
-  public function isAlreadyProcessedImageHash() {
-    
+
+  public function isAlreadyProcessedImageHash()
+  {
+
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
-    return $redis->sismember('processed_image_hash', self::$data["Content-md5"]);
-    
+    return $redis->sismember('processed_image_hash', $this->data["Content-md5"]);
   }
-  
-  public function saveProcessedImageHash() {
-    
+
+  public function saveProcessedImageHash()
+  {
+
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
-    return $redis->sadd('processed_image_hash', self::$data["Content-md5"]);
-    
+    return $redis->sadd('processed_image_hash', $this->data["Content-md5"]);
   }
-  
-  public function fetch($link) {
+
+  public function get($link)
+  {
     $fetcher = $this->kernel->getContainer()->get('imagepush.fetcher.content');
-    
-    $response = $fetcher->get($link);
-    
-    if (is_array($response)) {
-      self::$data = $response;
-      self::$isFetched = true;
-      //\D::dump(self::$data["Content-type"]);
-    } else {
-      self::$data = null;
-      self::$isFetched = false;
+
+    $this->link = $link;
+    $response = $fetcher->getRequest($link);
+
+    if (is_array($response))
+    {
+      $this->data = $response;
+      $this->status = $response["Status"];
+    } else
+    {
+      $this->data = null;
+      $this->status = false;
     }
     return $response;
   }
-  
-  public function head($link) {
+
+  public function head($link)
+  {
     $fetcher = $this->kernel->getContainer()->get('imagepush.fetcher.content');
-    
-    return $fetcher->head($link);
-    
+
+    return $fetcher->headRequest($link);
   }
-  
-  /**
-   * Init the main link and fetch the data
-   */
-  public function initAndFetch($link) {
-    $this->setLink($link);
-    return $this->fetch($link);
-  }
-  
+
 }

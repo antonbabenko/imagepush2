@@ -11,13 +11,13 @@ use Imagine\Image\Point;
 use Imagine\Image\ImageInterface;
 use Imagine\Filter\Transformation;
 
-class Image extends Content
+class ImageContent extends Content
 {
 
   /*
    * @services
    */
-  public $kernel;
+  //public $kernel;
   
   /*
    * @read: http://symfony.com/doc/2.0/cookbook/doctrine/file_uploads.html
@@ -27,8 +27,7 @@ class Image extends Content
 
   public function __construct(\AppKernel $kernel)
   {
-
-    $this->kernel = $kernel;
+    parent::__construct($kernel);
   }
 
   public function setId($id)

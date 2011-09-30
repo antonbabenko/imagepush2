@@ -1,6 +1,6 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Model;
+namespace Imagepush\ImagepushBundle\Entity;
 
 use Imagepush\ImagepushBundle\External\CustomStrings;
 use Imagepush\ImagepushBundle\Model\AbstractSource;
@@ -12,200 +12,98 @@ use Imagepush\ImagepushBundle\Services\Processor\Config;
 class Image extends AbstractSource
 {
 
-  /**
-   * @required
-   */
-  public $id;
-  public $imageKey;
-  public $link;
-  public $timestamp;
-  
-  /**
-   * @optional
-   */
-  public $title = "";
-  public $slug = "";
-  
-  /*
-   * @string
-   */
-  public $sourceType;
+  //public $id;
+  //public $imageKey;
+  //public $source;
+  //public $link;
+  //public $timestamp;
+  //public $title = "";
+  //public $slug = "";
 
-  /**
-   * @services
-   */
-  public $kernel;
-  
   public function __construct(\AppKernel $kernel) {
+    parent::__construct($kernel);
+  }
+  
+  /**
+   * Init all properties from source array
+   * @param array $source
+   */
+  public function initFromArray($data) {
+    $this->id = $data["id"];
+    $this->imageKey = $this->makeImageKey($data["id"]);
+    $this->link = $data["link"];
+    $this->timestamp = $data["timestamp"];
+    $this->title = $data["title"];
+    $this->slug = $data["slug"];
     
-    $this->kernel = $kernel;
+    $this->tags = (isset($data["tags"]) ? $data["tags"] : '');
+    $this->originalTags = (isset($data["original_tags"]) ? $data["original_tags"] : '');
+  }
+  
+  /**
+   * Get all finalized data as array to save data
+   * @return array
+   */
+  public function toArray() {
+    $result["id"] = $this->id;
+    $result["link"] = $this->link;
+    $result["timestamp"] = $this->timestamp;
+    $result["title"] = $this->title;
+    $result["slug"] = $this->slug;
     
-  }
-  
-  /**
-   * Set id
-   * @param integer $id
-   */
-  public function setId($id) {
-    $this->id = $id;
-  }
-  
-  /**
-   * Get id
-   * @return integer $id
-   */
-  public function getId() {
-    return $this->id;
-  }
-  
-  /**
-   * Set image key
-   * @param string $imageKey
-   */
-  public function setImageKey($imageKey) {
-    $this->imageKey = $imageKey;
+    $result["tags"] = (isset($this->tags) ? $this->tags : '');
+    $result["original_tags"] = (isset($this->originalTags) ? $this->originalTags : '');
+    
+    return $result;
+    
   }
   
   /**
    * Get image key
    * @return string $imageKey
    */
-  public function getImageKey() {
-    return $this->imageKey;
-  }
+  /*public function getImageKey() {
+    return "image_id:".$this->id;
+  }*/
   
-  /**
-   * Set link
-   * @param string $link
+  /*
+   * Save image as processed (with thumbs)
    */
-  public function setLink($link) {
-    $this->link = $link;
-  }
-  
-  /**
-   * Get link
-   * @return string $link
-   */
-  public function getLink() {
-    return $this->link;
-  }
-  
-  /**
-   * Set timestamp
-   * @param integer $timestamp
-   */
-  public function setTimestamp($timestamp) {
-    $this->timestamp = $timestamp;
-  }
-  
-  /**
-   * Get timestamp
-   * @return integer $timestamp
-   */
-  public function getTimestamp() {
-    return $this->timestamp;
-  }
-  
-  /**
-   * Set title
-   * @param string $title
-   */
-  public function setTitle($title = "") {
-    $this->title = CustomStrings::cleanTitle($title);
-  }
-  
-  /**
-   * Get title
-   * @param string $title
-   */
-  public function getTitle() {
-    return $this->title;
-  }
-  
-  /**
-   * Set tags
-   * @param array $tags
-   */
-  public function setTags($tags = array()) {
-    $this->tags = (array)$tags;
-  }
-  
-  /**
-   * Get tags
-   * @param array $tags
-   */
-  public function getTags() {
-    return $this->tags;
-  }
-  
-  /**
-   * Set slug from title
-   * @param string $slug
-   */
-  public function setSlugFromTitle() {
-    $this->slug = CustomStrings::slugify($this->title);
-  }
-  
-  /**
-   * Get slug
-   * @param string $slug
-   */
-  public function getSlug() {
-    return $this->slug;
-  }
-  
-  /**
-   * Get all data as array
-   * @param array $source
-   */
-  public function toArray() {
-    return array(
-      "id" => $this->id,
-      "link" => $this->link,
-      "timestamp" => $this->timestamp,
-      "title" => $this->title,
-      "slug" => $this->link,
-      "tags" => $this->tags,
-    );
-  }
-  
-  /**
-   * Save source object
-   * @return true or Exception
-   */
-  public function save() {
+  public function saveAsProcessed($data)
+  {
+    // Merge current image data with new image data
+    $newData = array_merge($this->toArray(), $data);
     
-    if (empty($this->id) || empty($this->link) || empty($this->timestamp) || empty($this->sourceType)) {
-      throw new \Exception("Source id, sourceType, link and timestamp can't be empty");
-    }
+    \D::dump($newData);
     
-    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
-    
-    $pipe = $redis->pipeline();
-    
-    // save temporary data
-    $pipe->hmset($this->imageKey, $this->toArray());
-    
-    // keep index of indexed links (to keep them once)
-    $pipe->sadd('indexed_links', $this->link);
-      
+    $pipe = $this->redis->pipeline();
+
+    // save final data
+    $pipe->hmset($this->imageKey, $newData);
+
     // and save data about link to process
-    $pipe->zadd('link_list_to_process', $this->timestamp, $this->imageKey);
-    
-    // incr counter
-    $pipe->incr('image_id');
+    $pipe->zrem('link_list_to_process', $this->imageKey);
+
+    // remove link from in progress list
+    $pipe->srem('link_list_in_progress', $this->imageKey);
+
+    // save image to the list and make it available (was: image_list)
+    $pipe->zadd('upcoming_image_list', $newData["timestamp"], $this->imageKey);
+
+    // was: saving to available_images, but correct -> upcoming_images
+    $pipe->sadd('upcoming_images', $this->imageKey);
     
     $pipe->execute();
     
     return true;
-    
+
   }
-  
+
   /**
    * Get latest unprocessed source and set it "in progress"
    * @return array|false Source as array or false if there is no unprocessed link
    */
-  public function getAndInitUnprocessed() {
+  public function initUnprocessedSource() {
 
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
@@ -221,7 +119,9 @@ class Image extends AbstractSource
             $redis->sadd("link_list_in_progress", $key);
           }
           
-          return $redis->hgetall($key);
+          $this->initFromArray($redis->hgetall($key));
+          
+          return true;
         }
       }
 
@@ -234,40 +134,80 @@ class Image extends AbstractSource
   /**
    * Remove image key with all data completely
    */
-  public static function removeKey($key, $link="")
+  public function remove()
   {
 
-    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
-
-    // remove data
-    // todo: verify that key is correct to not delete all if *
-    $redis->del($key);
-
+    $pipe = $this->redis->pipeline();
+    
+    $key = $this->imageKey;
+    $link = $this->link;
+    
+    \D::dump($key);
+    \D::dump($link);
+    
     // remove link from set of indexed links
     if (!empty ($link)) {
-      $redis->srem('indexed_links', $link);
-      $redis->sadd('failed_links', $link);
+      $pipe->srem('indexed_links', $link);
+      $pipe->sadd('failed_links', $link);
     }
 
     // remove link from process list
-    $redis->zrem('link_list_to_process', $key);
+    $pipe->zrem('link_list_to_process', $key);
 
     // remove link from in progress list
-    $redis->srem('link_list_in_progress', $key);
+    $pipe->srem('link_list_in_progress', $key);
 
     // remove image from all sets to make it available for user
-    $redis->zrem('image_list', $key);
-    $redis->srem('available_images', $key);
-    $redis->srem('upcoming_images', $key);
-    $redis->zrem('upcoming_image_list', $key);
+    $pipe->zrem('image_list', $key);
+    $pipe->srem('available_images', $key);
+    $pipe->srem('upcoming_images', $key);
+    $pipe->zrem('upcoming_image_list', $key);
+    
+    $pipe->execute();
 
-    self::removeUpcomingImageTags($key);
+    $this->removeFromUpcomingTags();
+    
+    // remove data
+    $this->redis->del($key);
 
-    // remove cached dom object
-    $redis->del("cached_dom_".$key);
+    return true;
 
   }
+  
+  /**
+   * Move tagged image from upcoming to available, or remove from upcoming only
+   */
+  public function removeFromUpcomingTags($makeAvailable = false)
+  {
 
+    $tags = @json_decode($this->tags);
+    
+    \D::dump($tags);
 
+    if ($tags && count($tags))
+    {
+
+      $pipe = $this->redis->pipeline();
+
+      foreach ($tags as $tagKey) {
+        $pipe->zrem('upcoming_image_list:' . $tagKey, $this->imageKey);
+
+        if ($makeAvailable)
+        {
+          $pipe->zadd('image_list:' . $tagKey, $this->timestamp, $this->imageKey);
+        }
+      }
+
+      if ($makeAvailable)
+      {
+        $pipe->sadd('available_images', $this->imageKey);
+      }
+
+      $pipe->execute();
+      
+    }
+
+    return true;
+  }
 
 }

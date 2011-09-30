@@ -5,7 +5,7 @@ Rewrite from symfony 1.4 started 28th of July.
 ---
 Redis notes:
 
-Symfony 1.4 used Redis 2.0.4, but Symfony 2 is using Redis 2.2.12 via this bundle (https://github.com/snc/SncRedisBundle)
+Symfony 1.4 used Redis 2.0.4, but Symfony 2 is using Redis 2.2.12 (to upgrade to 2.4) via this bundle (https://github.com/snc/SncRedisBundle)
 
 Upgrade Redis (http://redis.io/download):
 
@@ -54,3 +54,8 @@ from deps:
         /**
          * @todo: split $uselessTags into $whitelistedTags and $blacklistedTags for each source and global. Some tags are irrelevant to show on the site, but very good to use as twitter hashtags.
          */
+---
+1) Links added to link_list_to_process
+2) Links moved to upcoming_image_list after Processor->run() (sorted list of images with thumbs, but without tags and scores yet)
+3) image_list - sorted list of images with add data (thumbs, tags, score) needed to show on the site.
+

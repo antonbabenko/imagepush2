@@ -177,7 +177,7 @@ class Images
   /*
    * Save link as processed (with thumbs)
    */
-  public function saveAsProcessed($key, $data)
+ /* public function saveAsProcessed($key, $data)
   {
 
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
@@ -198,20 +198,20 @@ class Images
     $redis->sadd('upcoming_images', $key);
 
   }
-
+*/
   /**
    * Save image data for the key
    * @param string $key
    * @param array $data
    */
-  public function saveImageData($key, $data)
+/*  public function saveImageData($key, $data)
   {
 
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
     
     $redis->hmset($key, $data);
 
-  }
+  }*/
   
   /**
    * Save image tags for the key
@@ -230,14 +230,14 @@ class Images
     
     //\D::dump($data);
     
-    $this->saveImageData($key, $data);
+    $redis->hmset($key, $data);
 
   }
   
   /**
    * Remove key with all data completely
    */
-  public function removeKey($key, $link="")
+  /*public function removeKey($key, $link="")
   {
 
     \D::dump($key);
@@ -270,12 +270,12 @@ class Images
     // remove image data
     $redis->del($key);
 
-  }
+  }*/
 
   /**
    * Move tagged image from upcoming to available, or remove from upcoming only
    */
-  public function removeUpcomingImageTags($key, $make_available = false) {
+  /*public function removeUpcomingImageTags($key, $make_available = false) {
 
     $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
 
@@ -299,7 +299,7 @@ class Images
       }
     }
 
-  }
+  }*/
 
   /*
    * Verify that image has all required fields and define correct url fields

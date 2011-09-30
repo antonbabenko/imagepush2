@@ -26,8 +26,8 @@ class Config
   /**
    * Set $modifyDB to false for prod.
    */
-  //static $modifyDB = true;
-  static $modifyDB = false;
+  static $modifyDB = true;
+  //static $modifyDB = false;
   
   static $allowedImageContentTypes = array("image/gif", "image/jpeg", "image/jpg", "image/png");
 

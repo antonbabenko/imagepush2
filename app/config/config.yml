@@ -2,6 +2,9 @@ imports:
     - { resource: parameters.ini }
     - { resource: security.yml }
 
+#parameters:
+#  contact_email: anton@antonbabenko.com
+  
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }
@@ -113,29 +116,29 @@ services:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@kernel]
 
-    imagepush.source:
-        class: Imagepush\ImagepushBundle\Model\AbstractSource
-        arguments: [@kernel]
+#    imagepush.source:
+#        class: Imagepush\ImagepushBundle\Model\AbstractSource
+#        arguments: [@kernel]
 
     imagepush.processor:
         class: Imagepush\ImagepushBundle\Services\Processor\Processor
         arguments: [@kernel]
 
-    imagepush.processor.content:
-        class: Imagepush\ImagepushBundle\Services\Processor\Content
-        arguments: [@kernel]
-        
-    imagepush.processor.image:
-        class: Imagepush\ImagepushBundle\Services\Processor\Image
-        arguments: [@kernel]
-        
-    imagepush.processor.html:
-        class: Imagepush\ImagepushBundle\Services\Processor\Html
-        arguments: [@kernel]
-        
-    imagepush.processor.tag:
-        class: Imagepush\ImagepushBundle\Services\Processor\Tag
-        arguments: [@kernel]
+#    imagepush.processor.content:
+#        class: Imagepush\ImagepushBundle\Services\Processor\Content
+#        arguments: [@kernel]
+#        
+#    imagepush.processor.image:
+#        class: Imagepush\ImagepushBundle\Services\Processor\Image
+#        arguments: [@kernel]
+#        
+#    imagepush.processor.html:
+#        class: Imagepush\ImagepushBundle\Services\Processor\Html
+#        arguments: [@kernel]
+#        
+#    imagepush.processor.tag:
+#        class: Imagepush\ImagepushBundle\Services\Processor\Tag
+#        arguments: [@kernel]
         
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
