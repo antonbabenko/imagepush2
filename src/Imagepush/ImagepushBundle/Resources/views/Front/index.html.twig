@@ -17,7 +17,7 @@
                 <details class="no_vote"> {# open="open" #}
                   <span class="imgDescription">{{image.title}}</span>
                 </details>
-                <a href="{{image._view_url}}" title="{{image.title}}" class="imgWrapper">
+                <a href="{{ path('viewImage', {'id': image.imageId, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
                   <img src="{{image._thumb_img}}" width="140" height="140" alt="{{image.title}}" />
                   <span class="imgDescription"><span>{{image.title}}</span></span>
                 </a>

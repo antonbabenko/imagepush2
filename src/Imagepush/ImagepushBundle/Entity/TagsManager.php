@@ -1,27 +1,20 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services;
+namespace Imagepush\ImagepushBundle\Entity;
 
-use Predis\Client as RedisClient;
-use Imagepush\ImagepushBundle\Model\Tag;
 use Imagepush\ImagepushBundle\External\CustomStrings;
-use Imagepush\ImagepushBundle\External\Inflect;
 use Imagepush\ImagepushBundle\Services\Processor\Config;
 
-class Tags
+class TagsManager
 {
   
-  private $router;
-  private $redis;
-  private $images;
+  public $redis;
   
-  private static $customStrings;
+  public static $customStrings;
   
-  public function __construct(\AppKernel $kernel) {
+  public function __construct($redis) {
     
-    $this->router = $kernel->getContainer()->get('router');
-    $this->redis = $kernel->getContainer()->get('snc_redis.default_client');
-    //$this->images = $kernel->getContainer()->get('imagepush.images');
+    $this->redis = $redis;
     self::$customStrings = new CustomStrings();
     
   }
@@ -38,13 +31,23 @@ class Tags
   }
   
   /**
-   * Get tag keys for array
+   * Get tag keys for array (tag => score) or array(tag)
    */
   public function getTagKeys($tags, $isCleaned = false) {
     $tagKeys = array();
-    foreach ($tags as $tag) {
-      $tagKeys[] = $this->getTagKey($tag, $isCleaned);
+    
+    foreach ($tags as $tag => $score) {
+      
+      if (is_int($tag) && !is_int($score)) { // array(tag)
+        $key = $this->getTagKey($score, $isCleaned);
+        $tagKeys[$key] = 1;
+      } else { // array (tag => score)
+        $key = $this->getTagKey($tag, $isCleaned);
+        $tagKeys[$key] = $score;
+      }
+      
     }
+    
     return $tagKeys;
   }
 
@@ -80,12 +83,13 @@ class Tags
     //D::dump($tags);
 
     if (count($tags)) {
-      $human_tags = $this->redis->mget($tags);
+      $humanTags = $this->redis->mget($tags);
+      $humanTags = array_values(array_filter($humanTags, function($tag){return !is_null($tag);}));
     } else {
-      $human_tags = array();
+      $humanTags = array();
     }
 
-    return $human_tags;
+    return $humanTags;
   }
   
   /**
@@ -104,7 +108,7 @@ class Tags
     
     foreach ($originalTags as $originalTag) {
 
-      $tag = $this->customStrings->cleanTag($originalTag);
+      $tag = self::$customStrings->cleanTag($originalTag);
       
       //\D::dump($tag);
 
@@ -126,24 +130,5 @@ class Tags
 
     return array_keys($fixedTags);
   }
-
-  /*public function saveRawTags($imageKey, $tagsSrc, $tags)
-  {
-
-    if (empty($imageKey) || empty($tagsSrc) || empty($tags))
-      return;
-
-    $tagKeys = $this->verifyTags($tags);
-    //\D::dump($tagKeys);
-
-    if (count($tagKeys))
-    {
-      $pipe = $this->redis->pipeline();
-      foreach ($tagKeys as $tagKey) {
-        $pipe->sadd($imageKey . ":tmp_tags:" . $tagsSrc, $tagKey);
-      }
-      $pipe->execute();
-    }
-  }*/
 
 }

@@ -19,10 +19,7 @@ class ImageContent extends Content
    */
   //public $kernel;
   
-  /*
-   * @read: http://symfony.com/doc/2.0/cookbook/doctrine/file_uploads.html
-   */
-  public $uploadsDir = '/Users/Bob/Sites/imagepush2/web/uploads';
+  //public $uploadsDir = '/Users/Bob/Sites/imagepush2/web/uploads';
   public $id, $image;
 
   public function __construct(\AppKernel $kernel)
@@ -50,21 +47,31 @@ class ImageContent extends Content
     return $this->image;
   }
 
-  public function getFileExtension()
+  public function getFileTypeByContentType($contentType)
   {
-    return "jpg"; //$this->types[$this->image->getMIMEType()][0];
+    
+    if (in_array($contentType, array("image/gif"))) {
+      $type = "gif";
+    } elseif (in_array($contentType, array("image/png"))) {
+      $type = "png";
+    } else {
+      $type = "jpg";
+    }
+    
+    return $type;
+    
   }
 
-  public function makeThumbFilename($prefix)
+  public function makeThumbFilename($prefix, $fileType)
   {
 
     // For eg: 2567 => /0/2/5/67.jpg
     $filePath = floor($this->getId() / 10000) . "/";
     $filePath .= floor($this->getId() / 1000) . "/";
     $filePath .= floor($this->getId() / 100) . "/";
-    $filePath .= ( $this->getId() % 100) . "." . $this->getFileExtension();
+    $filePath .= ( $this->getId() % 100) . "." . $fileType;
 
-    $currentUmask = umask();
+    /*$currentUmask = umask();
     umask(0000);
 
     //check if dir is exists and writtable
@@ -74,27 +81,28 @@ class ImageContent extends Content
       mkdir($dir, 0777, true);
     }
 
-    umask($currentUmask);
+    umask($currentUmask);*/
 
     return $filePath;
   }
 
-  /*
+  /**
    * Verify if image has correct size then make thumbs
    */
-
   public function makeThumbs()
   {
 
     $imagine = new Imagine\Imagick\Imagine();
     
-    if ($content = $this->getContent()) {
+    $content = $this->getContent();
+    $fileType = $this->getFileTypeByContentType($this->getContentType());
+    
+    if ($content) {
       $image = $imagine->load($content);
     } else {
       return false;
     }
-
-    //$this->setId($id);
+    
     $this->setImage($image);
 
     if ($image->getSize()->getWidth() >= Config::$minWidth && $image->getSize()->getHeight() >= Config::$minHeight)
@@ -106,8 +114,8 @@ class ImageContent extends Content
       $thumbTypes = Config::$thumbTypes;
 
       foreach ($thumbTypes as $thumbType => $attributes) {
-        $prefix = $this->uploadsDir . '/' . $thumbType . '/';
-        $filename = $this->makeThumbFilename($prefix);
+        $prefix = $thumbType . '/';
+        $filename = $this->makeThumbFilename($prefix, $fileType);
 
         $tmpImage = $this->getImage();
 
@@ -122,26 +130,32 @@ class ImageContent extends Content
           throw new \Exception("Not thumbnail_inset or thumbnail_outbound action");
         }
 
-        //\D::dump($prefix.$filename);
-        $saved = $thumb->save($prefix . $filename, array("format" => "jpg", "quality" => 90));
-
-        //\D::dump($saved);
-        //$saved = $thumb->saveAs($path_prefix . $filename);
+        // Save on local disk
+        //$saved = $thumb->save($prefix . $filename, array("format" => "jpg", "quality" => 90));
+        
+        // Get image content
+        try {
+          $imageContent = $thumb->get($fileType, array("quality" => 90));
+        } catch (\ImagickException $e) {
+          throw new InvalidArgumentException('Show operation failed', $e->getCode(), $e);
+        }
+        
+        // Save on "images" filesystem
+        $saved = $this->fsImages->write($prefix . $filename, $imageContent, true);
+        
         if ($saved)
         {
-          $saved_data[$thumbType . "_file"] = $filename;
-          $saved_data[$thumbType . "_content_type"] = "image/jpeg"; //$saved->getMIMEType();
-          $saved_data[$thumbType . "_width"] = $saved->getSize()->getWidth();
-          $saved_data[$thumbType . "_height"] = $saved->getSize()->getHeight();
+          $data["file"] = $filename;
+          $data[$thumbType . "_w"] = $thumb->getSize()->getWidth();
+          $data[$thumbType . "_h"] = $thumb->getSize()->getHeight();
         } else
         {
           throw new \Exception("Couldn't save file - " . $prefix . $filename);
         }
-        //\D::dump($saved_data);
       }
     }
 
-    return (isset($saved_data) ? $saved_data : false);
+    return (isset($data) ? $data : false);
 
   }
 

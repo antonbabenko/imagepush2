@@ -16,7 +16,7 @@ class HtmlContent extends Content
     parent::__construct($kernel);
   }
 
-  public function initDom($reload = false)
+  public function getDom($reload = false)
   {
     if (!$this->dom || $reload)
     {
@@ -39,9 +39,7 @@ class HtmlContent extends Content
   public function getFullImageSrc()
   {
 
-    $this->initDom();
-
-    $domxpath = new \DOMXPath($this->dom);
+    $domxpath = new \DOMXPath($this->getDom());
     $filtered[] = $domxpath->query("//link[@rel='image_src']");
     $filtered[] = $domxpath->query("//meta[@property='og:image']");
     //\D::dump($filtered);
@@ -78,9 +76,7 @@ class HtmlContent extends Content
      *
      */
 
-    $this->initDom();
-
-    $domxpath = new \DOMXPath($this->dom);
+    $domxpath = new \DOMXPath($this->getDom());
     $filtered = $domxpath->query("//img[@src]");
     
     $images = array();

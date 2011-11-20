@@ -11,6 +11,8 @@ $loader->registerNamespaces(array(
     'Symfony'          => array(__DIR__.'/../vendor/symfony/src', __DIR__.'/../vendor/bundles'),
     'Sensio'           => __DIR__.'/../vendor/bundles',
     'JMS'              => __DIR__.'/../vendor/bundles',
+    'Doctrine\\ODM\\MongoDB'    => __DIR__.'/../vendor/doctrine-mongodb-odm/lib',
+    'Doctrine\\MongoDB'         => __DIR__.'/../vendor/doctrine-mongodb/lib',
     'Doctrine\\Common' => __DIR__.'/../vendor/doctrine-common/lib',
     'Doctrine\\DBAL'   => __DIR__.'/../vendor/doctrine-dbal/lib',
     'Doctrine'         => __DIR__.'/../vendor/doctrine/lib',
@@ -23,6 +25,9 @@ $loader->registerNamespaces(array(
     'Avalanche'        => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
     'Zend'             => __DIR__.'/../vendor/zend/library', // for feeds, but doesn't work for goutte, if goute.phar is included after this
+  
+    'Knp\Bundle'       => __DIR__.'/../vendor/bundles',
+    'Gaufrette'        => __DIR__.'/../vendor/gaufrette/src',
   
     'Imagepush'        => __DIR__.'/../src',
 
@@ -49,12 +54,17 @@ AnnotationRegistry::registerLoader(function($class) use ($loader) {
     return class_exists($class, false);
 });
 AnnotationRegistry::registerFile(__DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
+AnnotationRegistry::registerFile(
+    __DIR__.'/../vendor/doctrine-mongodb-odm/lib/Doctrine/ODM/MongoDB/Mapping/Annotations/DoctrineAnnotations.php'
+);
 
 // Swiftmailer needs a special autoloader to allow
 // the lazy loading of the init file (which is expensive)
 require_once __DIR__.'/../vendor/swiftmailer/lib/classes/Swift.php';
 Swift::registerAutoload(__DIR__.'/../vendor/swiftmailer/lib/swift_init.php');
 
+// AWS SDK needs a special autoloader
+require_once __DIR__.'/../vendor/aws-sdk/sdk.class.php';
 
 /**
  * Fix for Zend Framework 1.x

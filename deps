@@ -1,30 +1,30 @@
 [symfony]
     git=http://github.com/symfony/symfony.git
-    version=v2.0.3
+    version=v2.0.6
 
 [twig]
     git=http://github.com/fabpot/Twig.git
-    version=v1.1.2
+    version=v1.3.0
 
 [monolog]
     git=http://github.com/Seldaek/monolog.git
-    version=1.0.1
+    version=1.0.2
 
 [doctrine-common]
     git=http://github.com/doctrine/common.git
-    version=2.1.1
+    version=2.1.2
 
 [doctrine-dbal]
     git=http://github.com/doctrine/dbal.git
-    version=2.1.2
+    version=2.1.3
 
 [doctrine]
     git=http://github.com/doctrine/doctrine2.git
-    version=2.1.1
+    version=2.1.2
 
 [swiftmailer]
     git=http://github.com/swiftmailer/swiftmailer.git
-    version=v4.1.2
+    version=v4.1.3
 
 [assetic]
     git=http://github.com/kriswallsmith/assetic.git
@@ -35,7 +35,7 @@
 
 [metadata]
     git=http://github.com/schmittjoh/metadata.git
-    version=1.0.0
+    version=1.1.0
 
 [SensioFrameworkExtraBundle]
     git=http://github.com/sensio/SensioFrameworkExtraBundle.git
@@ -64,6 +64,17 @@
 
 
 
+[doctrine-mongodb]
+    git=http://github.com/doctrine/mongodb.git
+
+[doctrine-mongodb-odm]
+    git=http://github.com/doctrine/mongodb-odm.git
+
+[DoctrineMongoDBBundle]
+    git=http://github.com/symfony/DoctrineMongoDBBundle.git
+    target=/bundles/Symfony/Bundle/DoctrineMongoDBBundle
+    version=origin/2.0
+
 [digg]
     git=http://github.com/digg/Services_Digg2.git
 
@@ -81,6 +92,16 @@
 [imagine]
     git=http://github.com/avalanche123/Imagine.git
 
-[AvalancheImagineBundle]
-    git=http://github.com/avalanche123/AvalancheImagineBundle.git
-    target=/bundles/Avalanche/Bundle/ImagineBundle
+[LiipImagineBundle]
+    git=git://github.com/liip/LiipImagineBundle.git
+    target=/bundles/Liip/ImagineBundle
+
+[aws-sdk]
+    git=http://github.com/amazonwebservices/aws-sdk-for-php
+
+[gaufrette]
+    git=http://github.com/knplabs/Gaufrette.git
+
+[KnpGaufretteBundle]
+    git=http://github.com/knplabs/KnpGaufretteBundle.git
+    target=/bundles/Knp/Bundle/GaufretteBundle

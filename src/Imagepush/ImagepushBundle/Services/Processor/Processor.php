@@ -41,8 +41,6 @@ class Processor
     
     $result = false;
     
-    //\D::dump($this->kernel->getContainer()->getParameter('contact_email'));
-
     /**
      * Create image object based on unprocessed source
      */
@@ -95,15 +93,14 @@ class Processor
     //
     //$this->link = "http://i.imgur.com/SsvPB.jpg";
     
-    //echo $image->link = "http://imgur.com/gallery/mRJT0";
+    //$image->id = 24818;
+    //$image->link = "http://adayinthalifeof.files.wordpress.com/2009/06/picture-15.png";
     
     /**
      * Get content from the link
      */
     $content = new Content($this->kernel);
     $content->get($image->link);
-    
-    \D::dump($content->isSuccessStatus());
     
     if (!$content->isSuccessStatus())
     {
@@ -119,7 +116,7 @@ class Processor
 
       if ($content->isAlreadyProcessedImageHash())
       {
-        $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $this->id, $this->link));
+        $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->id, $image->link));
         return false;
       }
       
@@ -198,7 +195,7 @@ class Processor
       
     } // end of find image block
     
-    \D::dump($result);
+    //\D::dump($result);
     
     /**
      * No images found - remove link and image key
@@ -210,22 +207,15 @@ class Processor
         return false;
       }
     }
-    
+  
     /**
-     * FIND TAGS
+     * Find tags (optional)
      */
-  $result = false;
+    $processorTag = $this->kernel->getContainer()->get('imagepush.processor.tag');
+    $processorTag->setImage($image);
+    $processorTag->processTags();
     
-    if ($result) {
-      $processorTag->setImageKey($this->imageKey);
-      $processorTag->setSource($this->source);
-
-      $processorTag->processTags();
-      
-    }
-
-
-    return (isset($result) && $result ? $image->id : false);
+    return ($result ? $image->id : false);
 
   }
 

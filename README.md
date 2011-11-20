@@ -35,10 +35,6 @@ ImageMagick:
 6) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://mikepuchol.com/2010/08/26/getting-mamp-1-9-to-work-with-image-magick-imagick-so-and-other-flora/
 
 ---
-1) Ссылки на картинки и на сайты беруться с digg и сохраняются в модели "DiggSource"
-2) "DiggSource" парсится периодически и публикуется в Images.
-
----
 Helpful about DI:
 http://www.martinsikora.com/symfony2-and-dependency-injection
 
@@ -55,7 +51,42 @@ from deps:
          * @todo: split $uselessTags into $whitelistedTags and $blacklistedTags for each source and global. Some tags are irrelevant to show on the site, but very good to use as twitter hashtags.
          */
 ---
-1) Links added to link_list_to_process
-2) Links moved to upcoming_image_list after Processor->run() (sorted list of images with thumbs, but without tags and scores yet)
-3) image_list - sorted list of images with add data (thumbs, tags, score) needed to show on the site.
+todo on production:
+1) Remove null tag from redis:
+del tag_d41d8cd98f00b204e9800998ecf8427e
+---
+Static file load test on Apache/Mac:
 
+ab -n 1000 -c 200 -v 4 -r http://dev-anton.imagepush.to/uploads/m/2/24/247/75.jpg
+
+Apache/Mac:
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  237 105.2    260    1072
+Processing:     0   76 238.6      2    1069
+Waiting:        0   18  62.4      0     278
+Total:          1  313 187.8    272    1339
+
+Nginx/Mac:
+ab -n 1000 -c 200 -v 4 -r http://localhost/imagepush2/web/uploads/m/2/24/247/75.jpg
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        6   41  14.6     37     104
+Processing:     0    6  18.0      0      87
+Waiting:        0    6   8.4      6      50
+Total:          6   47  22.0     38     115
+
+---
+
+1) Link added to link_list_to_process
+2) Link moved to upcoming_image_list after Processor->run() (sorted list of images with thumbs, but without tags and scores yet)
+3) TagProcessor->run() find tags for upcoming image and push to image_list - sorted list of images with add data (thumbs, tags, score) needed to show on the site.
+//4) Later: ScoreProcessor->run() calculate score for the image (periodically).
+5) Push from image_list based on score (later), but for now (just latest).
+
+Todo:
+rename to - Fetcher, Processor, Publisher
+
+---
+https://github.com/Nek-/FeedBundle - feed generator to try instead of Zend

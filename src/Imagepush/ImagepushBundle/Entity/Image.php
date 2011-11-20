@@ -12,59 +12,21 @@ use Imagepush\ImagepushBundle\Services\Processor\Config;
 class Image extends AbstractSource
 {
 
-  //public $id;
-  //public $imageKey;
-  //public $source;
-  //public $link;
-  //public $timestamp;
-  //public $title = "";
-  //public $slug = "";
-
   public function __construct(\AppKernel $kernel) {
     parent::__construct($kernel);
   }
   
-  /**
-   * Init all properties from source array
-   * @param array $source
-   */
-  public function initFromArray($data) {
-    $this->id = $data["id"];
-    $this->imageKey = $this->makeImageKey($data["id"]);
-    $this->link = $data["link"];
-    $this->timestamp = $data["timestamp"];
-    $this->title = $data["title"];
-    $this->slug = $data["slug"];
+  public function load($id) {
     
-    $this->tags = (isset($data["tags"]) ? $data["tags"] : '');
-    $this->originalTags = (isset($data["original_tags"]) ? $data["original_tags"] : '');
-  }
-  
-  /**
-   * Get all finalized data as array to save data
-   * @return array
-   */
-  public function toArray() {
-    $result["id"] = $this->id;
-    $result["link"] = $this->link;
-    $result["timestamp"] = $this->timestamp;
-    $result["title"] = $this->title;
-    $result["slug"] = $this->slug;
+    $imageKey = $this->makeImageKey($id);
+    $data = $this->redis->hgetall($imageKey);
     
-    $result["tags"] = (isset($this->tags) ? $this->tags : '');
-    $result["original_tags"] = (isset($this->originalTags) ? $this->originalTags : '');
+    // init Image object
+    $this->initFromArray($data);
     
-    return $result;
+    return $this;
     
   }
-  
-  /**
-   * Get image key
-   * @return string $imageKey
-   */
-  /*public function getImageKey() {
-    return "image_id:".$this->id;
-  }*/
   
   /*
    * Save image as processed (with thumbs)
@@ -95,7 +57,77 @@ class Image extends AbstractSource
     
     $pipe->execute();
     
+    // refresh image data
+    $this->refresh();
+    
     return true;
+
+  }
+  
+  /**
+   * Save image tags. Saving best tags and all tags (keep for later)
+   * @param array $bestTags
+   * @param array $allTags
+   */
+  public function saveAsProcessedWithTags($bestTags, $allTags)
+  {
+
+    $bestTagsKeys = $this->tagsManager->getTagKeys($bestTags, true);
+    $allTagsKeys = $this->tagsManager->getTagKeys($allTags, true);
+    
+    // Merge current image data with tags data
+    $newData = array_merge(
+      $this->toArray(),
+      array(
+        "tags" => json_encode(array_keys($bestTagsKeys)),
+        "all_tags" => json_encode($allTagsKeys)
+      )
+    );
+    
+    \D::dump($newData);
+    
+    $pipe = $this->redis->pipeline();
+
+    // save final data
+    $pipe->hmset($this->imageKey, $newData);
+
+    $pipe->execute();
+    
+    // refresh image data
+    $this->refresh();
+    
+    return true;
+
+  }
+  
+  /**
+   * @todo Add checking if this image is still in upcoming.
+   */
+  public function migrateUpcomingToAvailable()
+  {
+    
+    // update timestamp
+    $this->setTimestamp(time());
+
+    $pipe = $this->redis->pipeline();
+    
+    // save data
+    $pipe->hmset($this->imageKey, $this->toArray());
+
+    // add into available lists
+    $pipe->zadd('image_list', $this->timestamp, $this->imageKey);
+
+    $pipe->sadd('available_images', $this->imageKey);
+
+    // remove from upcoming lists
+    $pipe->srem('upcoming_images', $this->imageKey);
+
+    $pipe->zrem('upcoming_image_list', $this->imageKey);
+    
+    $pipe->execute();
+
+    // migrate image tags
+    $this->removeFromUpcomingTags(true);
 
   }
 
@@ -105,7 +137,7 @@ class Image extends AbstractSource
    */
   public function initUnprocessedSource() {
 
-    $redis = $this->kernel->getContainer()->get('snc_redis.default_client');
+    $redis = $this->redis;
 
     $imageKeys = $redis->zrevrangebyscore('link_list_to_process', "+inf", "-inf");
     //\D::dump($imageKeys);
@@ -128,6 +160,16 @@ class Image extends AbstractSource
     }
 
     return false;
+
+  }
+
+  /**
+   * Refresh with updated data after save.
+   */
+  public function refresh() {
+
+    $data = $this->redis->hgetall($this->imageKey);
+    $this->initFromArray($data);
 
   }
 
@@ -165,7 +207,7 @@ class Image extends AbstractSource
     
     $pipe->execute();
 
-    $this->removeFromUpcomingTags();
+    $this->removeFromUpcomingTags(false);
     
     // remove data
     $this->redis->del($key);
@@ -177,7 +219,7 @@ class Image extends AbstractSource
   /**
    * Move tagged image from upcoming to available, or remove from upcoming only
    */
-  public function removeFromUpcomingTags($makeAvailable = false)
+  public function removeFromUpcomingTags($makeAvailable)
   {
 
     $tags = @json_decode($this->tags);

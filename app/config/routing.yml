@@ -11,7 +11,12 @@ robot:
     resource: "@ImagepushBundle/Controller/RobotController.php"
     prefix:   /robot
     type:     annotation
-    
-_imagine:
-    resource: .
-    type:     imagine
+
+import:
+    resource: "@ImagepushBundle/Controller/ImportController.php"
+    prefix:   /import
+    type:     annotation
+#    
+#_imagine:
+#    resource: .
+#    type:     imagine

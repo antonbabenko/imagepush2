@@ -5,10 +5,11 @@ namespace Imagepush\ImagepushBundle\Services\Fetcher\Digg;
 //use Imagepush\ImagepushBundle\Model\Tag;
 //use Imagepush\ImagepushBundle\Model\AbstractSource;
 use Imagepush\ImagepushBundle\Entity\Image;
-use Imagepush\ImagepushBundle\Services\Fetcher\AbstractFetcher;
+use Imagepush\ImagepushBundle\Services\Fetcher\AbstractFetcher; // no need in abstract
+use Imagepush\ImagepushBundle\Services\Fetcher\FetcherInterface;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 
-class DiggFetcher extends AbstractFetcher
+class DiggFetcher extends AbstractFetcher implements FetcherInterface
 {
   
   /**
@@ -18,10 +19,10 @@ class DiggFetcher extends AbstractFetcher
   public $fetchLimit = 10;
   
   /**
-   * Minimum diggs to save. 4-5 is OK.
+   * Minimum diggs score to save. 4-5 is OK.
    * @param integer $minDiggs
    */
-  public $minDiggs = 4; // 1
+  public $minDiggs = 1; // 4
   
   /**
    * Minimum delay between API requests. Set to 30 mins, but cron runs every 5 minutes, so there are 6 attempts in each interval
@@ -53,10 +54,10 @@ class DiggFetcher extends AbstractFetcher
         !$redis->sismember('failed_links', $item->link)
       );
 
-      /*if ($result) {
+      if ($result) {
         echo "<br>isWorthToSave = true";
         \D::dump($item);
-      }*/
+      }
 
     } else {
 
@@ -67,19 +68,12 @@ class DiggFetcher extends AbstractFetcher
     return $result;
 
   }
-
-  public function getDiggInstance() {
-    
-    $digg = new ImagepushDigg();
-    $digg->setVersion('2.0');
-    
-    return $digg;
-  }
   
   public function fetchData()
   {
 
-    $digg = $this->getDiggInstance();
+    $digg = new ImagepushDigg();
+    $digg->setVersion('2.0');
 
     try {
       $response = $digg->search->search(array(
@@ -126,8 +120,7 @@ class DiggFetcher extends AbstractFetcher
       $image->setSlugFromTitle();
       
       if (!empty($item->topic->name)) {
-        $image->setOriginalTags($item->topic->name);
-         //$tags->saveRawTags($imageKey, Tag::SRC_DIGG, $item->topic->name);
+        $image->setSourceTags($item->topic->name);
       }
 
       try {

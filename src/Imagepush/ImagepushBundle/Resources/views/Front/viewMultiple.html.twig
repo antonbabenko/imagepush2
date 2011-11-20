@@ -97,7 +97,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
 
               <div style="text-align:center;">
                 {% if type == "current" %}
-                <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }} "">
+                <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }} ">
                 {% endif %}
                 <figure class="bigImg" style="display:inline-block;">
                   <img src="{{image._article_img}}" alt="{{image.title}}" width="{{ image.a_width < 625 ? image.a_width : 625 }}" />
