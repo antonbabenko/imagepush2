@@ -6,7 +6,7 @@ class Config
 {
 
   // IDs of sources
-  const SRC_ORIGINAL = 0;
+  const SRC_SOURCE = 0; // original source
   const SRC_DIGG = 1;
   const SRC_DELICIOUS = 2;
   const SRC_STUMBLEUPON = 3;
@@ -15,7 +15,7 @@ class Config
   
   // Tag group value
   public static $tagGroupValue = array(
-    self::SRC_ORIGINAL => 3, // Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
+    self::SRC_SOURCE => 3, // Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
     self::SRC_DIGG => 2,
     self::SRC_DELICIOUS => 2,
     self::SRC_STUMBLEUPON => 2.5,
@@ -44,7 +44,7 @@ class Config
       "width" => 463,
       "height" => 1510,
     ),
-    "thumb" => array(/* thumb */
+    "t" => array(/* thumb */
       "action" => "thumbnail_outbound",
       "width" => 140,
       "height" => 140,
@@ -63,11 +63,10 @@ class Config
   static $minSubRedditScore = 5;
 
   // These tags will not be saved or displayed, because they are not specific enough
-  public static $uselessTags = array("reddit.com", "reddit", "askreddit", "pic", "digg", "digguser", "diggrt", "fun", "funny", "pict", "lol", "humor", "humour", "image", "img", "imagepush", "reportthespammer", "fffffffuuuuuuuuuuuu");
+  public static $uselessTags = array("reddit.com", "reddit", "askreddit", "pic", "digg", "digguser", "diggrt", "fun", "funny", "pict", "lol", "humor", "humour", "image", "img", "imagepush", "reportthespammer", "fffffffuuuuuuuuuuuu", "flickr", "filetype:jpg", "media:image");
 
   // These tags will not be displayed in the top trends, because they are almost not changeable there, though they are very informative, so we can't put them to $USELESS_TAGS
   public static $hiddenTrends = array("offbeat", "lifestyle", "entertainment", "technology", "science");
-  
   
   // These tags will be replaced as synonyms. Should be in single form (not plural).
   public static $tagSynonyms = array(

@@ -18,7 +18,6 @@ class RobotController extends Controller
   public function indexAction($action)
   {
     
-//    $images = $this->get('imagepush.images')->getImages("current", 7);
     $content = "";
     
     switch ($action) {
@@ -34,19 +33,29 @@ class RobotController extends Controller
         break;
       
       /**
-       * Process source tags = find related tags for the upcoming images
+       * Publish upcoming images
        */
-      case "processSourceTags":
-        $content = $this->get('imagepush.processor')->processSourceTags();
+      case "publishLatestUpcomingImage":
+        $content = $this->get('imagepush.publisher')->publishLatestUpcomingImage();
         break;
       
       /**
        * Just for test
        */
       case "testMakeThumbs":
+        define("AWS_CERTIFICATE_AUTHORITY", true);
+        //$fs = $this->get('knp_gaufrette.filesystem_map')->get('images');
+        
+        $fs = $this->get('knp_gaufrette.filesystem_map')->get('images');
+        //\D::dump($fs->keys());
+        //$fs->write('s3.txt', 'some content');
+        
+        $content = $fs->has('s3.txt');
+        \D::dump($content);
+        \D::dump($fs);
         $fileContent = file_get_contents("http://dev-anton.imagepush.to/test_images/1.jpg");
         $fileContentType = "image/jpeg";
-        $content = $this->get('imagepush.processor.image')->testMakeThumbs($fileContent, $fileContentType);
+        //$content = $this->get('imagepush.processor.image')->testMakeThumbs($fileContent, $fileContentType);
         break;
       
       default:

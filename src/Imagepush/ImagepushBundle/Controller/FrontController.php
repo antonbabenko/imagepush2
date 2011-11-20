@@ -17,7 +17,12 @@ class FrontController extends Controller
    */
   public function indexAction()
   {
-    $images = $this->get('imagepush.images')->getImages("current", 7);
+    $images = $this->get('doctrine.odm.mongodb.document_manager')
+    ->getRepository('ImagepushBundle:Image')
+    ->findImages("current", 7);
+    
+    \D::dump($images);
+    //$images = $this->get('imagepush.images.manager')->getImages("current", 7);
 
     return array("images" => $images);
   }
@@ -75,13 +80,13 @@ class FrontController extends Controller
     {
       $params = array("tag" => $tag);
 
-      $tag_key = $this->get('imagepush.tags')->getTagKey($tag);
+      $tag_key = $this->get('imagepush.tags.manager')->getTagKey($tag);
 
       // if tag has been ever created
       $count = $redis->zscore("tag_usage", $tag_key);
       if (!$count)
       {
-        $this->createNotFoundException(sprintf('There are no images to show by tag: %s', $tag));
+        throw new NotFoundHttpException(sprintf('There are no images to show by tag: %s', $tag));
       }
 
       // if there are images to show in opposite page_type (f.eg: show "upcoming" link when view "current" page).
@@ -96,7 +101,7 @@ class FrontController extends Controller
       $another_page_type_count = $redis->zcard($tag_set); //, $tag_key);
     }
 
-    $images = $this->get('imagepush.images')->getImages($type, 30, $params);
+    $images = $this->get('imagepush.images.manager')->getImages($type, 30, $params);
 
     //\D::dump($images);
     
@@ -111,20 +116,22 @@ class FrontController extends Controller
   }
 
   /**
-   * @Route("/i/{id}/{slug}", name="viewImage")
+   * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, name="viewImage")
    * @Template()
    */
   public function viewImageAction($id)
   {
-    $image = $this->get('imagepush.images')->getOneImage($id);
+    $image = $this->get('imagepush.images.manager')->getOneImage($id);
+    
+    //\D::dump($image);
 
     if (!$image)
     {
-      $this->createNotFoundException('Image doesn\'t exist');
+      throw new NotFoundHttpException('Image doesn\'t exist');
     }
 
-    $next_image = $this->get('imagepush.images')->getOneImageRelatedToTimestamp("next", $image["timestamp"]);
-    $prev_image = $this->get('imagepush.images')->getOneImageRelatedToTimestamp("prev", $image["timestamp"]);
+    $next_image = $this->get('imagepush.images.manager')->getOneImageRelatedToTimestamp("next", $image["timestamp"]);
+    $prev_image = $this->get('imagepush.images.manager')->getOneImageRelatedToTimestamp("prev", $image["timestamp"]);
 
     return array("image" => $image, "next_image" => $next_image, "prev_image" => $prev_image);
   }
@@ -146,7 +153,7 @@ class FrontController extends Controller
   public function rssAction($version)
   {
     
-    $images = $this->get('imagepush.images')->getImages("current", 20);
+    $images = $this->get('imagepush.images.manager')->getImages("current", 20);
 
     // MAMP 2.0.1 fails on "iconv_strlen", so this function is not ready yet!!!
     // For a while I have commented lines around line 622 in /Users/Bob/Sites/imagepush2/vendor/zendframework2/library/Zend/Validator/Hostname.php
@@ -214,7 +221,7 @@ class FrontController extends Controller
    */
   public function _trendingNowAction($max = 20)
   {
-    $tags = $this->get('imagepush.tags')->getLatestTrends($max);
+    $tags = $this->get('imagepush.tags.manager')->getLatestTrends($max);
     //\D::dump($tags);
 
     return array("tags" => $tags);
@@ -245,7 +252,7 @@ class FrontController extends Controller
       $group_by_tags = false;
     } else
     {
-      $tags = $this->get('imagepush.tags')->getLatestTrends(100);
+      $tags = $this->get('imagepush.tags.manager')->getLatestTrends(100);
       $group_by_tags = true;
     }
 
@@ -270,7 +277,7 @@ class FrontController extends Controller
 
       $tag_images = array();
 
-      $images = $this->get('imagepush.images')->getImages('current', 20, array("tag" => $tag));
+      $images = $this->get('imagepush.images.manager')->getImages('current', 20, array("tag" => $tag));
 
       //\D::dump($images);
       if (count($images) >= 2) // 4

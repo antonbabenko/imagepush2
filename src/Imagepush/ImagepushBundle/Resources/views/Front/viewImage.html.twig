@@ -1,7 +1,7 @@
 {% extends "ImagepushBundle::layoutFront.html.twig" %}
 
 {% block og_title %}
-<meta property="og:title" content="{{image.title}}" />
+<meta property="og:title" content="{{image.title|default('')}}" />
 <meta property="og:type" content="article" />
 {% endblock %}
 

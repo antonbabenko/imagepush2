@@ -14,13 +14,15 @@ class AppKernel extends Kernel
             new Symfony\Bundle\MonologBundle\MonologBundle(),
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Symfony\Bundle\DoctrineBundle\DoctrineBundle(),
+            new Symfony\Bundle\DoctrineMongoDBBundle\DoctrineMongoDBBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
             
             new Snc\RedisBundle\SncRedisBundle(),
-            new Avalanche\Bundle\ImagineBundle\AvalancheImagineBundle(),
-            
+            //new Liip\ImagineBundle\LiipImagineBundle(),
+            new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
+          
             new Imagepush\ImagepushBundle\ImagepushBundle(),
 
         );

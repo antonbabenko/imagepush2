@@ -18,7 +18,7 @@ framework:
     session:
         default_locale: %locale%
         auto_start:     true
-
+        
 # Twig Configuration
 twig:
     debug:            %kernel.debug%
@@ -42,19 +42,30 @@ assetic:
         #     jar: %kernel.root_dir%/java/yuicompressor-2.4.2.jar
 
 # Doctrine Configuration
-doctrine:
-    dbal:
-        driver:   %database_driver%
-        host:     %database_host%
-        port:     %database_port%
-        dbname:   %database_name%
-        user:     %database_user%
-        password: %database_password%
-        charset:  UTF8
+#doctrine:
+#    dbal:
+#        driver:   %database_driver%
+#        host:     %database_host%
+#        port:     %database_port%
+#        dbname:   %database_name%
+#        user:     %database_user%
+#        password: %database_password%
+#        charset:  UTF8
+#
+#    orm:
+#        auto_generate_proxy_classes: %kernel.debug%
+#        auto_mapping: true
 
-    orm:
-        auto_generate_proxy_classes: %kernel.debug%
-        auto_mapping: true
+doctrine_mongodb:
+    connections:
+        default:
+            server: mongodb://localhost:27017
+            options:
+                connect: true
+    default_database: imagepush_db
+    document_managers:
+        default:
+            auto_mapping: true
 
 # Swiftmailer Configuration
 swiftmailer:
@@ -87,27 +98,55 @@ snc_redis:
               profile: 2.2
 
 # Imagine
-avalanche_imagine:
-    web_root:     %kernel.root_dir%/../web
-    cache_prefix: imagine
-    driver:       gd
-    filters:
-        property_thumb:
-            type:    thumbnail
-            options: { size: [120, 90], mode: outbound }
-        default:
-            type:    thumbnail
-            options: { size: [120, 90], mode: inset }
+#liip_imagine:
+#    web_root:     %kernel.root_dir%/../web
+#    cache_prefix: cache
+#    #cache:        true
+#    #cache:        custom_cache_resolver
+#    #loader:       ~
+#    #data_loader:  custom_data_loader
+#    driver:       imagick
+#    filter_sets:
+#      property_main:
+#        filters:
+#          thumbnail: { size: [620, 400], mode: outbound }
+#      company_search:
+#        filters:
+#          thumbnail: { size: [200, 50], mode: inset }
+
+# Files storage
+knp_gaufrette:
+    adapters:
+        anton_dev:       # My local mac
+            local:
+                directory:  /Users/Bob/Sites/imagepush2/web/new_uploads
+                create:     true
+        prod:            # Prod server
+            local:
+                directory:  /mnt/imagepush/uploads
+                create:     true
+        prod_s3:         # S3 prod server
+            amazon_s3:
+                amazon_s3_id: imagepush.amazon.s3
+                bucket_name:  uploads.imagepush.to
+                create:       true
+    filesystems:
+        images:
+            adapter:    %filesystems_images_adapter%
+            #adapter:    prod
+
+
 
 services:
-    imagepush.images:
-        class: Imagepush\ImagepushBundle\Services\Images
-        arguments: [@kernel]
+    imagepush.images.manager:
+        class: Imagepush\ImagepushBundle\Entity\ImagesManager
+        arguments: [@router, @snc_redis.default_client, @imagepush.tags.manager]
 
-    imagepush.tags:
-        class: Imagepush\ImagepushBundle\Services\Tags
-        arguments: [@kernel]
+    imagepush.tags.manager:
+        class: Imagepush\ImagepushBundle\Entity\TagsManager
+        arguments: [@snc_redis.default_client]
 
+    # Robot services
     imagepush.fetcher.digg:
         class: Imagepush\ImagepushBundle\Services\Fetcher\Digg\DiggFetcher
         arguments: [@kernel]
@@ -116,30 +155,24 @@ services:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@kernel]
 
-#    imagepush.source:
-#        class: Imagepush\ImagepushBundle\Model\AbstractSource
-#        arguments: [@kernel]
-
     imagepush.processor:
         class: Imagepush\ImagepushBundle\Services\Processor\Processor
         arguments: [@kernel]
 
-#    imagepush.processor.content:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Content
-#        arguments: [@kernel]
-#        
-#    imagepush.processor.image:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Image
-#        arguments: [@kernel]
-#        
-#    imagepush.processor.html:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Html
-#        arguments: [@kernel]
-#        
-#    imagepush.processor.tag:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Tag
-#        arguments: [@kernel]
-        
+    imagepush.processor.tag:
+        class: Imagepush\ImagepushBundle\Services\Processor\TagProcessor
+        arguments: [@kernel]
+
+    imagepush.publisher:
+        class: Imagepush\ImagepushBundle\Services\Publisher\Publisher
+        arguments: [@kernel]
+
+    # Amazon S3
+    imagepush.amazon.s3:
+        class: AmazonS3
+        arguments: [%aws_key%, %aws_secret_key%]
+
+    # Twig
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:

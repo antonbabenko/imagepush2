@@ -14,11 +14,14 @@ class Content
   /*
    * @services
    */
-  protected $kernel;
+  public $kernel, $fs, $fsImages;
 
   public function __construct(\AppKernel $kernel)
   {
     $this->kernel = $kernel;
+    //$this->fs = $this->kernel->get('knp_gaufrette.filesystem_map');
+    $this->fsImages = $kernel->getContainer()->get('knp_gaufrette.filesystem_map')->get('images');
+    
   }
 
   /**
@@ -55,15 +58,18 @@ class Content
     return (array_key_exists("Content", $this->data) ? $this->data["Content"] : null);
   }
 
+  public function getContentType()
+  {
+    return (array_key_exists("Content-type", $this->data) ? $this->data["Content-type"] : null);
+  }
+
   public function isImageType()
   {
-
     return (!empty($this->data["Content-type"]) && in_array($this->data["Content-type"], Config::$allowedImageContentTypes));
   }
 
   public function isHTMLType()
   {
-
     return (!empty($this->data["Content-type"]) && (preg_match('/(x|ht)ml/i', $this->data["Content-type"])));
   }
 
