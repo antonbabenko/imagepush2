@@ -76,20 +76,42 @@ class TagsManager
 
   }
   
-  public function getHumanTags($tag)
+  public function getHumanTags($tag, $withIds = false)
   {
 
     $tags = (is_array($tag) ? $tag : array($tag));
     //D::dump($tags);
 
     if (count($tags)) {
-      $humanTags = $this->redis->mget($tags);
-      $humanTags = array_values(array_filter($humanTags, function($tag){return !is_null($tag);}));
+        
+        $tmpHumanTags = $this->redis->mget($tags);
+        
+        if ($withIds) {
+          for ($i=0;$i<count($tags);$i++) {
+            $humanTags[$tags[$i]] = $tmpHumanTags[$i];
+          }
+        } else {
+          $humanTags = array_values(array_filter($tmpHumanTags, function($tag){return !is_null($tag);}));
+        }
+        
     } else {
       $humanTags = array();
     }
 
     return $humanTags;
+  }
+  
+  public function getAllHumanTagsWithIds()
+  {
+    
+    $keys = $this->redis->keys("tag_*");
+    
+    if ($key = array_search("tag_usage",$keys)){
+      unset($keys[$key]);
+      $keys = array_values($keys);
+    }
+    
+    return $this->getHumanTags($keys, true);
   }
   
   /**

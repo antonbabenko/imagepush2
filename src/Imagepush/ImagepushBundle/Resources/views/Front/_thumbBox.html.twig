@@ -1,16 +1,19 @@
-{% if all_images is defined %}
-  {% for group in all_images %}
-    {% if group.images is defined %}
+{% import "ImagepushBundle:Helpers:siteHelper.html.twig" as siteHelper %}
+{% set currentImagePlacement = 0 %}
+{% if allImages is defined %}
+{% for group in allImages %}
 
-    <section class="additionalContent"><div class="contentWrapper">
+{% if group.images is defined %}
+
+<section class="additionalContent"><div class="contentWrapper">
     <header>
       <h3>
-        {% if _tags|length == 0 %}
-        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag}) }}">{{group.tag}}</a>
+        {% if initialTags|length == 0 %}
+        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag.0}) }}">{{group.tag.0}}</a>
         {% else %}
-        RELATED IMAGES BY {{group.used_tags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
-        
-        {% for tag in group.used_tags %}
+        RELATED IMAGES BY {{group.usedTags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
+
+        {% for tag in group.usedTags %}
         {% set tag = tag|replace({"\n": " "})|lower %}
         <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>
         {% endfor %}
@@ -22,23 +25,34 @@
     <section class="thumbnails">
       <ul>
         {% for image in group.images %}
+
+        {% if withAd and currentImagePlacement == bannerPlacement %}
+        <li>
+          <div class="adWrapper">
+            {{ siteHelper.html('square_125x125') }}
+          </div>
+        </li>
+        {% else %}
         <li>
           <div class="thumbWrapper">
             <details class="no_vote">
               <span class="imgDescription">{{image.title}}</span>
             </details>
-            <a href="{{image._view_url}}" title="{{image.title}}" class="imgWrapper">
-              <img src="{{image._thumb_img}}" width="140" height="140" alt="{{image.title}}" />
+            <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
+              <img src="{{image._thumbImg}}" width="140" height="140" alt="{{image.title}}" />
               <span class="imgDescription"><span>{{image.title}}</span></span>
             </a>
           </div>
         </li>
+        {% endif %}
+
+        {% set currentImagePlacement = currentImagePlacement + 1 %}
 
         {% endfor %}
       </ul>
     </section>
-    </div></section>
+  </div></section>
 
-    {% endif %}
-  {% endfor %}
+{% endif %}
+{% endfor %}
 {% endif %}

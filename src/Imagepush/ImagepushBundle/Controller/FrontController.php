@@ -17,14 +17,13 @@ class FrontController extends Controller
    */
   public function indexAction()
   {
-    $images = $this->get('doctrine.odm.mongodb.document_manager')
-    ->getRepository('ImagepushBundle:Image')
-    ->findImages("current", 7);
-    
-    \D::dump($images);
-    //$images = $this->get('imagepush.images.manager')->getImages("current", 7);
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
-    return array("images" => $images);
+    $images = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->findImages("current", 7);
+
+    return array("images" => array_values($images));
   }
 
   /**
@@ -67,52 +66,44 @@ class FrontController extends Controller
   public function viewMultipleAction($tag, $type)
   {
 
-    //\D::dump($tag);
-    //return array();
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
     $params = array();
 
-    $redis = $this->get('snc_redis.default_client');
-
-    $another_page_type_count = 0;
+    $isOppositeTypeExists = false;
 
     if (!is_null($tag))
     {
       $params = array("tag" => $tag);
 
-      $tag_key = $this->get('imagepush.tags.manager')->getTagKey($tag);
+      $tagObject = $dm->createQueryBuilder('ImagepushBundle:Tag')
+        ->field('text')->equals($tag)
+        ->getQuery()
+        ->getSingleResult();
 
-      // if tag has been ever created
-      $count = $redis->zscore("tag_usage", $tag_key);
-      if (!$count)
+      $typeField = 'getUsedIn' . ($type == "current" ? "Available" : "Upcoming");
+      $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
+
+      if (false == (count($tagObject) && $tagObject->{$typeField}() > 0))
       {
-        throw new NotFoundHttpException(sprintf('There are no images to show by tag: %s', $tag));
+        throw new NotFoundHttpException(sprintf('There are no %s images to show by tag: %s', $type, $tag));
       }
 
-      // if there are images to show in opposite page_type (f.eg: show "upcoming" link when view "current" page).
-      if ($type == "current")
-      {
-        $tag_set = "upcoming_image_list:" . $tag_key;
-      } else
-      {
-        $tag_set = "image_list:" . $tag_key;
-      }
-
-      $another_page_type_count = $redis->zcard($tag_set); //, $tag_key);
+      $isOppositeTypeExists = (bool) $tagObject->{$oppositeTypeField}();
     }
 
-    $images = $this->get('imagepush.images.manager')->getImages($type, 30, $params);
+    $images = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->findImages($type, 30, $params);
 
     //\D::dump($images);
-    
-    //$share_url = $this->get('request')->getUri();
 
     return array(
-      "images" => $images,
       "type" => $type,
       "tag" => $tag,
-      "another_page_type_count" => $another_page_type_count);
-      //"share_url" => $share_url);
+      "images" => $images,
+      "isOppositeTypeExists" => $isOppositeTypeExists
+    );
   }
 
   /**
@@ -121,8 +112,13 @@ class FrontController extends Controller
    */
   public function viewImageAction($id)
   {
-    $image = $this->get('imagepush.images.manager')->getOneImage($id);
-    
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
+
+    $image = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->findOneBy(array("id" => (int) $id, "isAvailable" => true));
+
+    //\D::dump($id);
     //\D::dump($image);
 
     if (!$image)
@@ -130,10 +126,15 @@ class FrontController extends Controller
       throw new NotFoundHttpException('Image doesn\'t exist');
     }
 
-    $next_image = $this->get('imagepush.images.manager')->getOneImageRelatedToTimestamp("next", $image["timestamp"]);
-    $prev_image = $this->get('imagepush.images.manager')->getOneImageRelatedToTimestamp("prev", $image["timestamp"]);
+    $nextImage = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->getOneImageRelatedToTimestamp("next", $image->getTimestamp());
 
-    return array("image" => $image, "next_image" => $next_image, "prev_image" => $prev_image);
+    $prevImage = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->getOneImageRelatedToTimestamp("prev", $image->getTimestamp());
+
+    return array("image" => $image, "nextImage" => $nextImage, "prevImage" => $prevImage);
   }
 
   /**
@@ -152,7 +153,7 @@ class FrontController extends Controller
    */
   public function rssAction($version)
   {
-    
+
     $images = $this->get('imagepush.images.manager')->getImages("current", 20);
 
     // MAMP 2.0.1 fails on "iconv_strlen", so this function is not ready yet!!!
@@ -161,15 +162,15 @@ class FrontController extends Controller
     // Fail case ====> echo iconv_strlen($str, "UTF-8"); die();
 
     $feed = new \Zend\Feed\Writer\Feed();
-    
+
     if (count($images))
     {
-/*
-      if ($feed_format == "RSS2") {
+      /*
+        if ($feed_format == "RSS2") {
         $this->feed = new sfRss201Feed();
-      } else {
+        } else {
         $this->feed = new sfRss10Feed();
-      }*/
+        } */
       //$feed->setType("rss");
 
       $feed->setTitle("Imagepush.to - Best images hourly");
@@ -177,7 +178,7 @@ class FrontController extends Controller
       $feed->setLanguage("en");
       $feed->setDescription("Best images hourly");
       $feed->setGenerator("Manually");
-      
+
       $feed->setLink('http://imagepush.com');
       $feed->setDateModified($images[0]["timestamp"]);
 
@@ -188,7 +189,8 @@ class FrontController extends Controller
         //$entry->setAuthor($image["link"]);
         $entry->setId($image["_share_url"]);
 
-        if (count($image["_tags"])) {
+        if (count($image["_tags"]))
+        {
           foreach ($image["_tags"] as $tag) {
             $entry->addCategory(array("term" => $tag));
           }
@@ -199,18 +201,18 @@ class FrontController extends Controller
         //$img_src = Images::getFileUrl($image, "m");
         $enclosure["uri"] = 'http://imagepush.to' . $image["_main_img"];
         //if ($file = sfConfig::get("sf_upload_dir") . "/m/" . $image["m_file"]) {
-          $enclosure["length"] = 1;//@filesize($file);
+        $enclosure["length"] = 1; //@filesize($file);
         //}
         $enclosure["type"] = $image["m_content_type"];
 
         $entry->setEnclosure($enclosure);
 
-        $entry->setDescription('<a href="'.$image["_share_url"].'"><img src="http://imagepush.to' . $image["_main_img"] . '" alt="'.str_replace('"', '\"', $image["title"]).'" border="0" width="'.$image["m_width"].'" height="'.$image["m_height"].'" /></a>');
+        $entry->setDescription('<a href="' . $image["_share_url"] . '"><img src="http://imagepush.to' . $image["_main_img"] . '" alt="' . str_replace('"', '\"', $image["title"]) . '" border="0" width="' . $image["m_width"] . '" height="' . $image["m_height"] . '" /></a>');
 
         $feed->addEntry($entry);
       }
     }
-    
+
     return new Response($feed->export("rss"));
   }
 
@@ -221,8 +223,11 @@ class FrontController extends Controller
    */
   public function _trendingNowAction($max = 20)
   {
-    $tags = $this->get('imagepush.tags.manager')->getLatestTrends($max);
-    //\D::dump($tags);
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
+
+    $tags = $dm
+      ->getRepository('ImagepushBundle:LatestTag')
+      ->getLatestTrends($max);
 
     return array("tags" => $tags);
   }
@@ -242,83 +247,123 @@ class FrontController extends Controller
    * 
    * @Template()
    */
-  public function _thumbBoxAction($_tags = array(), $skip_image_id = false)
+  public function _thumbBoxAction($initialTags = array(), $skipImageId = false, $withAd = false)
   {
 
-    //\D::dump($_tags);
-    if (count($_tags))
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
+
+    //\D::dump($initialTags);
+    if (count($initialTags))
     {
-      $tags = $_tags;
-      $group_by_tags = false;
+      $tags = $initialTags;
+      $groupTags = false;
+      $maxImages = 10;
     } else
     {
-      $tags = $this->get('imagepush.tags.manager')->getLatestTrends(100);
-      $group_by_tags = true;
+      $tags = $dm
+        ->getRepository('ImagepushBundle:LatestTag')
+        ->getLatestTrends(100);
+      //\D::dump($tags);
+
+      if (!count($tags))
+      {
+        return;
+      }
+
+      $tags = array_flip($tags);
+
+      $groupTags = true;
+      $maxImages = 4;
     }
 
-    if (!count($tags))
-    {
-      return;
-    }
 
-    $total_images = 0;
-    $all_images = $used_images = array();
+    $allImages = $usedImages = array();
+    $totalImages = 0;
 
     // skip main image
-    if (isset($skip_image_id))
+    if (!empty($skipImageId))
     {
-      $used_images[] = $skip_image_id;
+      $usedImages[] = $skipImageId;
     }
 
-    foreach ($tags as $tag) {
+    foreach ($tags as $tagId => $tag) {
 
-      if (count($all_images) >= 10)
+      $tagImages = $foundTags = array();
+
+      if (count($allImages) >= 10)
         break;
 
-      $tag_images = array();
+      // make just one search, if thumbs will be shown in one merged box
+      if (!$groupTags)
+      {
+        $lookupTags = $tags;
+      } else
+      {
+        $lookupTags = array($tag);
+      }
 
-      $images = $this->get('imagepush.images.manager')->getImages('current', 20, array("tag" => $tag));
+      $images = $dm
+        ->getRepository('ImagepushBundle:Image')
+        ->findImages("current", 10, array("tag" => $lookupTags));
 
-      //\D::dump($images);
-      if (count($images) >= 2) // 4
+      if (count($images) >= 3)
       {
         // make sure that each image is shown just once in all tags, if image belongs to multiple tags
-        foreach ($images as $image) {
+        foreach (array_values($images) as $image) {
 
-          if (count($tag_images) == 4)
+          if (count($tagImages) == $maxImages)
             break;
 
-          if (!in_array($image["id"], $used_images))
+          if (!in_array($image->getId(), $usedImages))
           {
-            $tag_images[] = $image;
-            $used_images[] = $image["id"];
+            $tagImages[] = $image;
+            $usedImages[] = $image->getId();
+            $foundTags = array_merge($foundTags, $image->getTags());
+            //\D::dump($foundTags);
           }
         }
 
-        if (count($tag_images) >= 3)
+        if (count($tagImages) >= 3)
         {
-          $all_images[] = array("tag" => $tag, "images" => $tag_images);
+          $foundTags = array_count_values($foundTags);
+          arsort($foundTags);
+          $foundTags = array_slice(array_flip($foundTags), 0, 5);
+
+          $allImages[] = array("tag" => $foundTags, "images" => $tagImages);
+
+          $totalImages += count($tagImages);
         }
+      }
 
-        $total_images += count($tag_images);
+      // Break the loop, if group of images received
+      if (!$groupTags)
+      {
+        break;
       }
     }
-
+    
     // Images related to other images by tags are not grouped
-    if (!$group_by_tags && count($all_images))
+    if (!$groupTags && count($allImages))
     {
-      $all_images_list = $used_tags = array();
-      foreach ($all_images as $images) {
-        $used_tags[] = $images["tag"];
-        $all_images_list = array_merge($all_images_list, $images["images"]);
+      $allImagesList = $usedTags = array();
+      foreach ($allImages as $images) {
+        $usedTags = $images["tag"];
+        $allImagesList = array_merge($allImagesList, $images["images"]);
       }
-      unset($all_images);
-      $all_images[] = array("used_tags" => $used_tags, "images" => $all_images_list);
+      unset($allImages);
+      $allImages[] = array("usedTags" => $usedTags, "images" => $allImagesList);
     }
 
-    //\D::dump($all_images);
+    //\D::dump($allImages);
+    //\D::dump($withAd);
+    //\D::dump($initialTags);
 
-    return array("all_images" => $all_images, "_tags" => $_tags, "skip_image_id" => $skip_image_id);
+    return array(
+      "allImages" => $allImages,
+      "initialTags" => $initialTags,
+      "skipImageId" => $skipImageId,
+      "withAd" => $withAd,
+      "bannerPlacement" => mt_rand(0, $totalImages - 1));
   }
 
 }

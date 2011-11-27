@@ -1,9 +1,9 @@
-{% if tags %}
+{% if tags is not empty %}
 <div class="slogan"><a href="{{ path('viewUpcoming') }}" title="Upcoming images" class="active">Trending now:</a></div>
 <nav>
   <ul>
     {# <li><a href="<?php echo url_for("@homepage"); ?>" title="Home" class="active">Home</a></li> #}
-    {% for tag in tags %}
+    {% for tag, count in tags %}
 
     {% set tag = tag|replace({"\n": " "})|lower %}
 

@@ -4,7 +4,7 @@
 */ ?>
 #}
 
-{% if settings.show_comments %}
+{% if settings.show_comments|default(false) %}
 <div id="fb-root"></div>
 <script>
   window.fbAsyncInit = function() {

@@ -9,52 +9,44 @@
     <meta charset=utf-8 />
     <link rel="icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" /> 
     
-    <title>{% block title %}Imagepush{% endblock %}</title>
     
-    {# <?php include_http_metas() ?>
-    <?php if (has_slot("og_title")): ?>
-      <title><?php echo get_slot("og_title"); ?></title>
-      <meta name="title" content="<?php echo get_slot("og_title"); ?>" />
-      <meta name="description" content="<?php echo get_slot("og_title"); ?>" />
-    <?php else: ?>
+    {% if block('og_title') %}
+      {{ block('og_title') }}
+    {% else %} {# if app.request.attributes.get('_route') == 'index' #}
       <title>Best images hourly</title>
       <meta name="title" content="Imagepush.to - Best images hourly" />
       <meta name="description" content="Imagepush.to - Best images hourly" />
-    <?php endif; ?>
-
-    <?php if (has_slot("meta_keywords")): ?>
-      <meta name="keywords" content="<?php echo get_slot("meta_keywords"); ?>" />
-    <?php endif; ?>
+      <meta property="og:type" content="website" />
+    {% endif %}
+    
+    
+    {% if block('og_url') %}
+      {{ block('og_url') }}
+    {% elseif app.request.attributes.get('_route') == 'index' %}
+      <link rel="canonical" href="http://imagepush.to/" />
+    {% endif %}
+    
+    
+    {% if block('meta_keywords') %}
+    <meta name="keywords" content="{{ block('meta_keywords') }}" />
+    {% endif %}
+    
+    
+    {% if block('image_src') %}
+    <link rel="image_src" href="{{ block('image_src') }}" />
+    <meta name="medium" content="image" />
+    {% endif %}
+    
+    {% block og_image %}{% endblock %}
+    
+    
+    {# <meta name="viewport" content="initial-scale=1.0, width=device-width"> #}
 
     <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://feeds.feedburner.com/imagepush" />
     <meta name="google-site-verification" content="tT08cSzzAI9CaHWx62miVpZuZc9dI0sC5I6AD7AMKbo" />
-
-    <?php if (has_slot("image_src")): ?>
-      <link rel="image_src" href="<?php echo get_slot("image_src"); ?>" />
-      <meta name="medium" content="image" />
-    <?php endif; ?>
-
     <meta property="og:site_name" content="Imagepush.to - Best images hourly" />
     <meta property="fb:admins" content="676763506" />
     <meta property="fb:app_id" content="118412418235312" />
-#}
-
-
-    {% if app.request.attributes.get('_route') == 'index' %}
-      <meta property="og:type" content="website" />
-    {% else %}
-      {% block og_title %}{% endblock %}
-    {% endif %}
-
-    {% block og_image %}{% endblock %}
-    
-    {% block og_url %}
-      {% if app.request.attributes.get('_route') == 'index' %}
-      <link rel="canonical" href="http://imagepush.to/" />
-      {% endif %}
-    {% endblock %}
-    
-    <meta name="viewport" content="initial-scale=1.0, width=device-width">
 
     <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
     <script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
@@ -144,7 +136,7 @@
           {{ siteHelper.html('right_300x250') }}
         </figure>
 
-        {{ siteHelper.html('facebook_likebox') }}
+        {# {{ siteHelper.html('facebook_likebox') }} #} 
 
       </aside>
       <div class="footerFix"></div>

@@ -17,8 +17,8 @@
                 <details class="no_vote"> {# open="open" #}
                   <span class="imgDescription">{{image.title}}</span>
                 </details>
-                <a href="{{ path('viewImage', {'id': image.imageId, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
-                  <img src="{{image._thumb_img}}" width="140" height="140" alt="{{image.title}}" />
+                <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
+                  <img src="{{image._thumbImg}}" width="140" height="140" alt="{{image.title}}" />
                   <span class="imgDescription"><span>{{image.title}}</span></span>
                 </a>
               </div>
@@ -34,7 +34,7 @@
       <div id="main_image">
       <header>
         <div class="category">
-          <div class="addthis_toolbox addthis_default_style" addthis:url="{{images.0._share_url}}" addthis:title="{{images.0.title}}" addthis:description="{{images.0.title}}">
+          <div class="addthis_toolbox addthis_default_style" addthis:url="{{images.0._shareUrl}}" addthis:title="{{images.0.title}}" addthis:description="{{images.0.title}}">
           <a class="addthis_button_facebook_like" fb:like:href="http://imagepush.to" fb:like:layout="button_count" fb:like:show_faces="false" fb:like:width="80" fb:like:font="trebuchet+ms" fb:like:action="like"></a><br>
           </div>
         </div>
@@ -42,9 +42,9 @@
           <li><h1 id="main_image_title">{{images.0.title}}</h1></li>
         </ul>
       </header>
-      <a href="{{images.0._view_url}}" id="main_image_link">
+      <a href="{{images.0._viewUrl}}" id="main_image_link">
         <figure class="bigImg">
-          <img src="{{images.0._main_img}}" alt="{{images.0.title}}" id="main_image_img" width="{{images.0.m_width < 463 ? images.0.m_width : 463}}" />
+          <img src="{{images.0._mainImg}}" alt="{{images.0.title}}" id="main_image_img" width="{{images.0.mWidth < 463 ? images.0.mWidth : 463}}" />
         </figure>
       </a>
 
@@ -73,6 +73,6 @@
 </div>
 #}
 
-{% render "ImagepushBundle:Front:_thumbBox" %}
+{% render "ImagepushBundle:Front:_thumbBox" with {'withAd': false} %}
 
 {% endblock %}
