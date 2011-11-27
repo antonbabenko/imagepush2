@@ -1,6 +1,7 @@
 {% extends "ImagepushBundle::layoutFront.html.twig" %}
 
 {% block og_title %}
+<title>{{'Best images hourly - ' ~ (type == 'upcoming' ? 'Upcoming' : 'Published') ~ (tag is none ? '' : ':' ~ tag)}}</title>
 <meta property="og:title" content="{{'Best images hourly - ' ~ (type == 'upcoming' ? 'Upcoming' : 'Published') ~ (tag is none ? '' : ':' ~ tag)}}" />
 <meta property="og:type" content="article" />
 {% endblock %}
@@ -11,23 +12,6 @@
 {% endblock %}
 
 {% block content %}
-
-{#
-<?php
-
-if (!empty($tag)) $tag = prepare_tag($tag);
-
-$share_data["_share_url"] = "http://imagepush.to".$sf_request->getPathInfo();
-$share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : '');
-//include_partial("default/verticalShare", array("object" => $share_data));
-?>
-
-<?php //D::dump($images); ?>
-<?php slot("meta_keywords", "upcoming, images, bestof, community, vote"); ?>
-<?php slot("og_title", "Best images hourly - ".($page_type == "upcoming" ? "Upcoming" : "Published").($tag ? ": ".$tag : "")); ?>
-<?php slot("og_url", $share_data["_share_url"]); ?>
-#}
-
 <section id="mainContent">
   <div class="contentWrapper">
       <header>
@@ -38,12 +22,12 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
 
             {% if tag %}
 
-            {% if another_page_type_count %}
+            {% if isOppositeTypeExists %}
             <li class="fright"><a href="{{ path('viewByTag', {'tag': tag}) }}">Previous hits</a></li>
             {% endif %}
 
             <li><a href="{{ path('viewUpcoming') }}">Upcoming</a> / </li>
-            <li><h1>Tag: {{ tag|replace({"\n": " "}) }}</h1></li>
+            <li><h1>Tag: {{tag}}</h1></li>
           
             {% else %}
 
@@ -51,7 +35,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
             
             {% endif %}
 
-          {% else %} {# current images #}
+          {% else %} 
 
             {% if tag %}
 
@@ -64,6 +48,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
             {% endif %}
 
           {% endif %}
+
         </ul>
       </header>
 
@@ -75,7 +60,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
 
         <section class="list">
         <ul>
-        {% for image in images %}
+        {% for imageKey, image in images %}
           <li id="item-{{image.id}}">
               <header>
                 <ul>
@@ -86,11 +71,11 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
                   <li style="vertical-align:middle;"><h1>{{image.title}}</h1></li>
                 </ul>
 
-                {% if image._tags|length %}
+                {% if image.tags|length %}
                 <p class="details">Tags:
-                {% for tag in image._tags %}
+                  {% for tag in image.tags %}
                   <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>&nbsp;
-                {% endfor %}
+                  {% endfor %}
                 {% endif %}
 
               </header>
@@ -100,7 +85,8 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
                 <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }} ">
                 {% endif %}
                 <figure class="bigImg" style="display:inline-block;">
-                  <img src="{{image._article_img}}" alt="{{image.title}}" width="{{ image.a_width < 625 ? image.a_width : 625 }}" />
+                  {# {% debug image %} #}
+                  <img src="{{image._articleImg}}" alt="{{image.title}}" width="{{ image.aWidth < 625 ? image.aWidth : 625 }}" />
                 </figure>
                 {% if type == "current" %}
                 </a>
@@ -114,7 +100,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
                     <a class="icon-inappropriate" href="#" onclick="javascript:if (confirm('Are you sure that this image is inappropriate? If this image does not contain porn or erotic, but you simply don\'t like it, please click &quot;I don\'t like it&quot; icon above the image?')) { Imagepush.Flag('{{image.id}}'); } return false;" id="flag-image-{{image.id}}">Flag image as inappropriate</a>
                   </div>
                   Fetched from
-                  <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image._original_host|replace({'www.': ''}) }}</a>
+                  <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image._originalHost|replace({'www.': ''}) }}</a>
                   on {{ image.timestamp|date('Y/m/d \\a\\t H:i') }}
                 </span>
                 {% endif %}
@@ -133,7 +119,7 @@ $share_data["title"] = "Upcoming images".(!empty($tag) ? " tagged as ".$tag : ''
           {% endif %}
         {% endif %}
 
-
+        
   </div>
 </section>
 
