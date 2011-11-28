@@ -39,7 +39,7 @@
 
             {% if tag %}
 
-            {% if another_page_type_count %}
+            {% if isOppositeTypeExists %}
             <li class="fright"><a href="{{ path('viewUpcomingByTag', {'tag': tag}) }}">Upcoming</a></li>
             {% endif %}
 

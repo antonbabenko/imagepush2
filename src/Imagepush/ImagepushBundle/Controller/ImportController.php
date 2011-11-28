@@ -22,8 +22,8 @@ class ImportController extends Controller
   public function indexAction()
   {
     $result = $this->importTags();
-    //$result = $this->importLatestTags();
-    //$result = $this->importImages();
+    $result = $this->importLatestTags();
+    $result = $this->importImages();
     
     echo "All done :)";
 
@@ -42,6 +42,7 @@ class ImportController extends Controller
     $tags = $this->get('imagepush.tags.manager')->getAllHumanTagsWithIds();
     
     //\D::dump($tags);
+    $importedTags = array();
     if (count($tags))
     {
       foreach ($tags as $legacyKey => $tag) {
@@ -51,22 +52,30 @@ class ImportController extends Controller
         if (strstr($legacyKey, "_replace")) {
           //\D::dump($redis->get(str_replace("_replace", "",$legacyKey)));
           //\D::dump($redis->get($text));
-          $text = $redis->get($text);
+          $legacyKey = $tag;
+          $text = $redis->get($tag);
         }
         
         // replace newline
         $text = str_replace("\n", " ", $text);
+        
+        if (!empty($text) && !in_array($text, $importedTags))
+        {
+          $importedTags[] = $text;
+        } else {
+          continue;
+        }
         
         $new = new Tag();
         $new->setLegacyKey($legacyKey);
         $new->setText($text);
         
         //$count = $redis->zscore("tag_usage", $legacyKey);
-        $availableCount = $redis->zcard("image_list:". $legacyKey);
-        $upcomingCount = $redis->zcard("upcoming_image_list:". $legacyKey);
+        //$availableCount = $redis->zcard("image_list:". $legacyKey);
+        //$upcomingCount = $redis->zcard("upcoming_image_list:". $legacyKey);
         
-        $new->setUsedInAvailable((int)$availableCount);
-        $new->setUsedInUpcoming((int)$upcomingCount);
+        //$new->setUsedInAvailable((int)$availableCount);
+        //$new->setUsedInUpcoming((int)$upcomingCount);
 
         $dm->persist($new);
 
@@ -163,6 +172,11 @@ class ImportController extends Controller
                 $tags[] = $oneTag;
                 $new->addTagsRef($tag);
                 $tag->addImagesRef($new);
+                if ($imageGroup == "current") {
+                  $tag->setUsedInAvailable($tag->getUsedInAvailable() + 1);
+                } else {
+                  $tag->setUsedInUpcoming($tag->getUsedInUpcoming() + 1);
+                }
                 $dm->persist($tag);
               } else
               {
@@ -178,7 +192,7 @@ class ImportController extends Controller
 
           $dm->persist($new);
 
-          if (++$i % 100 == 0)
+          if (++$i % 1000 == 0)
           {
             $dm->flush();
             $dm->clear();
