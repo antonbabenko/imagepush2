@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
- *   @MongoDB\Index(keys={"isAvailable"})
+ *   @MongoDB\Index(keys={"isAvailable"="asc"})
  * })
  */
 class Image

@@ -1,4 +1,14 @@
-# www.robotstxt.org/
-# www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
+User-Agent: msnbot
+Crawl-Delay: 20
 
 User-agent: *
+Disallow: /js
+Disallow: /images
+Disallow: /upcoming
+Disallow: /tag/*/upcoming
+
+User-agent: Mediapartners-Google
+Disallow:
+
+Sitemap: http://imagepush.to/sitemap.xml
+

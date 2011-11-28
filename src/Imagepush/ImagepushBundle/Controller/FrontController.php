@@ -80,14 +80,17 @@ class FrontController extends Controller
         ->field('text')->equals($tag)
         ->getQuery()
         ->getSingleResult();
-
-      $typeField = 'getUsedIn' . ($type == "current" ? "Available" : "Upcoming");
-      $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
-
-      if (false == (count($tagObject) && $tagObject->{$typeField}() > 0))
+      
+      if (!$tagObject)
       {
         throw new NotFoundHttpException(sprintf('There are no %s images to show by tag: %s', $type, $tag));
       }
+
+      //$typeField = 'getUsedIn' . ($type == "current" ? "Available" : "Upcoming");
+      // && $tagObject->{$typeField}() > 0))
+      
+      // Opposite type field has number of images in each tag, so we can show or hide the opposite type link
+      $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
 
       $isOppositeTypeExists = (bool) $tagObject->{$oppositeTypeField}();
     }
