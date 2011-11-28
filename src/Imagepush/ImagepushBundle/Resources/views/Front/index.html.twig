@@ -14,10 +14,10 @@
             {% if loop.index > 1 and loop.index <= 4 %}
             <li>
               <div class="thumbWrapper">
-                <details class="no_vote"> {# open="open" #}
+                <div class="details">
                   <span class="imgDescription">{{image.title}}</span>
-                </details>
-                <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
+                </div>
+                <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
                   <img src="{{image._thumbImg}}" width="140" height="140" alt="{{image.title}}" />
                   <span class="imgDescription"><span>{{image.title}}</span></span>
                 </a>
