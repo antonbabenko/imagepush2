@@ -55,7 +55,7 @@ a {color:#54acde; text-decoration:underline}
     a.like {display:inline-block; height:21px; width:64px; vertical-align:middle; background:url(gfx/social/btn-like.gif) no-repeat 0 0}
     a.dislike {display:inline-block; height:21px; width:74px; vertical-align:middle; background:url(gfx/social/btn-dislike.gif) no-repeat 0 0}
     a.like:hover, a.dislike:hover {background-position:0 -21px}
-    
+
 /*FORM*/
 input, select, textarea {font:12px Trebuchet MS, Tahoma, Verdana; color:#5f5c5c; vertical-align:middle}
 form {margin:0 0 20px}
@@ -205,15 +205,12 @@ a.icon-inappropriate {padding:0 0 0 18px; background:url(gfx/icon-inappropriate.
 	.thumbnails ul {width:650px; min-height:1%}
 	.thumbnails li {float:left; width:140px; height:140px; margin:0 15px 15px 0; padding:1px; border:1px solid #d6d6d6; cursor:pointer}
 		.thumbnails li:hover {position:relative; z-index:1; border-color:#aaa}
-		.thumbnails li:hover p.details, .thumbnails li:hover .imgWrapper .zoom {display:block}
-		.thumbnails li:hover .imgWrapper .imgDescription {background:#000; /*filter:alpha(opacity=100)*/}
+		.thumbnails li:hover .details, .thumbnails li:hover .imgWrapper .zoom {display:block}
+		.thumbnails li:hover .imgWrapper .imgDescription {background:#000;}
 	.thumbnails .thumbWrapper {position:relative; width:100%; height:100%}
 	.thumbnails .adWrapper {position:relative; padding: 7px; text-align: center; cursor:auto;}
-	.thumbnails details {position:absolute; top:-32px; left:-3px; width:100%; padding:151px 2px 3px; background:#fff; border:1px solid #ccc; display:none; box-shadow:0 0 3px #ccc; -moz-box-shadow:0 0 3px #ccc; -webkit-box-shadow:0 0 3px #ccc}
-		.thumbnails details .like {position:absolute; left:2px; top:5px}
-		.thumbnails details .dislike {position:absolute; right:2px; top:5px}
-		.thumbnails details.no_vote .imgDescription {display:block; clear:both; padding:0 5px; line-height:18px; background:#000; color:#fff; font-size:10px}
-	.thumbnails details.no_vote {top:-2px; padding-top:121px; padding-bottom: 2px;}
+	.thumbnails .details {position:absolute; top:-2px; left:-3px; width:100%; padding:121px 2px 2px; background:#fff; border:1px solid #ccc; display:none; box-shadow:0 0 3px #ccc; -moz-box-shadow:0 0 3px #ccc; -webkit-box-shadow:0 0 3px #ccc}
+		.thumbnails .details .imgDescription {display:block; clear:both; padding:0 5px; line-height:18px; background:#000; color:#fff; font-size:10px}
 	.thumbnails .imgWrapper {position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; text-decoration:none}
 	.thumbnails .imgWrapper .imgDescription {position:absolute; bottom:0; left:0; right:0; padding:0 5px; background:#000; background-color: rgba(0,0,0,0.75); color:#fff; font-size:10px; /*filter:alpha(opacity=75)*/}
 	.thumbnails .imgWrapper .imgDescription span {display:block; overflow:hidden; height:18px; line-height:18px}
