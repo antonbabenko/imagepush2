@@ -28,6 +28,9 @@ $loader->registerNamespaces(array(
   
     'Knp\Bundle'       => __DIR__.'/../vendor/bundles',
     'Gaufrette'        => __DIR__.'/../vendor/gaufrette/src',
+    'Nekland'          => __DIR__.'/../vendor/bundles',
+    'Stof'             => __DIR__.'/../vendor/bundles',
+    'Gedmo'            => __DIR__.'/../vendor/gedmo-doctrine-extensions/lib',
   
     'Imagepush'        => __DIR__.'/../src',
 

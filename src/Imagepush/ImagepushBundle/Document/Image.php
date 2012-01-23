@@ -4,6 +4,9 @@ namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+//use Nekland\FeedBundle\Item\ExtendedItemInterface;
 
 //use Imagepush\ImagepushBundle\External\CustomStrings;
 //use Imagepush\ImagepushBundle\Model\AbstractSource;
@@ -51,6 +54,7 @@ class Image
   protected $title;
 
   /**
+   * @Gedmo\Slug(fields={"title"}, unique=false)
    * @MongoDB\String
    */
   protected $slug;
@@ -118,7 +122,7 @@ class Image
   }
 
   /**
-   * Start: Custom helpers
+   * Start: Custom methods
    */
   public function get_originalHost()
   {
@@ -152,9 +156,9 @@ class Image
   }
 
   /**
-   * End: Custom helpers
+   * End: Custom methods
    */
-
+  
   /**
    * Get mongoId
    *

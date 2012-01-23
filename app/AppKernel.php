@@ -22,6 +22,8 @@ class AppKernel extends Kernel
             new Snc\RedisBundle\SncRedisBundle(),
             //new Liip\ImagineBundle\LiipImagineBundle(),
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
+            new Nekland\FeedBundle\NeklandFeedBundle(),
+            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
           
             new Imagepush\ImagepushBundle\ImagepushBundle(),
 
@@ -32,7 +34,7 @@ class AppKernel extends Kernel
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
             
-            include(__DIR__."/../src/CustomDebug.php");
+            include_once __DIR__."/../src/CustomDebug.php";
         }
 
         return $bundles;

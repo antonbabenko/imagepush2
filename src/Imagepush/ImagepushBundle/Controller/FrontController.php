@@ -152,11 +152,49 @@ class FrontController extends Controller
   /**
    * RSS feed (only in RSS2 format)
    *
-   * @Route("/rss{version}", name="rss", defaults={"version"=""}, requirements={"version"="|2"}))
+   * @Route("/rss{version}", name="rssFeed", defaults={"version"=""}, requirements={"version"="|2"}))
    */
   public function rssAction($version)
   {
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
+    $images = $dm
+      ->getRepository('ImagepushBundle:Image')
+      ->findImages("current", 20);
+    
+    $factory = $this->get('nekland_feed.factory');
+    
+    // "post" is the name of the feed in the configuration
+    //\D::dump($factory);
+    
+    //$get = $factory->get('images_feed'); 
+    //\D::dump($get);
+    
+    //$factory->load('images_feed', 'loader');
+
+foreach (array_values($images) as $image) {
+$factory->get('images_feed')->add(new \Imagepush\ImagepushBundle\Document\ImageFeedItem($image));
+}
+
+// For this example we are using rss_file but this is the default value, and if you extend the bundle you can use another loader
+    $output = $factory->render('images_feed'); // we want to render the feed into rss format but you can use the atom format
+    
+    \D::dump($output);
+    die();
+    $response = new Response($output);
+    
+    return $response;
+
+  }
+  /**
+   * RSS feed (only in RSS2 format)
+   *
+   * @Route("/oldrss{version}", name="rss", defaults={"version"=""}, requirements={"version"="|2"}))
+   */
+  public function oldrssAction($version)
+  {
+
+    
     $images = $this->get('imagepush.images.manager')->getImages("current", 20);
 
     // MAMP 2.0.1 fails on "iconv_strlen", so this function is not ready yet!!!
@@ -260,7 +298,7 @@ class FrontController extends Controller
     {
       $tags = $initialTags;
       $groupTags = false;
-      $maxImages = 10;
+      $maxImages = 16;
     } else
     {
       $tags = $dm
@@ -307,8 +345,8 @@ class FrontController extends Controller
 
       $images = $dm
         ->getRepository('ImagepushBundle:Image')
-        ->findImages("current", 10, array("tag" => $lookupTags));
-
+        ->findImages("current", 10*count($lookupTags), array("tag" => $lookupTags));
+      
       if (count($images) >= 3)
       {
         // make sure that each image is shown just once in all tags, if image belongs to multiple tags
@@ -322,9 +360,10 @@ class FrontController extends Controller
             $tagImages[] = $image;
             $usedImages[] = $image->getId();
             $foundTags = array_merge($foundTags, $image->getTags());
-            //\D::dump($foundTags);
           }
         }
+        //\D::dump($tagImages);
+        //\D::dump($foundTags);
 
         if (count($tagImages) >= 3)
         {
