@@ -1,10 +1,10 @@
 [symfony]
     git=http://github.com/symfony/symfony.git
-    version=v2.0.6
+    version=v2.0.9
 
 [twig]
     git=http://github.com/fabpot/Twig.git
-    version=v1.3.0
+    version=v1.5.1
 
 [monolog]
     git=http://github.com/Seldaek/monolog.git
@@ -12,19 +12,19 @@
 
 [doctrine-common]
     git=http://github.com/doctrine/common.git
-    version=2.1.2
+    version=2.1.4
 
 [doctrine-dbal]
     git=http://github.com/doctrine/dbal.git
-    version=2.1.3
+    version=2.1.5
 
 [doctrine]
     git=http://github.com/doctrine/doctrine2.git
-    version=2.1.2
+    version=2.1.5
 
 [swiftmailer]
     git=http://github.com/swiftmailer/swiftmailer.git
-    version=v4.1.3
+    version=v4.1.5
 
 [assetic]
     git=http://github.com/kriswallsmith/assetic.git
@@ -40,6 +40,7 @@
 [SensioFrameworkExtraBundle]
     git=http://github.com/sensio/SensioFrameworkExtraBundle.git
     target=/bundles/Sensio/Bundle/FrameworkExtraBundle
+    version=origin/2.0
 
 [JMSSecurityExtraBundle]
     git=http://github.com/schmittjoh/JMSSecurityExtraBundle.git
@@ -49,7 +50,7 @@
 [SensioDistributionBundle]
     git=http://github.com/sensio/SensioDistributionBundle.git
     target=/bundles/Sensio/Bundle/DistributionBundle
-    version=origin/1.0
+    version=origin/2.0
 
 [SensioGeneratorBundle]
     git=http://github.com/sensio/SensioGeneratorBundle.git
@@ -93,7 +94,7 @@
     git=http://github.com/avalanche123/Imagine.git
 
 [LiipImagineBundle]
-    git=git://github.com/liip/LiipImagineBundle.git
+    git=http://github.com/liip/LiipImagineBundle.git
     target=/bundles/Liip/ImagineBundle
 
 [aws-sdk]
@@ -105,3 +106,14 @@
 [KnpGaufretteBundle]
     git=http://github.com/knplabs/KnpGaufretteBundle.git
     target=/bundles/Knp/Bundle/GaufretteBundle
+
+[NeklandFeedBundle]
+    git=http://github.com/Nek-/FeedBundle.git
+    target=/bundles/Nekland/FeedBundle
+
+[gedmo-doctrine-extensions]
+    git=http://github.com/l3pp4rd/DoctrineExtensions.git
+
+[StofDoctrineExtensionsBundle]
+    git=http://github.com/stof/StofDoctrineExtensionsBundle.git
+    target=/bundles/Stof/DoctrineExtensionsBundle

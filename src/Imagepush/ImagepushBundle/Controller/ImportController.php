@@ -11,6 +11,7 @@ use Imagepush\ImagepushBundle\Entity\Image as RedisImage;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\Tag;
 use Imagepush\ImagepushBundle\Document\LatestTag;
+use Imagepush\ImagepushBundle\Document\Link;
 
 class ImportController extends Controller
 {
@@ -21,9 +22,10 @@ class ImportController extends Controller
    */
   public function indexAction()
   {
-    $result = $this->importTags();
-    $result = $this->importLatestTags();
-    $result = $this->importImages();
+    //$result = $this->importTags();
+    //$result = $this->importLatestTags();
+    $result = $this->importLinks(); // indexed, failed
+    //$result = $this->importImages();
     
     echo "All done :)";
 
@@ -131,6 +133,8 @@ class ImportController extends Controller
           if (!empty($image["source_type"]))
           {
             $new->setSourceType($image["source_type"]);
+          } else {
+            $new->setSourceType("digg");
           }
           if (!empty($image["source_tags"]))
           {
@@ -239,6 +243,49 @@ class ImportController extends Controller
         }
         
         if (++$i % 100 == 0)
+        {
+          $dm->flush();
+          $dm->clear();
+        }
+      }
+
+      $dm->flush();
+      $dm->clear();
+    }
+  }
+  
+  private function importLinks()
+  {
+
+    $dm = $this->get('doctrine.odm.mongodb.document_manager');
+    $redis = $this->get('snc_redis.default_client');
+    
+    $i = 0;
+
+    $dm->getDocumentCollection("ImagepushBundle:Link")->drop();
+
+//    $redis->sismember('indexed_links', $item->link) &&
+//    $redis->sismember('failed_links', $item->link)
+        
+    $allLinks = array(
+      "indexed" => $redis->smembers("indexed_links"),
+      "failed"  => $redis->smembers("failed_links")
+    );
+
+    //\D::dump($allLinks);
+    //die();
+    
+    if (count($allLinks))
+    {
+      foreach ($allLinks as $status => $links) {
+        foreach ($links as $link) {
+          $new = new Link();
+          $new->setStatus($status);
+          $new->setLink($link);
+          $dm->persist($new);
+        }
+
+        if (++$i % 500 == 0)
         {
           $dm->flush();
           $dm->clear();

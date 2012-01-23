@@ -21,12 +21,13 @@ class AbstractFetcher
    */
   public static $fetchedCounter, $savedCounter, $output;
   
-  public $kernel;
+  public $kernel, $logger, $dm;
   
   public function __construct(\AppKernel $kernel) {
     
     $this->kernel = $kernel;
     $this->logger = $kernel->getContainer()->get('logger');
+    $this->dm = $kernel->getContainer()->get('doctrine.odm.mongodb.document_manager');
     
   }
   
