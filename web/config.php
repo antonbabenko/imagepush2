@@ -9,7 +9,7 @@ if (!in_array(@$_SERVER['REMOTE_ADDR'], array(
     '::1',
 ))) {
     header('HTTP/1.0 403 Forbidden');
-    exit('This script is only accessible for developers locally.');
+    exit('This script is only accessible from localhost.');
 }
 
 $majorProblems = array();
@@ -156,7 +156,7 @@ if (ini_get('session.auto_start')) {
                 <div class="symfony-block-content">
                     <h1>Welcome!</h1>
                     <p>Welcome to your new Symfony project.</p>
-                    <p>This script will guide you through the basic configuration of your project. You can also do the same by editing the ‚Äò<strong>app/config/parameters.ini</strong>‚Äô file directly.</p>
+                    <p>This script will guide you through the basic configuration of your project. You can also do the same by editing the ‘<strong>app/config/parameters.ini</strong>’ file directly.</p>
 
                     <?php if (count($majorProblems)): ?>
                         <h2>
@@ -177,7 +177,7 @@ if (ini_get('session.auto_start')) {
                                 Additionally, to
                             <?php else: ?>
                                 To<?php endif; ?>
-                            enhance your Symfony experience, it‚Äôs recommended that you fix the following :
+                            enhance your Symfony experience, it’s recommended that you fix the following :
                         </p>
                         <ol>
                             <?php foreach ($minorProblems as $problem): ?>
@@ -188,14 +188,13 @@ if (ini_get('session.auto_start')) {
 
                     <?php if ($phpini): ?>
                             <a id="phpini"></a>
-                                <p>*
-                                    <?php if (get_cfg_var('cfg_file_path')): ?>
-                                        Changes to the <strong>php.ini</strong> file must be done in "<strong><?php echo get_cfg_var('cfg_file_path') ?></strong>".
-                                    <?php else: ?>
-                                        To change settings, create a "<strong>php.ini</strong>".
-                                    <?php endif; ?>
-                                </p>
-                            </div>
+                            <p>*
+                                <?php if (get_cfg_var('cfg_file_path')): ?>
+                                    Changes to the <strong>php.ini</strong> file must be done in "<strong><?php echo get_cfg_var('cfg_file_path') ?></strong>".
+                                <?php else: ?>
+                                    To change settings, create a "<strong>php.ini</strong>".
+                                <?php endif; ?>
+                            </p>
                     <?php endif; ?>
 
                     <ul class="symfony-install-continue">
