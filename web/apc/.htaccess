@@ -1,0 +1,4 @@
+#AuthUserFile ".htpasswd"
+#AuthType Basic
+#AuthName "Please login or ask Anton"
+#Require valid-user
