@@ -1,4 +1,4 @@
-server 'imagepush.to', :app, :web, :primary => true
+server 'new.imagepush.to', :app, :web, :primary => true
 set :deploy_to, "/mnt/www/imagepush"
 
 # Made vendor not shared. It is slower, but more secure.

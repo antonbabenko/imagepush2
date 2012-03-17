@@ -24,7 +24,7 @@ ssh_options[:forward_agent] = true
 default_run_options[:pty] = true
 ssh_options[:keys] = ENV["EC2_NE_CERT_FILE"]
 
-set :shared_files,        ["app/config/parameters.ini", "bin/backup_settings"]
+set :shared_files,        ["app/config/parameters.ini"]
 set :shared_children,     [app_path + "/logs", "web/uploads", "vendor"]
 
 set :update_vendors, true
