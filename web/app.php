@@ -1,5 +1,7 @@
 <?php
 
+umask(0000);
+
 require_once __DIR__.'/access_config.php';
 
 if (!user_has_access()) die();
