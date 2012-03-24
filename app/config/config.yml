@@ -94,17 +94,17 @@ snc_redis:
             dsn: redis://localhost
             options:
               profile: 2.2
-            
-nekland_feed:
-    feeds:
-        images_feed:
-            class:        Imagepush\ImagepushBundle\Document\ImageFeedItem
-            filename:     test_file
-            title:       'My fabulous posts'
-            description: 'Here is my very fabulous posts'
-            url:         'index'
-            language:    'en'
-            max_items:   20
+#            
+#nekland_feed:
+#    feeds:
+#        images_feed:
+#            class:        Imagepush\ImagepushBundle\Document\ImageFeedItem
+#            filename:     test_file
+#            title:       'My fabulous posts'
+#            description: 'Here is my very fabulous posts'
+#            url:         'index'
+#            language:    'en'
+#            max_items:   20
 
 stof_doctrine_extensions:
     default_locale: en_US

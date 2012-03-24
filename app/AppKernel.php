@@ -22,7 +22,6 @@ class AppKernel extends Kernel
             new Snc\RedisBundle\SncRedisBundle(),
             //new Liip\ImagineBundle\LiipImagineBundle(),
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
-            new Nekland\FeedBundle\NeklandFeedBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
           
             new Imagepush\ImagepushBundle\ImagepushBundle(),

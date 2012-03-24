@@ -79,9 +79,6 @@
 [digg]
     git=http://github.com/digg/Services_Digg2.git
 
-[zend]
-    git=http://github.com/zendframework/zf2.git
-
 [SncRedisBundle]
     git=http://github.com/snc/SncRedisBundle.git
     target=/bundles/Snc/RedisBundle
@@ -89,7 +86,7 @@
 
 [predis]
     git=http://github.com/nrk/predis.git
-//    using this version - v0.6.6
+    version=origin/v0.7
 
 [imagine]
     git=http://github.com/avalanche123/Imagine.git
@@ -108,13 +105,29 @@
     git=http://github.com/KnpLabs/KnpGaufretteBundle.git
     target=/bundles/Knp/Bundle/GaufretteBundle
 
-[NeklandFeedBundle]
-    git=http://github.com/Nek-/FeedBundle.git
-    target=/bundles/Nekland/FeedBundle
-
 [gedmo-doctrine-extensions]
     git=http://github.com/l3pp4rd/DoctrineExtensions.git
 
 [StofDoctrineExtensionsBundle]
     git=http://github.com/stof/StofDoctrineExtensionsBundle.git
     target=/bundles/Stof/DoctrineExtensionsBundle
+
+[zend-feed]
+    git=http://github.com/KnpLabs/zend-feed.git
+    target=Zend/Feed
+
+[zend-loader]
+    git=http://github.com/KnpLabs/zend-loader.git
+    target=Zend/Loader
+
+[zend-stdlib]
+    git=http://github.com/KnpLabs/zend-stdlib.git
+    target=Zend/Stdlib
+
+[zend-date]
+    git=http://github.com/KnpLabs/zend-date.git
+    target=Zend/Date
+
+[zend-locale]
+    git=http://github.com/KnpLabs/zend-locale.git
+    target=Zend/Locale
