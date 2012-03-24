@@ -24,11 +24,9 @@ $loader->registerNamespaces(array(
     'Imagine'          => __DIR__.'/../vendor/imagine/lib',
     'Avalanche'        => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
-    'Zend'             => __DIR__.'/../vendor/zend/library', // for feeds, but doesn't work for goutte, if goute.phar is included after this
-  
+    'Zend'             => __DIR__.'/../vendor', // zend components (feed)
     'Knp\Bundle'       => __DIR__.'/../vendor/bundles',
     'Gaufrette'        => __DIR__.'/../vendor/gaufrette/src',
-    'Nekland'          => __DIR__.'/../vendor/bundles',
     'Stof'             => __DIR__.'/../vendor/bundles',
     'Gedmo'            => __DIR__.'/../vendor/gedmo-doctrine-extensions/lib',
   
@@ -68,13 +66,3 @@ Swift::registerAutoload(__DIR__.'/../vendor/swiftmailer/lib/swift_init.php');
 
 // AWS SDK needs a special autoloader
 require_once __DIR__.'/../vendor/aws-sdk/sdk.class.php';
-
-/**
- * Fix for Zend Framework 1.x
- */
-/*
-set_include_path(implode(PATH_SEPARATOR, array(
-    __DIR__.'/../vendor/zend/library',
-    get_include_path()
-)));
-*/
