@@ -23,7 +23,7 @@
             {% if tag %}
 
             {% if isOppositeTypeExists %}
-            <li class="fright"><a href="{{ path('viewByTag', {'tag': tag}) }}">Previous hits</a></li>
+            <li class="fright"><a href="{{ path('viewByTag', {'tag': tag|url_encode()}) }}">Previous hits</a></li>
             {% endif %}
 
             <li><a href="{{ path('viewUpcoming') }}">Upcoming</a> / </li>
@@ -40,7 +40,7 @@
             {% if tag %}
 
             {% if isOppositeTypeExists %}
-            <li class="fright"><a href="{{ path('viewUpcomingByTag', {'tag': tag}) }}">Upcoming</a></li>
+            <li class="fright"><a href="{{ path('viewUpcomingByTag', {'tag': tag|url_encode()}) }}">Upcoming</a></li>
             {% endif %}
 
             <li><h1>Tag: {{ tag|replace({"\n": " "}) }}</h1></li>
@@ -74,7 +74,7 @@
                 {% if image.tags|length %}
                 <p class="details">Tags:
                   {% for tag in image.tags %}
-                  <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>&nbsp;
+                  <a href="{{ path('viewByTag', {'tag': tag|url_encode()}) }}">{{tag}}</a>&nbsp;
                   {% endfor %}
                 {% endif %}
 

@@ -6,12 +6,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-//use Nekland\FeedBundle\Item\ExtendedItemInterface;
-
-//use Imagepush\ImagepushBundle\External\CustomStrings;
-//use Imagepush\ImagepushBundle\Model\AbstractSource;
-//use Imagepush\ImagepushBundle\Services\Processor\Config;
-
 /**
  * @MongoDB\Document(collection="images", repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
@@ -126,7 +120,7 @@ class Image
    */
   public function get_originalHost()
   {
-    return ($this->link ? @parse_url($this->link, PHP_URL_HOST) : null);
+    return $this->link ? @parse_url($this->link, PHP_URL_HOST) : null;
   }
 
   public function get_shareUrl()

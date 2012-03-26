@@ -33,11 +33,6 @@ class Link
    */
   protected $status;
 
-  public function __construct()
-  {
-    
-  }
-
   /**
    * Get mongoId
    *

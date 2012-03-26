@@ -83,7 +83,7 @@
         {# {% if image.tags|length %}
         <div class="tags">Tags:
           {% for tag in image.tags %}
-            <a href="{{ path('viewByTag', {'tag': tag|lower}) }}">{{tag}}</a>
+            <a href="{{ path('viewByTag', {'tag': tag|lower|url_encode()}) }}">{{tag}}</a>
           {% endfor %}
         </div>
         {% endif %} #}
