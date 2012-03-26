@@ -9,13 +9,13 @@
     <header>
       <h3>
         {% if initialTags|length == 0 %}
-        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag.0}) }}">{{group.tag.0}}</a>
+        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag.0|url_encode()}) }}">{{group.tag.0}}</a>
         {% else %}
         RELATED IMAGES BY {{group.usedTags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
 
         {% for tag in group.usedTags %}
         {% set tag = tag|replace({"\n": " "})|lower %}
-        <a href="{{ path('viewByTag', {'tag': tag}) }}">{{tag}}</a>
+        <a href="{{ path('viewByTag', {'tag': tag|url_encode()}) }}">{{tag}}</a>
         {% endfor %}
 
         {% endif %}
