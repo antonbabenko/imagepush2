@@ -184,8 +184,12 @@ class ImagesManager
     $image["_main_img"] = $this->getFileUrl($image, "m"); // main
     $image["_article_img"] = $this->getFileUrl($image, "a"); // article
     $image["_tags"] = (isset($image["tags"]) && json_decode($image["tags"]) ? $this->tagsManager->getHumanTags(json_decode($image["tags"])) : "");
-    $image["_view_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]));
-    $image["_share_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]), true);
+    
+    if (!empty($image["id"]) || !empty($image["slug"])) {
+        $image["_view_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]));
+        $image["_share_url"] = $this->router->generate('viewImage', array('id' => $image["id"], 'slug' => $image["slug"]), true);
+    }
+    
     $image["_original_host"] = @parse_url($image["link"], PHP_URL_HOST);
     $image["_date"] = date(DATE_W3C, $image["timestamp"]);
 

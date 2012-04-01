@@ -55,29 +55,6 @@ todo on production:
 1) Remove null tag from redis:
 del tag_d41d8cd98f00b204e9800998ecf8427e
 ---
-Static file load test on Apache/Mac:
-
-ab -n 1000 -c 200 -v 4 -r http://dev-anton.imagepush.to/uploads/m/2/24/247/75.jpg
-
-Apache/Mac:
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0  237 105.2    260    1072
-Processing:     0   76 238.6      2    1069
-Waiting:        0   18  62.4      0     278
-Total:          1  313 187.8    272    1339
-
-Nginx/Mac:
-ab -n 1000 -c 200 -v 4 -r http://localhost/imagepush2/web/uploads/m/2/24/247/75.jpg
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        6   41  14.6     37     104
-Processing:     0    6  18.0      0      87
-Waiting:        0    6   8.4      6      50
-Total:          6   47  22.0     38     115
-
----
 
 1) Link added to link_list_to_process
 2) Link moved to upcoming_image_list after Processor->run() (sorted list of images with thumbs, but without tags and scores yet)
@@ -87,6 +64,3 @@ Total:          6   47  22.0     38     115
 
 Todo:
 rename to - Fetcher, Processor, Publisher
-
----
-https://github.com/Nek-/FeedBundle - feed generator to try instead of Zend
