@@ -4,7 +4,7 @@ web/js/combined/*
 web/sitemap.xml
 web/sitemap.xml.gz
 web/bundles/
-web/i/*x
+web/i/*
 app/bootstrap.php.cache
 app/cache/*
 app/logs/*
