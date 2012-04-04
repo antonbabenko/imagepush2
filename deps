@@ -90,10 +90,15 @@
 
 [imagine]
     git=http://github.com/avalanche123/Imagine.git
+    version=v0.2.8
 
 [LiipImagineBundle]
     git=http://github.com/liip/LiipImagineBundle.git
     target=/bundles/Liip/ImagineBundle
+
+[LiipImagineBundle_ANTON_DO_NOT_USE_THIS]
+    git=http://github.com/antonbabenko/LiipImagineBundle.git
+    target=/bundles/liip_anton/ImagineBundle
 
 [aws-sdk]
     git=http://github.com/amazonwebservices/aws-sdk-for-php

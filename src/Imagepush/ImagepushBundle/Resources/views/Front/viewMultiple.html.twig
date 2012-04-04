@@ -86,7 +86,7 @@
                 {% endif %}
                 <figure class="bigImg" style="display:inline-block;">
                   {# {% debug image %} #}
-                  <img src="{{image._articleImg}}" alt="{{image.title}}" width="{{ image.aWidth < 625 ? image.aWidth : 625 }}" />
+                  <img src="{{ macros.inset_img_url(image.file, 625, 2090) }}" alt="{{image.title}}" />{# width="{{ image.aWidth < 625 ? image.aWidth : 625 }}" #}
                 </figure>
                 {% if type == "current" %}
                 </a>

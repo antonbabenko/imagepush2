@@ -1,0 +1,80 @@
+{##################}
+{# DYNAMIC IMAGES #}
+{##################}
+
+
+{% macro _img_url (filter, file, width, height) %}
+{% spaceless %}
+
+{% set width = width|default(200) %}
+{% set height = height|default(200) %}
+
+{% if file|default(false) %}
+{% set file = 'i/' ~ file %}
+
+{{ file|imagepush_filter(filter, width, height, true) }}
+
+{% endif %}
+
+{% endspaceless %}
+{% endmacro %}
+
+
+
+{% macro inset_img_url (file, width, height) %}
+{% spaceless %}
+
+{{ _self._img_url('inset', file, width, height) }}
+
+{% endspaceless %}
+{% endmacro %}
+
+
+
+{% macro outbound_img_url (file, width, height) %}
+{% spaceless %}
+
+{{ _self._img_url('outbound', file, width, height) }}
+
+{% endspaceless %}
+{% endmacro %}
+
+
+
+
+{% macro inset_img_tag (file, width, height, extra_attr) %}
+{% spaceless %}
+
+{% set img_src = _self.inset_img_url(file, width, height) %}
+
+<img src="{{img_src}}" border="0" width="{{width}}" height="{{height}}" {{extra_attr|default('')|raw}}>
+
+{% endspaceless %}
+{% endmacro %}
+
+
+
+{% macro outbound_img_tag (file, width, height, extra_attr) %}
+{% spaceless %}
+
+{% set img_src = _self.outbound_img_url(file, width, height) %}
+
+<img src="{{img_src}}" border="0" width="{{width}}" height="{{height}}" {{extra_attr|default('')|raw}}>
+
+{% endspaceless %}
+{% endmacro %}
+
+
+
+{% macro square_img_tag (file, size, extra_attr) %}
+{% spaceless %}
+
+{{ _self.outbound_img_tag(file, size, size, extra_attr) }}
+
+{% endspaceless %}
+{% endmacro %}
+
+
+{##################}
+{# END OF IMAGES  #}
+{##################}

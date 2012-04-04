@@ -22,7 +22,7 @@ $loader->registerNamespaces(array(
   
     'Snc'              => __DIR__.'/../vendor/bundles',
     'Imagine'          => __DIR__.'/../vendor/imagine/lib',
-    'Avalanche'        => __DIR__.'/../vendor/bundles',
+    'Liip'        => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
     'Zend'             => __DIR__.'/../vendor', // zend components (feed)
     'Knp\Bundle'       => __DIR__.'/../vendor/bundles',
@@ -66,3 +66,8 @@ Swift::registerAutoload(__DIR__.'/../vendor/swiftmailer/lib/swift_init.php');
 
 // AWS SDK needs a special autoloader
 require_once __DIR__.'/../vendor/aws-sdk/sdk.class.php';
+
+// Load Amazon credentials config
+include_once  __DIR__.'/config/amazon_config.inc.php';
+
+//define("AWS_CERTIFICATE_AUTHORITY", true);

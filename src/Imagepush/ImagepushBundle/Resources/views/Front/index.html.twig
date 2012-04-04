@@ -18,7 +18,7 @@
                   <span class="imgDescription">{{image.title}}</span>
                 </div>
                 <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
-                  <img src="{{image._thumbImg}}" width="140" height="140" alt="{{image.title}}" />
+                  <img src="{{ macros.outbound_img_url(image.file, 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
                   <span class="imgDescription"><span>{{image.title}}</span></span>
                 </a>
               </div>
@@ -44,7 +44,7 @@
       </header>
       <a href="{{images.0._viewUrl}}" id="main_image_link">
         <figure class="bigImg">
-          <img src="{{images.0._mainImg}}" alt="{{images.0.title}}" id="main_image_img" width="{{images.0.mWidth < 463 ? images.0.mWidth : 463}}" />
+          <img src="{{ macros.inset_img_url(images.0.file, 463, 1510) }}" alt="{{images.0.title}}" id="main_image_img" />{# width="{{images.0.mWidth < 463 ? images.0.mWidth : 463}}" #}
         </figure>
       </a>
 

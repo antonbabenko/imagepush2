@@ -64,3 +64,10 @@ del tag_d41d8cd98f00b204e9800998ecf8427e
 
 Todo:
 rename to - Fetcher, Processor, Publisher
+
+---
+Export from mongo:
+mongodump --db imagepush_dev
+Import on anton-server:
+s3cmd get s3://...
+mongorestore --directoryperdb imagepush_prod
