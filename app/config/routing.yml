@@ -16,7 +16,7 @@ import:
     resource: "@ImagepushBundle/Controller/ImportController.php"
     prefix:   /import
     type:     annotation
-#   
-#_imagine:
-#    resource: .
-#    type:     imagine
+
+_imagine:
+    resource: .
+    type:     imagine

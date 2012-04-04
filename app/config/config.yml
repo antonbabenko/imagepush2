@@ -23,6 +23,7 @@ twig:
     
     # Settings to use in templates
     globals:
+      site_url: %site_url%
       settings:
         show_banners_and_static_helpers: true
         show_comments: true
@@ -101,23 +102,34 @@ stof_doctrine_extensions:
         default:
           timestampable: true
           sluggable: true
-        
+
 # Imagine
-#liip_imagine:
-#    web_root:     %kernel.root_dir%/../web
-#    cache_prefix: cache
-#    #cache:        true
-#    #cache:        custom_cache_resolver
-#    #loader:       ~
-#    #data_loader:  custom_data_loader
-#    driver:       imagick
-#    filter_sets:
-#      property_main:
-#        filters:
-#          thumbnail: { size: [620, 400], mode: outbound }
-#      company_search:
-#        filters:
-#          thumbnail: { size: [200, 50], mode: inset }
+liip_imagine:
+    web_root:     %kernel.root_dir%/../web
+    cache_prefix: cache
+    #cache:        true
+    cache:        custom_cache_resolver
+    #loader:       ~
+    #data_loader:  custom_data_loader
+    driver:       imagick
+    controller_action: imagepush.imagine.controller:filterAction
+    filter_sets:
+      outbound:
+        filters:
+          thumbnail: { mode: outbound }
+        #route:
+        #  hash: true
+        #  pattern: /{width}x{height}
+        #  requirements: { width: '[\d]{1,4}', height: '[\d]{1,4}' }
+        #filters:
+        #  thumbnail: { size: [$width, $height], mode: outbound }
+      #inset:
+        #route:
+        #  hash: true
+        #  pattern: /{width}x{height}
+        #  requirements: { width: '[\d]{1,4}', height: '[\d]{1,4}' }
+        #filters:
+        #  thumbnail: { size: [$width, $height], mode: inset }
 
 # Files storage
 knp_gaufrette:
@@ -126,21 +138,14 @@ knp_gaufrette:
             local:
                 directory:  /Users/Bob/Sites/imagepush2/web/new_uploads
                 create:     true
-        prod:            # Prod server
-            local:
-                directory:  /mnt/imagepush/uploads
-                create:     true
-        prod_s3:         # S3 prod server
+        prod:         # S3 prod server
             amazon_s3:
                 amazon_s3_id: imagepush.amazon.s3
-                bucket_name:  uploads.imagepush.to
+                bucket_name:  %s3_bucket_name%
                 create:       true
     filesystems:
         images:
             adapter:    %filesystems_images_adapter%
-            #adapter:    prod
-
-
 
 services:
     imagepush.images.manager:
@@ -174,10 +179,33 @@ services:
 
     # Amazon S3
     imagepush.amazon.s3:
-        class: AmazonS3
-        arguments: [%aws_key%, %aws_secret_key%]
+        class: Imagepush\ImagepushBundle\Imagine\ImagepushAmazonS3
+
+    #
+    imagepush.imagine.controller:
+      class: Imagepush\ImagepushBundle\Imagine\CustomController
+      arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, %kernel.debug%]
+      
+    # Imagine data loader (via Gaufrette with name "images")
+    imagepush.imagine.files.data.loader:
+        class: Imagepush\ImagepushBundle\Imagine\CustomDataLoader
+        arguments: [@liip_imagine, %liip_imagine.formats%, @knp_gaufrette.filesystem_map, images]
+        tags:
+            - { name: liip_imagine.data.loader, loader: custom_data_loader }
+ 
+    # Imagine cache resolver (via Gaufrette with name "images")
+    imagepush.imagine.files.cache.resolver:
+        class: Imagepush\ImagepushBundle\Imagine\CustomCacheResolver
+        arguments: [@service_container, @knp_gaufrette.filesystem_map, images]
+        tags:
+            - { name: liip_imagine.cache.resolver, resolver: custom_cache_resolver }
 
     # Twig
+    twig.extension.imagepush:
+        class: Imagepush\ImagepushBundle\Templating\ImagepushExtension
+        arguments: [@service_container]
+        tags:
+            - { name: twig.extension }
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:

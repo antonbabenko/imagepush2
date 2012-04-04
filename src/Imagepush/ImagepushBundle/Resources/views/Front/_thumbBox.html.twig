@@ -1,4 +1,6 @@
 {% import "ImagepushBundle:Helpers:siteHelper.html.twig" as siteHelper %}
+{% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
+
 {% set currentImagePlacement = 0 %}
 {% if allImages is defined %}
 {% for group in allImages %}
@@ -39,7 +41,7 @@
               <span class="imgDescription">{{image.title}}</span>
             </div>
             <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
-              <img src="{{image._thumbImg}}" width="140" height="140" alt="{{image.title}}" />
+              <img src="{{ macros.outbound_img_url(image.file, 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
               <span class="imgDescription"><span>{{image.title}}</span></span>
             </a>
           </div>
