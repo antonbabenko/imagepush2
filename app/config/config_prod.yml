@@ -6,6 +6,9 @@ imports:
 #    result_cache_driver: apc
 #    query_cache_driver: apc
 
+#assetic:
+#    write_to: s3://i.imagepush.to
+
 monolog:
     handlers:
         main:

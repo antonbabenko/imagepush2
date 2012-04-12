@@ -70,4 +70,22 @@ require_once __DIR__.'/../vendor/aws-sdk/sdk.class.php';
 // Load Amazon credentials config
 include_once  __DIR__.'/config/amazon_config.inc.php';
 
+/*
+// Load the custom PEAR vendors as well...
+set_include_path(
+    get_include_path() . PATH_SEPARATOR .
+    dirname(__DIR__) . '/vendor/pear/'
+);
+
+require_once 'Services/Amazon/S3.php';
+require_once 'Services/Amazon/S3/Stream.php';
+
+Services_Amazon_S3_Stream::register('s3',
+    array('access_key_id'     => 'xxx',
+          'secret_access_key' => 'yyy',
+          'acl' => 'public-read',
+    )
+);
+*/
+
 //define("AWS_CERTIFICATE_AUTHORITY", true);

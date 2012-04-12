@@ -85,8 +85,7 @@
                 <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }} ">
                 {% endif %}
                 <figure class="bigImg" style="display:inline-block;">
-                  {# {% debug image %} #}
-                  <img src="{{ macros.inset_img_url(image.file, 625, 2090) }}" alt="{{image.title}}" />{# width="{{ image.aWidth < 625 ? image.aWidth : 625 }}" #}
+                  <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 625, 2090, "w") }}" height="{{ image.thumbSize("in", 625, 2090, "h") }}" />
                 </figure>
                 {% if type == "current" %}
                 </a>

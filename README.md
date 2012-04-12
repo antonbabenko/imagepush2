@@ -71,3 +71,14 @@ mongodump --db imagepush_dev
 Import on anton-server:
 s3cmd get s3://...
 mongorestore --directoryperdb imagepush_prod
+
+---
+0) save largest version of the image as retrieved from original source and remove aWidth-like fields.
+export LC_CTYPE="en_US.UTF-8"
+1) put uploads/a into i.imagepush.to/i :
+s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/a/ s3://i.imagepush.to/i/
+2) copy already created thumbs into s3:
+# article:
+s3cmd cp --recursive -P -p -M -H s3://i.imagepush.to/i/ s3://i.imagepush.to/in/625x2090/i/
+s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/thumb/ s3://i.imagepush.to/out/140x140/i/
+s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/m/ s3://i.imagepush.to/in/463x1548/i/

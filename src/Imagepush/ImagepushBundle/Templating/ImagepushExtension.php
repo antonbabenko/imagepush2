@@ -30,23 +30,51 @@ class ImagepushExtension extends \Twig_Extension
     {
         return array(
             'imagepush_filter' => new \Twig_Filter_Method($this, 'imagepushFilter'),
+            'cdn_imagepush_filter' => new \Twig_Filter_Method($this, 'cdnImagepushFilter'),
         );
     }
 
     /**
      * Gets cache path of an image to be filtered
      *
-     * @param string $string
+     * @param string $file
+     * @param string $filter
+     * @param integer $width
+     * @param integer $height
+     * @param integer $imageId  Optional image id (if object is Image)
      *
      * @return string
      */
-    public function imagepushFilter($file, $filter, $width, $height)
+    public function imagepushFilter($file, $filter, $width, $height, $imageId = null)
     {
-        
-        $hash = substr(md5($width . '|' . $height . '|' . $file), 0, 4);
+
+        $hash = substr(md5($width . '|' . $height . '|' . $file . ($imageId ? '|' . $imageId : '')), 0, 4);
         $url = rtrim($this->container->getParameter('site_url'), '/');
         $url .= '/cache/' . $filter . '/' . $width . 'x' . $height . '/' . ltrim($file, '/');
         $url .= '?hash=' . $hash;
+
+        if ($imageId) {
+            $url .= '&i=' . $imageId;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Gets CDN url of an image which is already saved there
+     *
+     * @param string $file
+     * @param string $filter
+     * @param integer $width
+     * @param integer $height
+     *
+     * @return string
+     */
+    public function cdnImagepushFilter($file, $filter, $width, $height)
+    {
+
+        $url = rtrim($this->container->getParameter('cdn_images_url'), '/');
+        $url .= '/' . $filter . '/' . $width . 'x' . $height . '/' . ltrim($file, '/');
 
         return $url;
     }
