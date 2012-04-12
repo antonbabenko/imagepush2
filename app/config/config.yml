@@ -11,7 +11,11 @@ framework:
     form:            true
     csrf_protection: true
     validation:      { enable_annotations: true }
-    templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
+    templating:
+      engines: ['twig']
+      #assets_base_urls:
+      #  http: [http://cdn.imagepush.to]
+      #assets_version: SomeVersionScheme
     session:
         default_locale: %locale%
         auto_start:     true
@@ -24,12 +28,15 @@ twig:
     # Settings to use in templates
     globals:
       site_url: %site_url%
+      cdn_images_url: %cdn_images_url%
       settings:
         show_banners_and_static_helpers: true
         show_comments: true
 
 # Assetic Configuration
 assetic:
+    #read_from: %kernel.root_dir%/web
+    #write_to:  %kernel.root_dir%/web
     debug:          %kernel.debug%
     use_controller: false
     filters:
@@ -110,26 +117,16 @@ liip_imagine:
     #cache:        true
     cache:        custom_cache_resolver
     #loader:       ~
-    #data_loader:  custom_data_loader
+    data_loader:  custom_data_loader
     driver:       imagick
     controller_action: imagepush.imagine.controller:filterAction
     filter_sets:
-      outbound:
+      out:
         filters:
           thumbnail: { mode: outbound }
-        #route:
-        #  hash: true
-        #  pattern: /{width}x{height}
-        #  requirements: { width: '[\d]{1,4}', height: '[\d]{1,4}' }
-        #filters:
-        #  thumbnail: { size: [$width, $height], mode: outbound }
-      #inset:
-        #route:
-        #  hash: true
-        #  pattern: /{width}x{height}
-        #  requirements: { width: '[\d]{1,4}', height: '[\d]{1,4}' }
-        #filters:
-        #  thumbnail: { size: [$width, $height], mode: inset }
+      in:
+        filters:
+          thumbnail: { mode: inset }
 
 # Files storage
 knp_gaufrette:
@@ -184,19 +181,19 @@ services:
     #
     imagepush.imagine.controller:
       class: Imagepush\ImagepushBundle\Imagine\CustomController
-      arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, %kernel.debug%]
+      arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, @doctrine.odm.mongodb.document_manager, @liip_imagine, @logger, %kernel.debug%]
       
     # Imagine data loader (via Gaufrette with name "images")
     imagepush.imagine.files.data.loader:
         class: Imagepush\ImagepushBundle\Imagine\CustomDataLoader
-        arguments: [@liip_imagine, %liip_imagine.formats%, @knp_gaufrette.filesystem_map, images]
+        arguments: [@liip_imagine, %liip_imagine.formats%, @gaufrette.images_filesystem]
         tags:
             - { name: liip_imagine.data.loader, loader: custom_data_loader }
  
     # Imagine cache resolver (via Gaufrette with name "images")
     imagepush.imagine.files.cache.resolver:
         class: Imagepush\ImagepushBundle\Imagine\CustomCacheResolver
-        arguments: [@service_container, @knp_gaufrette.filesystem_map, images]
+        arguments: [@service_container, @gaufrette.images_filesystem]
         tags:
             - { name: liip_imagine.cache.resolver, resolver: custom_cache_resolver }
 

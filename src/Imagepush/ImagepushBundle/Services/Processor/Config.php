@@ -42,7 +42,7 @@ class Config
     "m" => array(/* main page */
       "action" => "thumbnail_inset",
       "width" => 463,
-      "height" => 1510,
+      "height" => 1548, // was 1510
     ),
     "t" => array(/* thumb */
       "action" => "thumbnail_outbound",

@@ -89,7 +89,7 @@ class ImportController extends Controller
         }
     }
 
-    private function importImages($limit = 999999)
+    private function importImages($limit = 10)
     {
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
@@ -109,6 +109,10 @@ class ImportController extends Controller
 
             if (count($images)) {
                 foreach ($images as $image) {
+                    
+                    $createdMW = $createdTW = $createdAW = 0;
+                    $createdMH = $createdTH = $createdAH = 0;
+                    
                     if (empty($image["id"])) {
                         $missing[] = $image;
                         continue;
@@ -138,23 +142,43 @@ class ImportController extends Controller
                         $new->setSourceTags(json_decode($image["source_tags"], true));
                     }
                     if (!empty($image["m_width"])) {
-                        $new->setMWidth($image["m_width"]);
+                        $createdMW = $image["m_width"];
+                        //$new->setMWidth($image["m_width"]);
                     }
                     if (!empty($image["m_height"])) {
-                        $new->setMHeight($image["m_height"]);
+                        $createdMH = $image["m_height"];
+                        //$new->setMHeight($image["m_height"]);
                     }
                     if (!empty($image["thumb_width"])) {
-                        $new->setTWidth($image["thumb_width"]);
+                        $createdTW = $image["thumb_width"];
+                        //$new->setTWidth($image["thumb_width"]);
                     }
                     if (!empty($image["thumb_height"])) {
-                        $new->setTHeight($image["thumb_height"]);
+                        $createdTH = $image["thumb_height"];
+                        //$new->setTHeight($image["thumb_height"]);
                     }
                     if (!empty($image["a_width"])) {
-                        $new->setAWidth($image["a_width"]);
+                        $createdAW = $image["a_width"];
+                        //$new->setAWidth($image["a_width"]);
                     }
                     if (!empty($image["a_height"])) {
-                        $new->setAHeight($image["a_height"]);
+                        $createdAH = $image["a_height"];
+                        //$new->setAHeight($image["a_height"]);
                     }
+                    
+                    if ($createdMW) { // main
+                        $new->addThumbs("in", "463x1548", $createdMW, $createdMH);
+                    }
+
+                    if ($createdTW) { // thumb
+                        $new->addThumbs("out", "140x140", $createdTW, $createdTH);
+                    }
+
+                    if ($createdAW) { // article
+                        $new->addThumbs("in", "625x2090", $createdAW, $createdAH);
+                    }
+
+                    
                     if (!empty($image["_tags"])) {
 
                         $tags = array();

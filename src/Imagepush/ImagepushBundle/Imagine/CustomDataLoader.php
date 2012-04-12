@@ -5,7 +5,7 @@ namespace Imagepush\ImagepushBundle\Imagine;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Imagine\Image\ImagineInterface;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Gaufrette\Filesystem;
 
 class CustomDataLoader implements LoaderInterface
 {
@@ -30,16 +30,13 @@ class CustomDataLoader implements LoaderInterface
      *
      * @param ImagineInterface  $imagine
      * @param array             $formats
-     * @param FilesystemMap     $filesystem
-     * @param string            $mapName
+     * @param Filesystem        $fs
      */
-    public function __construct(ImagineInterface $imagine, $formats, FilesystemMap $filesystem, $mapName)
+    public function __construct(ImagineInterface $imagine, $formats, Filesystem $fs)
     {
         $this->imagine = $imagine;
         $this->formats = $formats;
-
-        // Get instance of filesystem map
-        $this->fs = $filesystem->get($mapName);
+        $this->fs = $fs;
     }
 
     /**
@@ -50,14 +47,16 @@ class CustomDataLoader implements LoaderInterface
     public function find($path)
     {
 
+        if (false !== strpos($path, '/../') || 0 === strpos($path, '../')) {
+            throw new NotFoundHttpException(sprintf("Source image was searched with '%s' out side of the defined root path", $path));
+        }
+
         $info = pathinfo($path);
+        
+        //\D::dump($path);
 
         $name = $info['dirname'] . '/' . $info['filename'];
         $targetFormat = empty($this->formats) || in_array($info['extension'], $this->formats) ? $info['extension'] : null;
-
-        //\D::dump($name);
-        //\D::dump($path);
-        //\D::dump($this->fs->has($path));
 
         if (empty($targetFormat) || !$this->fs->has($path)) {
             // attempt to determine path and format

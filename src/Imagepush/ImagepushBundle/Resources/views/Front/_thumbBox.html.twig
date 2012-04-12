@@ -40,8 +40,8 @@
             <div class="details">
               <span class="imgDescription">{{image.title}}</span>
             </div>
-            <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
-              <img src="{{ macros.outbound_img_url(image.file, 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
+            <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
+              <img src="{{ macros.thumb_url(image, "out", 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
               <span class="imgDescription"><span>{{image.title}}</span></span>
             </a>
           </div>

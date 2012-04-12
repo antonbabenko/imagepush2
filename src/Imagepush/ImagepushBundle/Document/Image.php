@@ -9,498 +9,417 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * @MongoDB\Document(collection="images", repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"})
  * })
  */
+//*   @MongoDB\UniqueIndex(keys={"id"="asc"}),
+
 class Image
 {
 
-  /**
-   * @MongoDB\Id(strategy="AUTO")
-   */
-  protected $mongoId;
+    /**
+     * @MongoDB\Id(strategy="AUTO")
+     */
+    protected $mongoId;
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $id;
+    /**
+     * @MongoDB\Int
+     */
+    protected $id;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $link;
+    /**
+     * @MongoDB\String
+     */
+    protected $link;
 
-  /**
-   * @MongoDB\Timestamp
-   */
-  protected $timestamp;
+    /**
+     * @MongoDB\Timestamp
+     */
+    protected $timestamp;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $file;
+    /**
+     * @MongoDB\String
+     */
+    protected $file;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $title;
+    /**
+     * @MongoDB\String
+     */
+    protected $title;
 
-  /**
-   * @Gedmo\Slug(fields={"title"}, unique=false)
-   * @MongoDB\String
-   */
-  protected $slug;
+    /**
+     * @Gedmo\Slug(fields={"title"}, unique=false)
+     * @MongoDB\String
+     */
+    protected $slug;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $sourceType;
+    /**
+     * @MongoDB\String
+     */
+    protected $sourceType;
 
-  /**
-   * @MongoDB\Collection
-   */
-  protected $sourceTags;
+    /**
+     * @MongoDB\Collection
+     */
+    protected $sourceTags;
 
-  /**
-   * @MongoDB\Collection
-   */
-  protected $tags;
+    /**
+     * @MongoDB\Collection
+     */
+    protected $tags;
 
-  /**
-   * @MongoDB\Collection
-   * @MongoDB\ReferenceMany(targetDocument="Tag")
-   */
-  protected $tagsRef;
+    /**
+     * @MongoDB\Collection
+     * @MongoDB\ReferenceMany(targetDocument="Tag")
+     */
+    protected $tagsRef;
 
-  /**
-   * Available (published) or Upcoming
-   * @MongoDB\Boolean
-   */
-  protected $isAvailable;
+    /**
+     * Available (published) or Upcoming
+     * @MongoDB\Boolean
+     */
+    protected $isAvailable;
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $mWidth;
+    /**
+     * Created thumbs with actual dimensions
+     * @MongoDB\Hash
+     */
+    protected $thumbs;
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $mHeight;
+    public function __construct()
+    {
+        $this->tagsRef = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->thumbs = array();
+    }
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $tWidth;
+    /**
+     * Start: Custom methods
+     */
+    public function get_originalHost()
+    {
+        return $this->link ? @parse_url($this->link, PHP_URL_HOST) : null;
+    }
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $tHeight;
+    /*public function get_shareUrl()
+    {
+        return "http://imagepush.to" . $this->get_viewUrl();
+    }*/
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $aWidth;
+    /*public function get_viewUrl()
+    {
+        return "/i/" . $this->id . "/" . $this->slug;
+        //$this->container->get('router')->generate('viewImage', array('id' => $this->id, 'slug' => $this->slug), true) : null);
+    }*/
 
-  /**
-   * @MongoDB\Int
-   */
-  protected $aHeight;
+    /**
+     * End: Custom methods
+     */
 
-  public function __construct()
-  {
-    $this->tagsRef = new \Doctrine\Common\Collections\ArrayCollection();
-  }
+    /**
+     * Get mongoId
+     *
+     * @return id $mongoId
+     */
+    public function getMongoId()
+    {
+        return $this->mongoId;
+    }
 
-  /**
-   * Start: Custom methods
-   */
-  public function get_originalHost()
-  {
-    return $this->link ? @parse_url($this->link, PHP_URL_HOST) : null;
-  }
+    /**
+     * Set id
+     *
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-  public function get_shareUrl()
-  {
-    return "http://imagepush.to" . $this->get_viewUrl();
-  }
+    /**
+     * Get id
+     *
+     * @return int $id
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-  public function get_viewUrl()
-  {
-    return "/i/" . $this->id . "/" . $this->slug;
-    //$this->container->get('router')->generate('viewImage', array('id' => $this->id, 'slug' => $this->slug), true) : null);
-  }
+    /**
+     * Set link
+     *
+     * @param string $link
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+    }
 
-  public function get_mainImg()
-  {
-    return "http://imagepush.to/uploads/m/" . $this->file;
-  }
+    /**
+     * Get link
+     *
+     * @return string $link
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
 
-  public function get_articleImg()
-  {
-    return "http://imagepush.to/uploads/a/" . $this->file;
-  }
+    /**
+     * Set timestamp
+     *
+     * @param timestamp $timestamp
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
+    }
 
-  public function get_thumbImg()
-  {
-    return "http://imagepush.to/uploads/thumb/" . $this->file;
-  }
+    /**
+     * Get timestamp
+     *
+     * @return timestamp $timestamp
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
 
-  /**
-   * End: Custom methods
-   */
-  
-  /**
-   * Get mongoId
-   *
-   * @return id $mongoId
-   */
-  public function getMongoId()
-  {
-    return $this->mongoId;
-  }
+    /**
+     * Set file
+     *
+     * @param string $file
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
 
-  /**
-   * Set id
-   *
-   * @param int $id
-   */
-  public function setId($id)
-  {
-    $this->id = $id;
-  }
+    /**
+     * Get file
+     *
+     * @return string $file
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
 
-  /**
-   * Get id
-   *
-   * @return int $id
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
+    /**
+     * Set title
+     *
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
 
-  /**
-   * Set link
-   *
-   * @param string $link
-   */
-  public function setLink($link)
-  {
-    $this->link = $link;
-  }
+    /**
+     * Get title
+     *
+     * @return string $title
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
-  /**
-   * Get link
-   *
-   * @return string $link
-   */
-  public function getLink()
-  {
-    return $this->link;
-  }
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+    }
 
-  /**
-   * Set timestamp
-   *
-   * @param timestamp $timestamp
-   */
-  public function setTimestamp($timestamp)
-  {
-    $this->timestamp = $timestamp;
-  }
+    /**
+     * Get slug
+     *
+     * @return string $slug
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
 
-  /**
-   * Get timestamp
-   *
-   * @return timestamp $timestamp
-   */
-  public function getTimestamp()
-  {
-    return $this->timestamp;
-  }
+    /**
+     * Set sourceType
+     *
+     * @param string $sourceType
+     */
+    public function setSourceType($sourceType)
+    {
+        $this->sourceType = $sourceType;
+    }
 
-  /**
-   * Set file
-   *
-   * @param string $file
-   */
-  public function setFile($file)
-  {
-    $this->file = $file;
-  }
+    /**
+     * Get sourceType
+     *
+     * @return string $sourceType
+     */
+    public function getSourceType()
+    {
+        return $this->sourceType;
+    }
 
-  /**
-   * Get file
-   *
-   * @return string $file
-   */
-  public function getFile()
-  {
-    return $this->file;
-  }
+    /**
+     * Set sourceTags
+     *
+     * @param collection $sourceTags
+     */
+    public function setSourceTags($sourceTags)
+    {
+        $this->sourceTags = $sourceTags;
+    }
 
-  /**
-   * Set title
-   *
-   * @param string $title
-   */
-  public function setTitle($title)
-  {
-    $this->title = $title;
-  }
+    /**
+     * Get sourceTags
+     *
+     * @return collection $sourceTags
+     */
+    public function getSourceTags()
+    {
+        return $this->sourceTags;
+    }
 
-  /**
-   * Get title
-   *
-   * @return string $title
-   */
-  public function getTitle()
-  {
-    return $this->title;
-  }
+    /**
+     * Set tags
+     *
+     * @param collection $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
 
-  /**
-   * Set slug
-   *
-   * @param string $slug
-   */
-  public function setSlug($slug)
-  {
-    $this->slug = $slug;
-  }
+    /**
+     * Get tags
+     *
+     * @return collection $tags
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
 
-  /**
-   * Get slug
-   *
-   * @return string $slug
-   */
-  public function getSlug()
-  {
-    return $this->slug;
-  }
+    /**
+     * Add tagsRef
+     *
+     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     */
+    public function addTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+    {
+        $this->tagsRef[] = $tagsRef;
+    }
 
-  /**
-   * Set sourceType
-   *
-   * @param string $sourceType
-   */
-  public function setSourceType($sourceType)
-  {
-    $this->sourceType = $sourceType;
-  }
+    /**
+     * Get tagsRef
+     *
+     * @return Doctrine\Common\Collections\Collection $tagsRef
+     */
+    public function getTagsRef()
+    {
+        return $this->tagsRef;
+    }
 
-  /**
-   * Get sourceType
-   *
-   * @return string $sourceType
-   */
-  public function getSourceType()
-  {
-    return $this->sourceType;
-  }
+    /**
+     * Set isAvailable
+     *
+     * @param boolean $isAvailable
+     */
+    public function setIsAvailable($isAvailable)
+    {
+        $this->isAvailable = $isAvailable;
+    }
 
-  /**
-   * Set sourceTags
-   *
-   * @param collection $sourceTags
-   */
-  public function setSourceTags($sourceTags)
-  {
-    $this->sourceTags = $sourceTags;
-  }
+    /**
+     * Get isAvailable
+     *
+     * @return boolean $isAvailable
+     */
+    public function getIsAvailable()
+    {
+        return $this->isAvailable;
+    }
 
-  /**
-   * Get sourceTags
-   *
-   * @return collection $sourceTags
-   */
-  public function getSourceTags()
-  {
-    return $this->sourceTags;
-  }
+    /**
+     * Get array of created thumbs.
+     *
+     * @return array $thumbs
+     */
+    public function getThumbs()
+    {
+        return $this->thumbs;
+    }
 
-  /**
-   * Set tags
-   *
-   * @param collection $tags
-   */
-  public function setTags($tags)
-  {
-    $this->tags = $tags;
-  }
+    /**
+     * Add created thumb.
+     */
+    public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0)
+    {
+        $key = $filter . "/" . $size;
 
-  /**
-   * Get tags
-   *
-   * @return collection $tags
-   */
-  public function getTags()
-  {
-    return $this->tags;
-  }
+        $this->thumbs[$key] = array("w" => (int) $actualWidth, "h" => (int) $actualHeight);
+    }
 
-  /**
-   * Add tagsRef
-   *
-   * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
-   */
-  public function addTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
-  {
-    $this->tagsRef[] = $tagsRef;
-  }
+    /**
+     * Get thumb information.
+     * If requested thumb is NOT created (means not on S3/CDN), then file has to be generated on first request.
+     *
+     * @return array|false $thumbs
+     */
+    public function getThumbByFilterAndSize($filter, $size)
+    {
 
-  /**
-   * Get tagsRef
-   *
-   * @return Doctrine\Common\Collections\Collection $tagsRef
-   */
-  public function getTagsRef()
-  {
-    return $this->tagsRef;
-  }
+        $key = $filter . "/" . $size;
 
-  /**
-   * Set isAvailable
-   *
-   * @param boolean $isAvailable
-   */
-  public function setIsAvailable($isAvailable)
-  {
-    $this->isAvailable = $isAvailable;
-  }
+        if (array_key_exists($key, $this->thumbs)) {
+            return $this->thumbs[$key];
+        } else {
+            return false;
+        }
+    }
 
-  /**
-   * Get isAvailable
-   *
-   * @return boolean $isAvailable
-   */
-  public function getIsAvailable()
-  {
-    return $this->isAvailable;
-  }
+    /**
+     * Get thumb information.
+     * If thumb has been already created then we have actual image property (width/height).
+     *
+     * @param string  $filter
+     * @param integer $width
+     * @param integer $height
+     * @param string  $property  Property name for the height is "h", for width is "w"
+     * 
+     * @return array|false $thumbs
+     */
+    public function getThumbSize($filter, $width, $height, $property)
+    {
 
-  /**
-   * Set mWidth
-   *
-   * @param int $mWidth
-   */
-  public function setMWidth($mWidth)
-  {
-    $this->mWidth = $mWidth;
-  }
+        $key = $filter . "/" . $width . "x" . $height;
 
-  /**
-   * Get mWidth
-   *
-   * @return int $mWidth
-   */
-  public function getMWidth()
-  {
-    return $this->mWidth;
-  }
+        //\D::dump($key);
 
-  /**
-   * Set mHeight
-   *
-   * @param int $mHeight
-   */
-  public function setMHeight($mHeight)
-  {
-    $this->mHeight = $mHeight;
-  }
+        if (array_key_exists($key, $this->thumbs)) {
 
-  /**
-   * Get mHeight
-   *
-   * @return int $mHeight
-   */
-  public function getMHeight()
-  {
-    return $this->mHeight;
-  }
+            $thumb = $this->thumbs[$key];
 
-  /**
-   * Set tWidth
-   *
-   * @param int $tWidth
-   */
-  public function setTWidth($tWidth)
-  {
-    $this->tWidth = $tWidth;
-  }
+            if (!empty($thumb[$property])) {
+                return $thumb[$property];
+            }
 
-  /**
-   * Get tWidth
-   *
-   * @return int $tWidth
-   */
-  public function getTWidth()
-  {
-    return $this->tWidth;
-  }
-
-  /**
-   * Set tHeight
-   *
-   * @param int $tHeight
-   */
-  public function setTHeight($tHeight)
-  {
-    $this->tHeight = $tHeight;
-  }
-
-  /**
-   * Get tHeight
-   *
-   * @return int $tHeight
-   */
-  public function getTHeight()
-  {
-    return $this->tHeight;
-  }
-
-  /**
-   * Set aWidth
-   *
-   * @param int $aWidth
-   */
-  public function setAWidth($aWidth)
-  {
-    $this->aWidth = $aWidth;
-  }
-
-  /**
-   * Get aWidth
-   *
-   * @return int $aWidth
-   */
-  public function getAWidth()
-  {
-    return $this->aWidth;
-  }
-
-  /**
-   * Set aHeight
-   *
-   * @param int $aHeight
-   */
-  public function setAHeight($aHeight)
-  {
-    $this->aHeight = $aHeight;
-  }
-
-  /**
-   * Get aHeight
-   *
-   * @return int $aHeight
-   */
-  public function getAHeight()
-  {
-    return $this->aHeight;
-  }
+            if ($property == "w") {
+                return $width;
+            } elseif ($property == "h") {
+                return $height;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
 }

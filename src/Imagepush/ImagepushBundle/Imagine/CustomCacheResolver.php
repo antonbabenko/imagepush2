@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response,
 use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver,
     Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface,
     Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Gaufrette\Filesystem;
 
 class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareInterface
 {
@@ -24,15 +24,13 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
     /**
      * Constructs
      *
-     * @param FilesystemMap     $filesystem
-     * @param string            $mapName
+     * @param ContainerInterface     $container
+     * @param Filesystem    $fs
      */
-    public function __construct($container, FilesystemMap $filesystem, $mapName)
+    public function __construct($container, Filesystem $fs)
     {
         $this->container = $container;
-
-        // Get instance of filesystem map
-        $this->fs = $filesystem->get($mapName);
+        $this->fs = $fs;
     }
 
     /**
@@ -46,26 +44,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
      */
     public function resolve(Request $request, $targetPath, $filter)
     {
-        //\D::dump($request->get("width"));
-        //\D::dump($targetPath);
-        //$targetPath = parent::resolve($request, $targetPath, $filter);
-//\D::dump($targetPath);
-        
-        //$config = $this->container->get('liip_imagine.filter.configuration')->get($filter);
-
-        /*if (!empty($config["route"])) {
-            $targetPath = basename($this->container->getParameter('liip_imagine.cache_prefix')) . "/" . $filter . "/" . $request->get("width") . "x" . $request->get("height") . "/" . $targetPath;
-        } else {
-            $targetPath = basename($this->container->getParameter('liip_imagine.cache_prefix')) . "/" . $filter . "/" . $targetPath;
-        }*/
-        //$targetPath = $this->cacheManager->getWebRoot().$targetPath;
-
-        //\D::dump($targetPath);
-        //$targetPath = $this->getFixedTargetPath($targetPath);
-        //\D::dump($targetPath);
-        // if the file has already been cached, we're probably not rewriting
-        // correctly, hence make a 301 to proper location, so browser remembers
-            //\D::dump($this->container->getParameter('cdn_images_url')."/".$targetPath);
+        $targetPath = $filter . "/" . $targetPath;
         if ($this->fs->has($targetPath)) {
             return new RedirectResponse($this->container->getParameter('cdn_images_url') . "/" . $targetPath);
         }
@@ -82,9 +61,11 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
      */
     public function store(Response $response, $targetPath, $filter)
     {
-        
-        \D::dump($response->headers->get('Content-Type'));
-        
+
+        //\D::dump($response->headers->get('Content-Type'));
+        //$targetPath = $filter . "/". $targetPath;
+        //\D::dump($targetPath);
+
         $metadata = array(
             'Content-Type' => $response->headers->get('Content-Type', "image/jpeg"),
             'Cache-Control' => 'public',
@@ -99,13 +80,18 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
 
             $amazonS3 = $this->container->get('imagepush.amazon.s3');
 
+            //\D::dump($amazonS3);
+            //\D::dump($bucket);
+            //\D::dump($targetPath);
+            //\D::dump(\AmazonS3::ACL_PUBLIC);
+
             $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
         }
-        
+
         $response->setEtag(md5($targetPath));
         $response->setLastModified(new \DateTime("now"));
         $response->setExpires(new \DateTime("+1 year"));
-        $response->setSharedMaxAge(365*24*3600); // 1 year
+        $response->setSharedMaxAge(365 * 24 * 3600); // 1 year
 
         $response->setStatusCode(201);
 

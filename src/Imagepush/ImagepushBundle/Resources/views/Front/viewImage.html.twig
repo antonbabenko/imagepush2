@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% block og_url %}
-<meta property="og:url" content="{{image._shareUrl}}" />
-<link rel="canonical" href="{{image._shareUrl}}" />
+<meta property="og:url" content="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
+<link rel="canonical" href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
 {% endblock %}
 
 {% block og_image %}
-<meta property="og:image" content="{{ macros.outbound_img_url(image.file, 140, 140) }}" />
+<meta property="og:image" content="{{ macros.thumb_url(image, "out", 140, 140, true) }}" />
 {% endblock %}
 
 {% block meta_keywords %}
@@ -23,7 +23,7 @@
   
 {% block image_src %}
 {% spaceless %}
-{{ macros.inset_img_url(image.file, 463, 1510) }}
+{{ macros.thumb_url(image, "in", 463, 1548, true) }}
 {% endspaceless %}
 {% endblock %}
 
@@ -71,10 +71,10 @@
       
       <div style="text-align:center;">
         <figure class="bigImg">
-          <img src="{{ macros.inset_img_url(image.file, 625, 2090) }}" alt="{{image.title}}" width="{{ image.aWidth < 625 ? image.aWidth : 625}}" />
+          <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 625, 2090, "w") }}" height="{{ image.thumbSize("in", 625, 2090, "h") }}" />
         </figure>
 
-        {% render "ImagepushBundle:Front:_comments" with {'href': image._shareUrl} %}
+        {% render "ImagepushBundle:Front:_comments" with {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) } %}
         
       </div>
 

@@ -17,8 +17,8 @@
                 <div class="details">
                   <span class="imgDescription">{{image.title}}</span>
                 </div>
-                <a href="{{ image._viewUrl}}" title="{{image.title}}" class="imgWrapper">
-                  <img src="{{ macros.outbound_img_url(image.file, 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
+                <a href="{{ path('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}" class="imgWrapper">
+                  <img src="{{ macros.thumb_url(image, "out", 140, 140) }}" width="140" height="140" alt="{{image.title}}" />
                   <span class="imgDescription"><span>{{image.title}}</span></span>
                 </a>
               </div>
@@ -34,7 +34,7 @@
       <div id="main_image">
       <header>
         <div class="category">
-          <div class="addthis_toolbox addthis_default_style" addthis:url="{{images.0._shareUrl}}" addthis:title="{{images.0.title}}" addthis:description="{{images.0.title}}">
+          <div class="addthis_toolbox addthis_default_style" addthis:url="{{ url('viewImage', {'id': images.0.id, 'slug': images.0.slug}) }}" addthis:title="{{images.0.title}}" addthis:description="{{images.0.title}}">
           <a class="addthis_button_facebook_like" fb:like:href="http://imagepush.to" fb:like:layout="button_count" fb:like:show_faces="false" fb:like:width="80" fb:like:font="trebuchet+ms" fb:like:action="like"></a><br>
           </div>
         </div>
@@ -42,9 +42,9 @@
           <li><h1 id="main_image_title">{{images.0.title}}</h1></li>
         </ul>
       </header>
-      <a href="{{images.0._viewUrl}}" id="main_image_link">
+      <a href="{{ path('viewImage', {'id': images.0.id, 'slug': images.0.slug}) }}" id="main_image_link">
         <figure class="bigImg">
-          <img src="{{ macros.inset_img_url(images.0.file, 463, 1510) }}" alt="{{images.0.title}}" id="main_image_img" />{# width="{{images.0.mWidth < 463 ? images.0.mWidth : 463}}" #}
+          <img src="{{ macros.thumb_url(images.0, "in", 463, 1548) }}" alt="{{images.0.title}}" id="main_image_img" width="{{ images.0.thumbSize("in", 463, 1548, "w") }}" height="{{ images.0.thumbSize("in", 463, 1548, "h") }}" />
         </figure>
       </a>
 

@@ -154,54 +154,68 @@ class FrontController extends Controller
     public function rssAction()
     {
 
-        $images = $this->get('imagepush.images.manager')->getImages("current", 20);
+        $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
-        $feed = new \Zend\Feed\Writer\Feed();
+        $images = $dm
+            ->getRepository('ImagepushBundle:Image')
+            ->findImages("current", 20);
+
+        $images = array_values($images);
 
         if (count($images)) {
 
+            $feed = new \Zend\Feed\Writer\Feed();
+
             $feed->setTitle("Imagepush.to - Best images hourly");
-            $feed->addAuthor("Anton Babenko");
+            $feed->addAuthor("Imapepush");
             $feed->setLanguage("en");
             $feed->setDescription("Best images hourly");
             $feed->setGenerator("Manually");
 
-            $feed->setLink('http://imagepush.com');
-            $feed->setDateModified($images[0]["timestamp"]);
+            $feed->setLink('http://imagepush.to/');
+            $feed->setDateModified($images[0]->getTimestamp()->sec);
 
             foreach ($images as $image) {
+
+                $shareUrl = $this->get('router')->generate('viewImage', array('id' => $image->getId(), 'slug' => $image->getSlug()), true);
                 $entry = new \Zend\Feed\Writer\Entry();
-                $title = $image["title"];
 
-                $entry->setTitle(htmlentities($title, ENT_COMPAT, 'utf-8'));
-                $entry->setLink($image["_share_url"]);
-                //$entry->setAuthor($image["link"]);
-                $entry->setId($image["_share_url"]);
+                $entry->setTitle(htmlentities($image->getTitle(), ENT_COMPAT, 'utf-8'));
+                $entry->setLink($shareUrl);
+                $entry->setId($shareUrl);
 
-                if (count($image["_tags"])) {
-                    foreach ($image["_tags"] as $tag) {
+                //\D::dump($image->getTags());
+                if (count($image->getTags())) {
+                    foreach ($image->getTags() as $tag) {
                         $entry->addCategory(array("term" => $tag));
                     }
                 }
 
-                $entry->setDateCreated($image["timestamp"]);
+                $entry->setDateCreated($image->getTimestamp()->sec);
+
+                $mainImage = $this->get('twig.extension.imagepush')->cdnImagepushFilter($image->getFile(), 'in', 463, 1548, $image->getId());
+                $mainImageWidth = $image->getThumbSize("in", 463, 1548, "w");
+                $mainImageHeight = $image->getThumbSize("in", 463, 1548, "h");
 
                 //$img_src = Images::getFileUrl($image, "m");
-                $enclosure["uri"] = 'http://imagepush.to' . $image["_main_img"];
-                //if ($file = sfConfig::get("sf_upload_dir") . "/m/" . $image["m_file"]) {
-                $enclosure["length"] = 1; //@filesize($file);
-                //}
-                $enclosure["type"] = $image["m_content_type"];
+                //$enclosure["uri"] = $mainImage;
+                //$enclosure["length"] = 1; //@filesize($file);
+                //$enclosure["type"] = $image["m_content_type"];
+                //$entry->setEnclosure($enclosure);
 
-                $entry->setEnclosure($enclosure);
+                $description = '<a href="' . $shareUrl . '">';
+                $description .= '<img src="' . $mainImage . '" alt="' . htmlentities($image->getTitle(), ENT_COMPAT, 'utf-8') . '" border="0" width="' . $mainImageWidth . '" height="' . $mainImageHeight . '" />';
+                $description .= '</a>';
 
-                $entry->setDescription('<a href="' . $image["_share_url"] . '"><img src="http://imagepush.to' . $image["_main_img"] . '" alt="' . addslashes($title) . '" border="0" width="' . $image["m_width"] . '" height="' . $image["m_height"] . '" /></a>');
+                $entry->setDescription($description);
 
                 $feed->addEntry($entry);
             }
+
+            return new Response($feed->export("rss"));
         }
 
-        return new Response($feed->export("rss"));
+        return new Response("No images found", 500);
     }
 
     /**
@@ -341,7 +355,7 @@ class FrontController extends Controller
             "initialTags" => $initialTags,
             "skipImageId" => $skipImageId,
             "withAd" => $withAd,
-            "bannerPlacement" => mt_rand(0, $totalImages - 1));
+            "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
     }
 
 }

@@ -8,6 +8,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
+use Imagine\Image\ImagineInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Monolog\Logger;
 
 class CustomController
 {
@@ -28,6 +31,16 @@ class CustomController
     protected $cacheManager;
 
     /**
+     * @var DocumentManager 
+     */
+    protected $dm;
+
+    /**
+     * @var Imagine\Image\ImagineInterface
+     */
+    private $imagine;
+
+    /**
      * Allow to generate images without hash verification in debug mode
      * @var boolean 
      */
@@ -36,15 +49,22 @@ class CustomController
     /**
      * Constructor
      *
-     * @param DataManager $dataManager
-     * @param FilterManager $filterManager
-     * @param CacheManager $cacheManager
+     * @param DataManager      $dataManager
+     * @param FilterManager    $filterManager
+     * @param CacheManager     $cacheManager
+     * @param DocumentManager  $dm
+     * @param ImagineInterface $imagine
+     * @param Logger           $logger
+     * @param boolean          $debug
      */
-    public function __construct(DataManager $dataManager, FilterManager $filterManager, CacheManager $cacheManager, $debug)
+    public function __construct(DataManager $dataManager, FilterManager $filterManager, CacheManager $cacheManager, DocumentManager $dm, ImagineInterface $imagine, \Monolog\Logger $logger, $debug)
     {
         $this->dataManager = $dataManager;
         $this->filterManager = $filterManager;
         $this->cacheManager = $cacheManager;
+        $this->dm = $dm;
+        $this->imagine = $imagine;
+        $this->logger = $logger;
         $this->debug = $debug;
     }
 
@@ -69,11 +89,12 @@ class CustomController
 
         $targetPath = $this->cacheManager->resolve($request, $path, $filter);
         //\D::dump($targetPath);
+        //\D::dump($path);
         if ($targetPath instanceof Response) {
             return $targetPath;
         }
 
-        // Sample: http://dev-anton.imagepush.to/cache/outbound/100x200/new_uploads/file.jpg?hash=abcd
+        // Sample: http://dev-anton.imagepush.to/cache/out/100x200/new_uploads/file.jpg?hash=abcd
         if (false !== strpos($path, "/")) {
 
             $path = explode("/", $path);
@@ -88,8 +109,9 @@ class CustomController
 
                 $path = implode("/", $path);
 
+                $imageId = $request->query->get('i');
                 if (!$this->debug) {
-                    $correctHash = md5($width . '|' . $height . '|' . $path);
+                    $correctHash = md5($width . '|' . $height . '|' . $path . ($imageId ? '|' . $imageId : ''));
                     $hash = $request->query->get('hash');
                     if (false === (strlen($hash) >= 4 && strpos($correctHash, $hash) === 0)) {
                         throw new NotFoundHttpException('Incorrect hash');
@@ -116,6 +138,28 @@ class CustomController
 
         if ($targetPath) {
             $response = $this->cacheManager->store($response, $targetPath, $filter);
+
+            // Update image thumbs in database to prevent it from generating again
+            if (!empty($imageId)) {
+                $image = $this->dm
+                    ->getRepository('ImagepushBundle:Image')
+                    ->findOneBy(array("id" => (int) $imageId));
+                //\D::dump($image);
+                if ($image) {
+                    // try to get real image size
+                    try {
+                        $resized = $this->imagine->load($response->getContent());
+
+                        $image->addThumbs($filter, $width . 'x' . $height, $resized->getSize()->getWidth(), $resized->getSize()->getHeight());
+                        $this->dm->persist($image);
+                        $this->dm->flush();
+                    } catch (\Exception $e) {
+                        // skip imagine exceptions, if image can't be loaded
+                        $this->logger->err("Image id: " . $imageId . "; Error on image thumb update: " . $e->getMessage());
+                    }
+                }
+                //\D::dump($image);
+            }
         }
 
         return $response;
