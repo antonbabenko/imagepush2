@@ -7,14 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
+ * Image
+ * 
  * @MongoDB\Document(collection="images", repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
+ *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"})
  * })
  */
-//*   @MongoDB\UniqueIndex(keys={"id"="asc"}),
-
 class Image
 {
 
@@ -82,6 +83,12 @@ class Image
     protected $isAvailable;
 
     /**
+     * Is "in process"
+     * @MongoDB\Boolean
+     */
+    protected $isInProcess;
+
+    /**
      * Created thumbs with actual dimensions
      * @MongoDB\Hash
      */
@@ -101,16 +108,16 @@ class Image
         return $this->link ? @parse_url($this->link, PHP_URL_HOST) : null;
     }
 
-    /*public function get_shareUrl()
-    {
-        return "http://imagepush.to" . $this->get_viewUrl();
-    }*/
+    /* public function get_shareUrl()
+      {
+      return "http://imagepush.to" . $this->get_viewUrl();
+      } */
 
-    /*public function get_viewUrl()
-    {
-        return "/i/" . $this->id . "/" . $this->slug;
-        //$this->container->get('router')->generate('viewImage', array('id' => $this->id, 'slug' => $this->slug), true) : null);
-    }*/
+    /* public function get_viewUrl()
+      {
+      return "/i/" . $this->id . "/" . $this->slug;
+      //$this->container->get('router')->generate('viewImage', array('id' => $this->id, 'slug' => $this->slug), true) : null);
+      } */
 
     /**
      * End: Custom methods
@@ -347,6 +354,53 @@ class Image
     }
 
     /**
+     * Set isInProcess
+     *
+     * @param boolean $isInProcess
+     */
+    public function setIsInProcess($isInProcess)
+    {
+        $this->isInProcess = $isInProcess;
+    }
+
+    /**
+     * Get isInProcess
+     *
+     * @return boolean $isInProcess
+     */
+    public function getIsInProcess()
+    {
+        return $this->isInProcess;
+    }
+
+    /**
+     * Generate filename based on ID and content type
+     *
+     * @return string $file
+     */
+    public function updateFilename($contentType)
+    {
+
+        if (in_array($contentType, array("image/gif"))) {
+            $fileExt = "gif";
+        } elseif (in_array($contentType, array("image/png"))) {
+            $fileExt = "png";
+        } else {
+            $fileExt = "jpg";
+        }
+
+        // For eg: 2567 => /0/2/5/67.jpg
+        $file = floor($this->getId() / 10000) . "/";
+        $file .= floor($this->getId() / 1000) . "/";
+        $file .= floor($this->getId() / 100) . "/";
+        $file .= ( $this->getId() % 100) . "." . $fileExt;
+
+        $this->setFile($file);
+
+        return $file;
+    }
+
+    /**
      * Get array of created thumbs.
      *
      * @return array $thumbs
@@ -388,10 +442,10 @@ class Image
      * Get thumb information.
      * If thumb has been already created then we have actual image property (width/height).
      *
-     * @param string  $filter
-     * @param integer $width
-     * @param integer $height
-     * @param string  $property  Property name for the height is "h", for width is "w"
+     * @param string  $filter   Filter Name
+     * @param integer $width    Width
+     * @param integer $height   Height
+     * @param string  $property Property name for the height is "h", for width is "w"
      * 
      * @return array|false $thumbs
      */

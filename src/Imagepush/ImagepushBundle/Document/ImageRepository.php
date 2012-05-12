@@ -52,18 +52,18 @@ class ImageRepository extends DocumentRepository
     /**
      * @return array()|false
      */
-    public function getOneImage($id)
-    {
+    /* public function getOneImage($id)
+      {
 
-        $key = $this->getImageKey($id);
+      $key = $this->getImageKey($id);
 
-        if ($this->redis->sismember('available_images', $key)) {
-            $image = $this->redis->hgetall($key);
-            return $this->normalizeImage($image);
-        } else {
-            return false;
-        }
-    }
+      if ($this->redis->sismember('available_images', $key)) {
+      $image = $this->redis->hgetall($key);
+      return $this->normalizeImage($image);
+      } else {
+      return false;
+      }
+      } */
 
     /**
      * @return array()|false
@@ -71,8 +71,9 @@ class ImageRepository extends DocumentRepository
     public function getOneImageRelatedToTimestamp($direction, $timestamp)
     {
 
-        if (!$timestamp || !in_array($direction, array("next", "prev")))
+        if (!$timestamp || !in_array($direction, array("next", "prev"))) {
             return false;
+        }
 
         $query = $this->createQueryBuilder();
 
@@ -91,6 +92,58 @@ class ImageRepository extends DocumentRepository
             ->getQuery();
 
         return $query->getSingleResult();
+    }
+
+    /**
+     * @return int|false
+     */
+    public function getNextId()
+    {
+        $maxId = $this->createQueryBuilder()
+            ->sort('id', 'DESC')
+            ->limit(1)
+            ->getQuery()
+            ->getSingleResult();
+
+        if ($maxId && $maxId->getId()) {
+            return $maxId->getId() + 1;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get unprocessed image and change status for it to "in process"
+     * 
+     * @return Image|false
+     */
+    public function initUnprocessedSource($isDebug = false)
+    {
+        $image = $this->createQueryBuilder()
+            ->field('isAvailable')->exists(false)
+            ->field('isInProcess')->notEqual(true)
+            ->sort('timestamp', 'DESC')
+            ->limit(1)
+            ->getQuery()
+            ->getSingleResult();
+
+        if ($image) {
+
+            /**
+             * There is no database update in debug mode 
+             */
+            if (!$isDebug) {
+                $image->setIsInProcess(true);
+
+                $this->dm->persist($image);
+                $this->dm->flush();
+                $this->dm->refresh($image);
+            }
+
+            return $image;
+        } else {
+            return false;
+        }
     }
 
 }

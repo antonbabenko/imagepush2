@@ -164,15 +164,30 @@ services:
 
     imagepush.processor:
         class: Imagepush\ImagepushBundle\Services\Processor\Processor
-        arguments: [@kernel]
+        arguments: [@service_container, %kernel.debug%]
+
+    imagepush.processor.content:
+        class: Imagepush\ImagepushBundle\Services\Processor\Content
+        arguments: [@service_container]
+        prototype: true
+
+    imagepush.processor.image_content:
+        class: Imagepush\ImagepushBundle\Services\Processor\ImageContent
+        arguments: [@service_container]
+        prototype: true
+
+    imagepush.processor.html_content:
+        class: Imagepush\ImagepushBundle\Services\Processor\HtmlContent
+        arguments: [@service_container]
+        prototype: true
 
     imagepush.processor.tag:
         class: Imagepush\ImagepushBundle\Services\Processor\TagProcessor
-        arguments: [@kernel]
+        arguments: [@service_container]
 
     imagepush.publisher:
         class: Imagepush\ImagepushBundle\Services\Publisher\Publisher
-        arguments: [@kernel]
+        arguments: [@service_container]
 
     # Amazon S3
     imagepush.amazon.s3:
