@@ -4,6 +4,6 @@ namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
-class LinkRepository extends DocumentRepository
+class ProcessedHashRepository extends DocumentRepository
 {
 }

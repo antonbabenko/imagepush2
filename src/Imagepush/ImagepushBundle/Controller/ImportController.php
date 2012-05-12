@@ -12,6 +12,7 @@ use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\Tag;
 use Imagepush\ImagepushBundle\Document\LatestTag;
 use Imagepush\ImagepushBundle\Document\Link;
+use Imagepush\ImagepushBundle\Document\ProcessedHash;
 
 class ImportController extends Controller
 {
@@ -26,12 +27,16 @@ class ImportController extends Controller
         $result = $this->importLatestTags();
         $result = $this->importLinks(); // indexed, failed
         $result = $this->importImages();
+        $result = $this->importProcessedHashes();
 
         echo "All done :)";
 
         return array();
     }
 
+    /**
+     * Import tags
+     */
     private function importTags()
     {
 
@@ -89,6 +94,9 @@ class ImportController extends Controller
         }
     }
 
+    /**
+     * Import images
+     */
     private function importImages($limit = 10)
     {
 
@@ -109,16 +117,16 @@ class ImportController extends Controller
 
             if (count($images)) {
                 foreach ($images as $image) {
-                    
+
                     $createdMW = $createdTW = $createdAW = 0;
                     $createdMH = $createdTH = $createdAH = 0;
-                    
+
                     if (empty($image["id"])) {
                         $missing[] = $image;
                         continue;
                         //\D::dump($image);
                     }
-                    
+
                     $new = new Image();
                     $new->setIsAvailable($imageGroup == "current");
                     $new->setId($image["id"]);
@@ -165,20 +173,23 @@ class ImportController extends Controller
                         $createdAH = $image["a_height"];
                         //$new->setAHeight($image["a_height"]);
                     }
-                    
-                    if ($createdMW) { // main
+
+                    if ($createdMW) {
+                        // main
                         $new->addThumbs("in", "463x1548", $createdMW, $createdMH);
                     }
 
-                    if ($createdTW) { // thumb
+                    if ($createdTW) {
+                        // thumb
                         $new->addThumbs("out", "140x140", $createdTW, $createdTH);
                     }
 
-                    if ($createdAW) { // article
+                    if ($createdAW) {
+                        // article
                         $new->addThumbs("in", "625x2090", $createdAW, $createdAH);
                     }
 
-                    
+
                     if (!empty($image["_tags"])) {
 
                         $tags = array();
@@ -217,10 +228,13 @@ class ImportController extends Controller
                 $dm->clear();
             }
         }
-        
+
         \D::dump($missing);
     }
 
+    /**
+     * Import latest tags
+     */
     private function importLatestTags()
     {
 
@@ -260,6 +274,9 @@ class ImportController extends Controller
         }
     }
 
+    /**
+     * Import links
+     */
     private function importLinks()
     {
 
@@ -291,6 +308,42 @@ class ImportController extends Controller
                 }
 
                 if (++$i % 500 == 0) {
+                    $dm->flush();
+                    $dm->clear();
+                }
+            }
+
+            $dm->flush();
+            $dm->clear();
+        }
+    }
+
+    /**
+     * Import processed hashes
+     */
+    private function importProcessedHashes()
+    {
+
+        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $redis = $this->get('snc_redis.default_client');
+
+        $i = 0;
+
+        $dm->getDocumentCollection("ImagepushBundle:ProcessedHash")->drop();
+
+        $allHashes = $redis->smembers("processed_image_hash");
+
+        //\D::dump($allHashes);
+        //die();
+
+        if (count($allHashes)) {
+            foreach ($allHashes as $hash) {
+                $new = new ProcessedHash();
+                $new->setHash($hash);
+                $dm->persist($new);
+
+
+                if (++$i % 1000 == 0) {
                     $dm->flush();
                     $dm->clear();
                 }

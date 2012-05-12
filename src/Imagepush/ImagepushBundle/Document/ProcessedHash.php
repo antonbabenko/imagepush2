@@ -3,84 +3,56 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Original links (indexed, failed, blocked).
+ * Processed image hashes (in order to not index same images more then once)
  * 
- * @MongoDB\Document(collection="link", repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
+ * @MongoDB\Document(collection="processedHash", repositoryClass="Imagepush\ImagepushBundle\Document\ProcessedHashRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"text"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"text"="asc"}, dropDups=true)
+ *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, dropDups=true)
  * })
  */
-class Link
+class ProcessedHash
 {
 
-  /**
-   * @MongoDB\Id(strategy="AUTO")
-   */
-  protected $mongoId;
+    /**
+     * @MongoDB\Id(strategy="AUTO")
+     */
+    protected $mongoId;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $link;
+    /**
+     * @MongoDB\String
+     */
+    protected $hash;
 
-  /**
-   * Link status - indexed, failed, blocked
-   * @MongoDB\String
-   */
-  protected $status;
+    /**
+     * Get mongoId
+     *
+     * @return id $mongoId
+     */
+    public function getMongoId()
+    {
+        return $this->mongoId;
+    }
 
-  /**
-   * Get mongoId
-   *
-   * @return id $mongoId
-   */
-  public function getMongoId()
-  {
-    return $this->mongoId;
-  }
+    /**
+     * Set hash
+     *
+     * @param string $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
 
-  /**
-   * Set link
-   *
-   * @param string $link
-   */
-  public function setLink($link)
-  {
-    $this->link = $link;
-  }
-
-  /**
-   * Get link
-   *
-   * @return string $link
-   */
-  public function getLink()
-  {
-    return $this->link;
-  }
-
-  /**
-   * Set status
-   *
-   * @param string $status
-   */
-  public function setStatus($status)
-  {
-    $this->status = $status;
-  }
-
-  /**
-   * Get status
-   *
-   * @return string $status
-   */
-  public function getStatus()
-  {
-    return $this->status;
-  }
+    /**
+     * Get hash
+     *
+     * @return string $hash
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
 
 }

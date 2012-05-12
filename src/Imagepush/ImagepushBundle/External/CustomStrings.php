@@ -5,23 +5,18 @@ namespace Imagepush\ImagepushBundle\External;
 class CustomStrings
 {
 
-  static $separator_pattern =
-    '[|\-«»—~:\@]+';
-
-  static $general_endings_pattern =
-    '@[{(\[][\d\s]*(pic|pics|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]$@ui';
-
-  static $forbidden_endings_pattern =
-    '@[{(\[]\s*(nsfw)+\s*[)\]}]@ui';
-
-  static $url_pattern =
-    '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
-  
-  static $remove_start = '
+    public static $separatorPattern =
+        '[|\-«»—~:\@]+';
+    public static $generalEndingsPattern =
+        '@[{(\[][\d\s]*(pic|pics|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]$@ui';
+    public static $forbiddenEndingsPattern =
+        '@[{(\[]\s*(nsfw)+\s*[)\]}]@ui';
+    public static $urlPattern =
+        '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
+    public static $removeStart = '
     The Underfold
 ';
-
-  static $remove_end = '
+    public static $removeEnd = '
     The Oatmeal
     TheJourneyPoint
     Catastrophe Monitor
@@ -92,127 +87,125 @@ class CustomStrings
     koikoikoi.com - Visual Arts Magazine, graphic design, illustration, photography, interviews, inspiration, tutorials
 ';
 
-    
-  /**
-   * Modifies a string to remove all non ASCII characters and spaces.
-   */
-  static public function slugify($text)
-  {
-    // replace non letter or digits by -
-    $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
-    $text = trim($text, '-');
-
-    // There is a bug on php 5.3.6 on mamp with iconv, which always returns empty string
-    // transliterate
-    if (function_exists('iconv') && PHP_VERSION != '5.3.6' && PHP_OS != 'Darwin')
+    /**
+     * Modifies a string to remove all non ASCII characters and spaces.
+     */
+    static public function slugify($text)
     {
-      $text = iconv('UTF-8', 'US-ASCII//TRANSLIT//IGNORE', $text);
+        // replace non letter or digits by -
+        $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+        $text = trim($text, '-');
+
+        // There is a bug on php 5.3.6 on mamp with iconv, which always returns empty string
+        // transliterate
+        if (function_exists('iconv') && PHP_VERSION != '5.3.6' && PHP_OS != 'Darwin') {
+            $text = iconv('UTF-8', 'US-ASCII//TRANSLIT//IGNORE', $text);
+        }
+
+        // lowercase
+        if (function_exists('mb_strtolower')) {
+            $text = mb_strtolower($text, 'UTF-8');
+        } else {
+            $text = strtolower($text);
+        }
+
+        // remove unwanted characters
+        $text = preg_replace('~[^-\\pL\d]+~u', '', $text);
+        if ($text === "") {
+            return 'n-a';
+        }
+
+        return $text;
     }
 
-    // lowercase
-    if (function_exists('mb_strtolower')) {
-      $text = mb_strtolower($text, 'UTF-8');
-    } else {
-      $text = strtolower($text);
-    }
-
-    // remove unwanted characters
-    $text = preg_replace('~[^-\\pL\d]+~u', '', $text);
-    if ($text === "")
+    /**
+     * Check if text has words like "nsfw".
+     * | title here (nsfw) , for example, will return true
+     */
+    public static function isForbiddenTitle($text)
     {
-      return 'n-a';
+        return (bool) preg_match(self::$forbiddenEndingsPattern, trim($text));
     }
 
-    return $text;
-  }
+    public static function makeSafeRegexFromArray($values = array())
+    {
+        $result = array();
+        foreach ($values as $value) {
+            $value = trim($value);
+            if ($value != "") {
+                $result[] = str_replace("|", "\|", $value);
+            }
+        }
 
-  /*
-   * Check if text has words like "nsfw".
-   * | title here (nsfw) , for example, will return true
-   */
-  public static function isForbiddenTitle($text) {
-
-    return (bool)preg_match(self::$forbidden_endings_pattern, trim($text));
-    
-  }
-
-  public static function makeSafeRegexFromArray($values = array()) {
-    $result = array();
-    foreach ($values as $value) {
-      $value = trim($value);
-      if ($value != "") {
-        $result[] = str_replace("|", "\|", $value);
-      }
+        return $result;
     }
-    return $result;
-  }
 
-  /**
-   * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
-   */
-  static public function cleanTitle($text)
-  {
+    /**
+     * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
+     */
+    static public function cleanTitle($text)
+    {
 
-    $starts_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$remove_start))));
-    $ends_pattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$remove_end))));
-    
-    // just url
-    $patterns[] = '@^'.self::$url_pattern . '$@ui';
+        $startsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeStart))));
+        $endsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeEnd))));
 
-    // "read more"
-    $patterns[] = '@(Read more:*\s*' . self::$url_pattern . '*\s*)$@ui';
+        // just url
+        $patterns[] = '@^' . self::$urlPattern . '$@ui';
 
-    // separator with url
-    $patterns[] = '@('.self::$separator_pattern.'\s*' . self::$url_pattern . '*\s*)$@ui';
+        // "read more"
+        $patterns[] = '@(Read more:*\s*' . self::$urlPattern . '*\s*)$@ui';
 
-    // (pics, images, etc)
-    $patterns[] = self::$general_endings_pattern;
+        // separator with url
+        $patterns[] = '@(' . self::$separatorPattern . '\s*' . self::$urlPattern . '*\s*)$@ui';
 
-    // site-specific beginning or ending
-    $patterns[] = '@^(' . $starts_pattern . ')?\s*' . self::$separator_pattern . '@ui';
-    $patterns[] = '@' . self::$separator_pattern . '\s*(' . $ends_pattern . ')?\s*$@ui';
+        // (pics, images, etc)
+        $patterns[] = self::$generalEndingsPattern;
 
-    // (pics, images, etc) again
-    $patterns[] = self::$general_endings_pattern;
+        // site-specific beginning or ending
+        $patterns[] = '@^(' . $startsPattern . ')?\s*' . self::$separatorPattern . '@ui';
+        $patterns[] = '@' . self::$separatorPattern . '\s*(' . $endsPattern . ')?\s*$@ui';
 
-    foreach ($patterns as $pattern) {
-      $text = trim($text);
-      $text = preg_replace($pattern, '', $text);
+        // (pics, images, etc) again
+        $patterns[] = self::$generalEndingsPattern;
+
+        foreach ($patterns as $pattern) {
+            $text = trim($text);
+            $text = preg_replace($pattern, '', $text);
+        }
+
+        // replace newlines with max 1 space
+        $text = str_replace("\n", "", $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+
+        $text = trim($text);
+
+        if ($text == "") {
+            $text = "Untitled";
+        }
+
+        return $text;
     }
-    
-    // replace newlines with max 1 space
-    $text = str_replace("\n", "", $text);
-    $text = preg_replace('/\s\s+/', ' ', $text);
 
-    $text = trim($text);
+    /**
+     * Remove useless chars, spaces, newlines, singularize, etc and return it.
+     */
+    public static function cleanTag($tag)
+    {
 
-    if ($text == "") $text = "Untitled";
+        $tag = mb_strtolower($tag, 'UTF-8');
 
-    return $text;
-  }
-  
-  /**
-   * Remove useless chars, spaces, newlines, singularize, etc and return it.
-   */
-  public static function cleanTag($tag)
-  {
+        $tag = preg_replace('/\n/', ' ', $tag);       // newlines to spaces
 
-    $tag = mb_strtolower($tag, 'UTF-8');
+        $tag = trim($tag);
+        $tag = preg_replace('/\p{P}+\s*$/', '', $tag); // all punctuation at the end
+        $tag = preg_replace('/^\s*\p{P}+/', '', $tag); // all punctuation at the beginning
+        //$tag = preg_replace('/\p{P}+/', '', $tag); // all punctuation in the middle
+        $tag = preg_replace('/\s\s+/', ' ', $tag);    // not more than one space
 
-    $tag = preg_replace('/\n/', ' ', $tag);       // newlines to spaces
+        $tag = trim($tag);
+        $tag = Inflect::singularize($tag);
 
-    $tag = trim($tag);
-    $tag = preg_replace('/\p{P}+\s*$/', '', $tag); // all punctuation at the end
-    $tag = preg_replace('/^\s*\p{P}+/', '', $tag); // all punctuation at the beginning
-    //$tag = preg_replace('/\p{P}+/', '', $tag); // all punctuation in the middle
-    $tag = preg_replace('/\s\s+/', ' ', $tag);    // not more than one space
-
-    $tag = trim($tag);
-    $tag = Inflect::singularize($tag);
-
-    return $tag;
-
-  }
-  
+        return $tag;
+    }
 
 }

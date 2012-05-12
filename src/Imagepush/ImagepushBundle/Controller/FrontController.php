@@ -23,6 +23,12 @@ class FrontController extends Controller
             ->getRepository('ImagepushBundle:Image')
             ->findImages("current", 7);
 
+        /* $i = array_values($images);
+          $image = $i[0];
+          echo "<br>==".$mainImage = $this->get('twig.extension.imagepush')->imagepushFilter($image->getFile(), 'in', 463, 1548, $image->getId());
+          echo "<br>==".$mainImageWidth = $image->getThumbSize("in", 463, 1548, "w");
+          echo "<br>==".$mainImageHeight = $image->getThumbSize("in", 463, 1548, "h");
+         */
         return array("images" => array_values($images));
     }
 
@@ -288,8 +294,9 @@ class FrontController extends Controller
 
             $tagImages = $foundTags = array();
 
-            if (count($allImages) >= 10)
+            if (count($allImages) >= 10) {
                 break;
+            }
 
             // make just one search, if thumbs will be shown in one merged box
             if (!$groupTags) {
@@ -306,8 +313,9 @@ class FrontController extends Controller
                 // make sure that each image is shown just once in all tags, if image belongs to multiple tags
                 foreach (array_values($images) as $image) {
 
-                    if (count($tagImages) == $maxImages)
+                    if (count($tagImages) == $maxImages) {
                         break;
+                    }
 
                     if (!in_array($image->getId(), $usedImages)) {
                         $tagImages[] = $image;
