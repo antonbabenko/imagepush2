@@ -17,6 +17,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Link
 {
 
+    const FAILED = "failed";
+    const INDEXED = "indexed";
+    const BLOCKED = "blocked";
+
     /**
      * @MongoDB\Id(strategy="AUTO")
      */
@@ -32,6 +36,16 @@ class Link
      * @MongoDB\String
      */
     protected $status;
+
+    /**
+     * @param string $link   Link
+     * @param string $status Status
+     */
+    public function __construct($link = null, $status = null)
+    {
+        $this->setLink($link);
+        $this->setStatus($status);
+    }
 
     /**
      * Get mongoId

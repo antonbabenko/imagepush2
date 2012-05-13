@@ -103,6 +103,7 @@
 [aws-sdk]
     git=http://github.com/amazonwebservices/aws-sdk-for-php
     version=1.5.5
+    ; 1.5.0.1 worked well before!
     ; Error description - https://forums.aws.amazon.com/thread.jspa?messageID=331703
     ; Latest version (1.5.3) returns error when use set_object_acl(): Fatal error: Call to a member function query() on a non-object in /Users/Bob/Sites/imagepush2/vendor/aws-sdk/services/s3.class.php on line 2616
 

@@ -1,13 +1,16 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services\Processor;
+namespace Imagepush\ImagepushBundle\Services\Processor\Content;
 
 use Imagepush\ImagepushBundle\Services\Processor\Config;
-use Imagepush\ImagepushBundle\Services\Processor\Content;
+use Imagepush\ImagepushBundle\Services\Processor\Content\Content;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class HtmlContent extends Content
+/**
+ * Class contains methods to look for images in HTML (using DOM/XPath)
+ */
+class Html
 {
 
     public $dom;
@@ -16,17 +19,35 @@ class HtmlContent extends Content
      * @var Container $container
      */
     public $container;
+    public $content;
 
     public function __construct(ContainerInterface $container)
     {
-        parent::__construct($container);
+        $this->container = $container;
     }
 
+    /**
+     * Set content object
+     */
+    public function setContent(Content $content)
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * Get DOM object for the content
+     * 
+     * @param boolean $reload
+     * 
+     * @return \DOMDocument $dom
+     */
     public function getDom($reload = false)
     {
         if (!$this->dom || $reload) {
 
-            $content = $this->getContent();
+            $content = $this->content->getContent();
 
             libxml_use_internal_errors(true); // to allow html5 tags
             $this->dom = new \DOMDocument();
@@ -39,6 +60,7 @@ class HtmlContent extends Content
 
     /**
      * Get the full url of images in image_src or og:image
+     * 
      * @return array|false Array with urls
      */
     public function getFullImageSrc()
@@ -55,7 +77,7 @@ class HtmlContent extends Content
 
                     ($href = $link->getAttribute("content")) || ($href = $link->getAttribute("href"));
 
-                    $imgUrl = self::generateFullUrl($href, $this->getLink());
+                    $imgUrl = $this->generateFullUrl($href, $this->content->getLink());
 
                     $images[] = array("url" => $imgUrl, "xpath" => $link->getNodePath());
                 }
@@ -71,7 +93,7 @@ class HtmlContent extends Content
     public function getBestImageFromDom()
     {
 
-        /*
+        /**
          * Priority for the best image on the page:
          * 1) get all img inside body
          * 2) keep images, which have aspect ratio between 0.3 and 2.5 AND width >= 450
@@ -79,13 +101,12 @@ class HtmlContent extends Content
          * 4) find tags inside content area by patterns ("labels:", "keywords:", ...)
          *
          */
-
         $domxpath = new \DOMXPath($this->getDom());
         $filtered = $domxpath->query("//img[@src]");
 
         $images = array();
 
-        \D::dump($filtered);
+        //\D::dump($filtered);
 
         if (!count($filtered)) {
             return false;
@@ -102,7 +123,7 @@ class HtmlContent extends Content
                 continue;
             }
 
-            $imgUrl = self::generateFullUrl($src, $this->getLink());
+            $imgUrl = $this->generateFullUrl($src, $this->content->getLink());
 
             //\D::dump($imgUrl);
             //\D::dump($w);
@@ -116,7 +137,7 @@ class HtmlContent extends Content
 
             // do HEAD request and check min filesize and content-type
             if ((!$w || !$h) &&
-                ($imgSrcHead = $this->head($imgUrl)) &&
+                ($imgSrcHead = $this->content->head($imgUrl)) &&
                 in_array($imgSrcHead["Content-type"], Config::$allowedImageContentTypes) &&
                 $imgSrcHead["Content-length"] >= Config::$minFilesize &&
                 $imgSrcHead["Content-length"] <= Config::$maxFilesize) {
@@ -125,11 +146,10 @@ class HtmlContent extends Content
             }
         }
 
-        \D::dump($images);
-
+        //\D::dump($images);
         // fetch images
         if (!count($images)) {
-            $message = sprintf("No suitable image found (among %d available) on this link: %s", count($filtered), $this->getLink());
+            $message = sprintf("No suitable image found (among %d available) on this link: %s", count($filtered), $this->content->getLink());
             $this->kernel->getContainer()->get('logger')->warn($message);
         }
 
@@ -144,7 +164,7 @@ class HtmlContent extends Content
      * 
      * @return string 
      */
-    public static function generateFullUrl($href, $fetchedLink)
+    public function generateFullUrl($href, $fetchedLink)
     {
 
         // Is full url?

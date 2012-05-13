@@ -3,6 +3,7 @@
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
 use Imagepush\ImagepushBundle\Document\Image;
+use Imagepush\ImagepushBundle\Document\Link;
 use Imagepush\ImagepushBundle\Document\ProcessedHash;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,6 +72,11 @@ class Processor
 
             return false;
         }
+
+        if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($image->getLink())) {
+            return false;
+        }
+
         \D::dump($image->getMongoId());
 
         /* if ($image->sourceDomainIsBlocked())
@@ -107,8 +113,9 @@ class Processor
         // parse url problem
         //$this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
         //
-        $sourceLink = "http://i.imgur.com/SsvPB.jpg";
-        $image->setId(99999);
+        //$sourceLink = "http://i.imgur.com/SsvPB.jpg";
+        $sourceLink = "http://imagepush.to/i/40033/well-cosplayed-sir";
+        //$image->setId(99999);
         //$sourceLink = "http://adayinthalifeof.files.wordpress.com/2009/06/picture-15.png";
 
         /**
@@ -136,42 +143,12 @@ class Processor
                 return false;
             }
 
-            // verify image size
-            $imagine = $this->container->get('liip_imagine.imagick');
-            $foundImage = $imagine->load($content->getContent());
-            //\D::dump($foundImage->getSize()->getWidth());
+            $result = $this->processFoundImage($image, $content);
 
-            if ($foundImage->getSize()->getWidth() >= Config::$minWidth && $foundImage->getSize()->getHeight() >= Config::$minHeight) {
-
-                // Update filename based on content type
-                $image->updateFilename($content->getContentType());
-
-                // Save original image to specified location using save way as other thumbnails (to set corrent permissions on amazon)
-                /*
-                  $this->container
-                  ->get('imagepush.imagine.files.cache.resolver')
-                  ->store(new Response($content->getContent()), 'i/' . $image->getFile(), "");
-
-                  $this->generateRequiredThumbs($image);
-                 */
-
-                // Store processed hash
-                $processedHash = new ProcessedHash;
-                $processedHash->setHash($content->getContentMd5());
-                $this->dm->persist($processedHash);
-
-                // Update image object
-                $image->setIsInProcess(false);
-                $image->setIsAvailable(false);
-
-                $this->dm->persist($image);
-                $this->dm->flush();
-
+            if ($result) {
                 $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->getId(), $image->getLink()));
-
-                $result = true;
             }
-        }//die();
+        }
 
         /**
          * Content is HTML/XML
@@ -183,58 +160,72 @@ class Processor
                 "getBestImageFromDom" /* Try to find large images inside html DOM */
             );
 
-            $processorHtml = new HtmlContent($this->kernel);
-            $processorHtml->setLink($image->link);
-            $processorHtml->setData($content->getData());
-
             foreach ($functions as $function) {
 
-                $imagesUrl = $processorHtml->$function();
+                $imagesUrl = $content->htmlContent->$function();
+
+                \D::dump($function);
+                \D::dump($imagesUrl);
 
                 if ($imagesUrl) {
 
-                    //\D::dump($function);
-                    //\D::dump($imagesUrl);
-
                     foreach ($imagesUrl as $imageUrl) {
 
-                        $content->get($imageUrl["url"]);
+                        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($imageUrl["url"])) {
+                            continue;
+                        }
 
-                        if ($content->isImageType() && !$content->isAlreadyProcessedImageHash()) {
-                            $processorImage = new ImageContent($this->kernel);
-                            $processorImage->setId($image->id);
-                            $processorImage->setData($content->getData());
+                        $contentInside = $this->container->get('imagepush.processor.content');
+                        $contentInside->get($imageUrl["url"]);
 
-                            $result = $processorImage->makeThumbs();
+                        if (!$contentInside->isImageType()) {
+                            continue;
+                        }
 
-                            if ($result) {
-                                if (Config::$modifyDB) {
-                                    $content->saveProcessedImageHash();
-                                    $image->saveAsProcessed($result);
-                                }
+                        if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
+                            $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $imageUrl["url"]));
 
-                                $this->logger->info(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->id, $image->link, $function, $imageUrl["url"]));
+                            continue;
+                        }
 
-                                // Image has been found and saved. No need to search further.
-                                break 2;
-                            }
+                        $result = $this->processFoundImage($image, $contentInside);
+
+                        if ($result) {
+                            $this->logger->warn(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $imageUrl["url"]));
+
+                            $link = new Link($imageUrl["url"], Link::INDEXED);
+                            $this->dm->persist($link);
+                            $this->dm->flush();
+
+                            // Image has been found and saved. No need to search further.
+                            break 2;
                         }
                     }
                 }
             }
-        } // end of find image block
-        //\D::dump($result);
+        }
+
+        \D::dump($result);
 
         /**
          * No images found - remove link and image key
          */
-        if (!$result) {
-            $this->logger->info(sprintf("ID: %d. No images found, so link %s should be removed.", $image->getId(), $image->getLink()));
-            if (Config::$modifyDB) {
-                $this->dm->remove($image);
+        if ($result) {
+            if (!$this->isDebug) {
+                $link = new Link($image->getLink(), Link::INDEXED);
+                $this->dm->persist($link);
                 $this->dm->flush();
+            }
+        } else {
+            $this->logger->info(sprintf("ID: %d. No images found, so link %s should be removed.", $image->getId(), $image->getLink()));
 
-                // @todo: Mark Document\Link as failed, so that we don't look at this link next time
+            if (!$this->isDebug) {
+                $this->dm->remove($image);
+
+                $link = new Link($image->getLink(), Link::FAILED);
+                $this->dm->persist($link);
+
+                $this->dm->flush();
 
                 return false;
             }
@@ -243,11 +234,59 @@ class Processor
         /**
          * Find tags (optional)
          */
-        $processorTag = $this->container->get('imagepush.processor.tag');
+        // @todo (13.5.2012) to fix
+        //$processorTag = $this->container->get('imagepush.processor.tag');
         //$processorTag->setImage($image);
-        $processorTag->processTags($image);
+        //$processorTag->processTags($image);
 
-        return ($result ? $image->id : false);
+        return ($result ? $image->getId() : false);
+    }
+
+    /**
+     * Process content of found image
+     * (verify image size, save original image, generate required thumbnails)
+     * 
+     * @param Image   $image   Image
+     * @param Content $content Content
+     * 
+     * @return boolean True if image has been successfully saved
+     */
+    private function processFoundImage(Image $image, $content)
+    {
+        $imagine = $this->container->get('liip_imagine');
+        $foundImage = $imagine->load($content->getContent());
+        \D::dump($foundImage->getSize()->getWidth());
+
+        if ($foundImage->getSize()->getWidth() >= Config::$minWidth && $foundImage->getSize()->getHeight() >= Config::$minHeight) {
+
+            // Update filename based on content type
+            $image->updateFilename($content->getContentType());
+
+            // Save original file (to set corrent permissions as for other thumbnails)
+            $this->container
+                ->get('imagepush.imagine.files.cache.resolver')
+                ->store(new Response($content->getContent()), 'i/' . $image->getFile(), "");
+
+            // Generate required thumbnails
+            // Thumbnails won't be regenerated, if there is already same file exists
+            $this->generateRequiredThumbs($image);
+
+            // Store processed hash
+            $processedHash = new ProcessedHash;
+            $processedHash->setHash($content->getContentMd5());
+            $this->dm->persist($processedHash);
+
+            // Update image object
+            $image->setIsInProcess(false);
+            $image->setIsAvailable(false);
+
+            $this->dm->persist($image);
+            $this->dm->flush();
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -262,7 +301,7 @@ class Processor
                 ->get('twig.extension.imagepush')
                 ->imagepushFilter('i/' . $image->getFile(), $attributes[0], $attributes[1], $attributes[2], $image->getId());
 
-            //\D::dump($url);
+            \D::dump($url);
 
             $this->container
                 ->get('imagepush.fetcher.content')
