@@ -1,6 +1,6 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Services\Processor;
+namespace Imagepush\ImagepushBundle\Services\Processor\Content;
 
 use Imagepush\ImagepushBundle\Services\Processor\Config;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,11 +27,17 @@ class Content
      */
     public $fetcher;
 
+    /**
+     * @var imagepush.processor.html_content $htmlContent
+     */
+    public $htmlContent;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->fetcher = $container->get('imagepush.fetcher.content');
         $this->fsImages = $container->get('knp_gaufrette.filesystem_map')->get('images');
+        $this->htmlContent = $container->get('imagepush.processor.content.html')->setContent($this);
     }
 
     /**

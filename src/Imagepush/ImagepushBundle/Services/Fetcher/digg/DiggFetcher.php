@@ -44,15 +44,12 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
             return false;
         }
 
-        $isIndexedOrFailed = $this->dm->getRepository('ImagepushBundle:Link')->findOneBy(array(
-            "link" => $item->link,
-            //"status" => "indexed" // @todo: status is "indexed" or "failed"
-            ));
+        $isIndexedOrFailed = $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($item->link);
 
         $result = (
             isset($item->diggs) &&
             $item->diggs >= $this->minDiggs &&
-            null === $isIndexedOrFailed
+            false === $isIndexedOrFailed
             );
 
         if ($result) {

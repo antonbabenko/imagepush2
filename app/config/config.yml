@@ -167,17 +167,12 @@ services:
         arguments: [@service_container, %kernel.debug%]
 
     imagepush.processor.content:
-        class: Imagepush\ImagepushBundle\Services\Processor\Content
+        class: Imagepush\ImagepushBundle\Services\Processor\Content\Content
         arguments: [@service_container]
         prototype: true
 
-    imagepush.processor.image_content:
-        class: Imagepush\ImagepushBundle\Services\Processor\ImageContent
-        arguments: [@service_container]
-        prototype: true
-
-    imagepush.processor.html_content:
-        class: Imagepush\ImagepushBundle\Services\Processor\HtmlContent
+    imagepush.processor.content.html:
+        class: Imagepush\ImagepushBundle\Services\Processor\Content\Html
         arguments: [@service_container]
         prototype: true
 
