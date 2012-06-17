@@ -5,23 +5,24 @@ namespace Imagepush\ImagepushBundle\Services\Processor;
 class Config
 {
     // IDs of sources
+    /* moved:
+      const SRC_SOURCE = 0; // original source
+      const SRC_DIGG = 1;
+      const SRC_DELICIOUS = 2;
+      const SRC_STUMBLEUPON = 3;
+      const SRC_REDDIT = 4;
+      const SRC_TWITTER = 5;
 
-    const SRC_SOURCE = 0; // original source
-    const SRC_DIGG = 1;
-    const SRC_DELICIOUS = 2;
-    const SRC_STUMBLEUPON = 3;
-    const SRC_REDDIT = 4;
-    const SRC_TWITTER = 5;
-
-    // Tag group value
-    public static $tagGroupValue = array(
-        self::SRC_SOURCE => 3, // Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
-        self::SRC_DIGG => 2,
-        self::SRC_DELICIOUS => 2,
-        self::SRC_STUMBLEUPON => 2.5,
-        self::SRC_REDDIT => 1.5,
-        self::SRC_TWITTER => 3,
-    );
+      // Tag group value
+      public static $tagGroupValue = array(
+      self::SRC_SOURCE => 3, // Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
+      self::SRC_DIGG => 2,
+      self::SRC_DELICIOUS => 2,
+      self::SRC_STUMBLEUPON => 2.5,
+      self::SRC_REDDIT => 1.5,
+      self::SRC_TWITTER => 3,
+      );
+     */
 
     /**
      * Set $modifyDB to false for prod.
@@ -70,26 +71,26 @@ class Config
     /**
      * Tags
      */
-    public static $minTitleLengthForTwitterSearch = 15;
-    public static $minSubRedditScore = 5;
+    // moved: public static $minTitleLengthForTwitterSearch = 15;
+    // moved: public static $minSubRedditScore = 5;
     // These tags will not be saved or displayed, because they are not specific enough
-    public static $uselessTags = array("reddit.com", "reddit", "askreddit", "pic", "digg", "digguser", "diggrt", "fun", "funny", "pict", "lol", "humor", "humour", "image", "img", "imagepush", "reportthespammer", "fffffffuuuuuuuuuuuu", "flickr", "filetype:jpg", "media:image");
+    // moved: public static $uselessTags = array("reddit.com", "reddit", "askreddit", "pic", "digg", "digguser", "diggrt", "fun", "funny", "pict", "lol", "humor", "humour", "image", "img", "imagepush", "reportthespammer", "fffffffuuuuuuuuuuuu", "flickr", "filetype:jpg", "media:image");
     // These tags will not be displayed in the top trends, because they are almost not changeable there, though they are very informative, so we can't put them to $USELESS_TAGS
     public static $hiddenTrends = array("offbeat", "lifestyle", "entertainment", "technology", "science");
-    // These tags will be replaced as synonyms. Should be in single form (not plural).
-    public static $tagSynonyms = array(
-        "photography" => "photo",
-        "picture" => "pic",
-        "img" => "pic",
-        "image" => "pic",
-        "humor" => "fun",
-        "lol" => "fun",
-        "haha" => "fun",
-        "hehe" => "fun",
-        "joke" => "fun",
-        "worldnews" => "world news",
-        "busines" => "business",
-        "busine" => "business",
-    );
 
+    // These tags will be replaced as synonyms. Should be in single form (not plural).
+    /* moved: public static $tagSynonyms = array(
+      "photography" => "photo",
+      "picture" => "pic",
+      "img" => "pic",
+      "image" => "pic",
+      "humor" => "fun",
+      "lol" => "fun",
+      "haha" => "fun",
+      "hehe" => "fun",
+      "joke" => "fun",
+      "worldnews" => "world news",
+      "busines" => "business",
+      "busine" => "business",
+      ); */
 }

@@ -65,6 +65,23 @@ del tag_d41d8cd98f00b204e9800998ecf8427e
 Todo:
 rename to - Fetcher, Processor, Publisher
 
+
+---
+10.6.2012:
+Probably, there should be services to:
+1) Get and save source data from:
+1.1) Digg
+1.2) RSS
+1.3) Pinterest
+2) Process source data
+3) Get unprocessed sources
+4) Get content by URI
+5) Save image data based on source
+6) Find tags for source:
+6.1) Digg
+6.2) Delicious, etc
+7) Update image data based on tags
+
 ---
 Export from mongo:
 mongodump --db imagepush_dev
@@ -81,3 +98,9 @@ s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/a/ s3:
 s3cmd cp --recursive -P -p -M -H s3://i.imagepush.to/i/ s3://i.imagepush.to/in/625x2090/i/
 s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/thumb/ s3://i.imagepush.to/out/140x140/i/
 s3cmd sync --recursive -P -p -M -H /var/www/imagepush/current/web/uploads/m/ s3://i.imagepush.to/in/463x1548/i/
+
+---
+     * @todo: see here:
+     * http://sharedcount.com/?url=http%3A%2F%2Fimagepush.to%2F
+     * http://www.linkedin.com/cws/share-count?url=http://www.facebook.com
+     * 

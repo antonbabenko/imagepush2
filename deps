@@ -72,7 +72,7 @@
     git=http://github.com/doctrine/mongodb-odm.git
 
 [DoctrineMongoDBBundle]
-    git=http://github.com/symfony/DoctrineMongoDBBundle.git
+    git=http://github.com/doctrine/DoctrineMongoDBBundle.git
     target=/bundles/Symfony/Bundle/DoctrineMongoDBBundle
     version=origin/2.0
 
