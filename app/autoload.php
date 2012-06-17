@@ -19,17 +19,17 @@ $loader->registerNamespaces(array(
     'Monolog'          => __DIR__.'/../vendor/monolog/src',
     'Assetic'          => __DIR__.'/../vendor/assetic/src',
     'Metadata'         => __DIR__.'/../vendor/metadata/src',
-  
+
     'Snc'              => __DIR__.'/../vendor/bundles',
     'Imagine'          => __DIR__.'/../vendor/imagine/lib',
-    'Liip'        => __DIR__.'/../vendor/bundles',
+    'Liip'             => __DIR__.'/../vendor/bundles',
     'Predis'           => __DIR__.'/../vendor/predis/lib',
     'Zend'             => __DIR__.'/../vendor', // zend components (feed)
     'Knp\Bundle'       => __DIR__.'/../vendor/bundles',
     'Gaufrette'        => __DIR__.'/../vendor/gaufrette/src',
     'Stof'             => __DIR__.'/../vendor/bundles',
     'Gedmo'            => __DIR__.'/../vendor/gedmo-doctrine-extensions/lib',
-  
+
     'Imagepush'        => __DIR__.'/../src',
 
 ));
@@ -52,12 +52,11 @@ $loader->register();
 
 AnnotationRegistry::registerLoader(function($class) use ($loader) {
     $loader->loadClass($class);
+
     return class_exists($class, false);
 });
 AnnotationRegistry::registerFile(__DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
-AnnotationRegistry::registerFile(
-    __DIR__.'/../vendor/doctrine-mongodb-odm/lib/Doctrine/ODM/MongoDB/Mapping/Annotations/DoctrineAnnotations.php'
-);
+AnnotationRegistry::registerFile(__DIR__.'/../vendor/doctrine-mongodb-odm/lib/Doctrine/ODM/MongoDB/Mapping/Annotations/DoctrineAnnotations.php');
 
 // Swiftmailer needs a special autoloader to allow
 // the lazy loading of the init file (which is expensive)

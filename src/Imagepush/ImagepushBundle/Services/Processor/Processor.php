@@ -164,8 +164,8 @@ class Processor
 
                 $imagesUrl = $content->htmlContent->$function();
 
-                \D::dump($function);
-                \D::dump($imagesUrl);
+                //\D::dump($function);
+                //\D::dump($imagesUrl);
 
                 if ($imagesUrl) {
 
@@ -207,6 +207,8 @@ class Processor
 
         \D::dump($result);
 
+        $result = true;
+
         /**
          * No images found - remove link and image key
          */
@@ -234,10 +236,8 @@ class Processor
         /**
          * Find tags (optional)
          */
-        // @todo (13.5.2012) to fix
-        //$processorTag = $this->container->get('imagepush.processor.tag');
-        //$processorTag->setImage($image);
-        //$processorTag->processTags($image);
+        $processorTag = $this->container->get('imagepush.processor.tag');
+        $processorTag->processTags($image);
 
         return ($result ? $image->getId() : false);
     }

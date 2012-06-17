@@ -214,11 +214,4 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
         return self::$output;
     }
 
-    /**
-     * @return serialized data to use as test fixtures
-     */
-    /* private function serializeDataAsFixtures()
-      {
-      return serialize($this->data);
-      } */
 }
