@@ -18,3 +18,5 @@ nbproject
 .rsync_cache
 .DS_Store
 .tmp_staging/
+composer.phar
+composer.lock

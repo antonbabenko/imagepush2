@@ -69,7 +69,7 @@ class FrontController extends Controller
      * Universal function to show images by tags/ by type (upcoming/current)
      * @Template()
      */
-    public function viewMultipleAction($tag, $type)
+    public function viewMultipleAction($type, $tag = null)
     {
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
@@ -152,76 +152,18 @@ class FrontController extends Controller
     }
 
     /**
-     * RSS 2.0 feed
+     * Latest images feeds (rss2.0, rss, atom formats)
      *
-     * @Route("/rss2", name="rss2Feed")
-     * @Route("/rss", name="rssFeed")
+     * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
+     * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
+     * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
      */
-    public function rssAction()
+    public function latestImagesFeedAction($_format)
     {
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('type' => 'current', '_format' => $_format));
 
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("current", 20);
-
-        $images = array_values($images);
-
-        if (count($images)) {
-
-            $feed = new \Zend\Feed\Writer\Feed();
-
-            $feed->setTitle("Imagepush.to - Best images hourly");
-            $feed->addAuthor("Imapepush");
-            $feed->setLanguage("en");
-            $feed->setDescription("Best images hourly");
-            $feed->setGenerator("Manually");
-
-            $feed->setLink('http://imagepush.to/');
-            $feed->setDateModified($images[0]->getTimestamp()->sec);
-
-            foreach ($images as $image) {
-
-                $shareUrl = $this->get('router')->generate('viewImage', array('id' => $image->getId(), 'slug' => $image->getSlug()), true);
-                $entry = new \Zend\Feed\Writer\Entry();
-
-                $entry->setTitle(htmlentities($image->getTitle(), ENT_COMPAT, 'utf-8'));
-                $entry->setLink($shareUrl);
-                $entry->setId($shareUrl);
-
-                //\D::dump($image->getTags());
-                if (count($image->getTags())) {
-                    foreach ($image->getTags() as $tag) {
-                        $entry->addCategory(array("term" => $tag));
-                    }
-                }
-
-                $entry->setDateCreated($image->getTimestamp()->sec);
-
-                $mainImage = $this->get('twig.extension.imagepush')->cdnImagepushFilter($image->getFile(), 'in', 463, 1548, $image->getId());
-                $mainImageWidth = $image->getThumbSize("in", 463, 1548, "w");
-                $mainImageHeight = $image->getThumbSize("in", 463, 1548, "h");
-
-                //$img_src = Images::getFileUrl($image, "m");
-                //$enclosure["uri"] = $mainImage;
-                //$enclosure["length"] = 1; //@filesize($file);
-                //$enclosure["type"] = $image["m_content_type"];
-                //$entry->setEnclosure($enclosure);
-
-                $description = '<a href="' . $shareUrl . '">';
-                $description .= '<img src="' . $mainImage . '" alt="' . htmlentities($image->getTitle(), ENT_COMPAT, 'utf-8') . '" border="0" width="' . $mainImageWidth . '" height="' . $mainImageHeight . '" />';
-                $description .= '</a>';
-
-                $entry->setDescription($description);
-
-                $feed->addEntry($entry);
-            }
-
-            return new Response($feed->export("rss"));
-        }
-
-        return new Response("No images found", 500);
+        return $response;
     }
 
     /**

@@ -176,7 +176,7 @@ class Image
     /**
      * Set timestamp
      *
-     * @param timestamp $timestamp
+     * @param \MongoTimestamp $timestamp
      */
     public function setTimestamp($timestamp)
     {
@@ -186,11 +186,21 @@ class Image
     /**
      * Get timestamp
      *
-     * @return timestamp $timestamp
+     * @return \MongoTimestamp $timestamp
      */
     public function getTimestamp()
     {
         return $this->timestamp;
+    }
+
+    /**
+     * Get timestamp as \DateTime (to be able to use in templates)
+     *
+     * @return \DateTime $datetime
+     */
+    public function getDatetime()
+    {
+        return new \DateTime("@" . $this->timestamp->__toString());
     }
 
     /**

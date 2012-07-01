@@ -73,7 +73,7 @@ class RobotController extends Controller
                 break;
         }
 
-        return array("content" => is_array($content) ? $content : (array) $content);
+        return array("content" => (array) $content);
     }
 
 }

@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Imagepush\ImagepushBundle\Entity\Image as RedisImage;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\Tag;
 use Imagepush\ImagepushBundle\Document\LatestTag;
@@ -23,11 +22,11 @@ class ImportController extends Controller
      */
     public function indexAction()
     {
-        $result = $this->importTags();
-        $result = $this->importLatestTags();
-        $result = $this->importLinks(); // indexed, failed
-        $result = $this->importImages();
-        $result = $this->importProcessedHashes();
+        $this->importTags();
+        $this->importLatestTags();
+        $this->importLinks(); // indexed, failed
+        $this->importImages();
+        $this->importProcessedHashes();
 
         echo "All done :)";
 

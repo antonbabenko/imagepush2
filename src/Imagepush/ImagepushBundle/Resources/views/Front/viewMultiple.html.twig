@@ -100,7 +100,7 @@
                   </div>
                   Fetched from
                   <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image._originalHost|replace({'www.': ''}) }}</a>
-                  on {{ image.timestamp|date('Y/m/d \\a\\t H:i') }}
+                  on {{ image.datetime|date('Y/m/d \\a\\t H:i') }}
                 </span>
                 {% endif %}
               </footer>

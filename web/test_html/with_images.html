@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Title goes here</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <!-- width and height -->
+        <img src="./images/img_girl.jpg" width="533" height="800" />
+        
+        <!-- width -->
+        <img src="./images/img_taxi.jpg" width="625" />
+        
+        <!-- height -->
+        <img src="./images/img_taxi.jpg" height="445" />
+        
+        <!-- small height -->
+        <img src="./images/img_taxi.jpg" height="45" />
+        
+        <!-- small width -->
+        <img src="./images/img_taxi.jpg" width="45" />
+        
+        <!-- No width and no height => skip this -->
+        <img src="./images/img_taxi.jpg" />
+        
+        <!-- Width and height exist, so HEAD request doesn't check is image actually exist -->
+        <img src="./images/wrong_url.jpg" width="625" height="445" />
+    </body>
+</html>

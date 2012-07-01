@@ -48,8 +48,8 @@
           <li><h1>{{image.title}}</h1></li>
         </ul>
         <div class="headerMeta">
-          <time datetime="{{image.timestamp|date(constant('DATE_ATOM'))}}">
-            <strong>Published:</strong> {{image.timestamp|date('Y/m/d \\a\\t H:i')}}
+          <time datetime="{{image.datetime|date(constant('DATE_ATOM'))}}">
+            <strong>Published:</strong> {{image.datetime|date('Y/m/d \\a\\t H:i')}}
           </time>
           <nav>
             {% if prevImage is not empty %}
@@ -90,29 +90,6 @@
       </footer>
     </article>
     
-{#
-    <?php /* ?>
-    <div id="collapsable_comments" style="display:none;">
-    <hr />
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-    var disqus_shortname = 'imagepush';
-    var disqus_identifier = '<?php echo "image_".$image["id"]; ?>';
-    var disqus_url = '<?php echo $image["_share_url"]; ?>';
-    var disqus_title = '<?php echo $image["title"]; ?>';
-    //var disqus_developer = 1;
-
-    // DON'T EDIT BELOW THIS LINE
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-    </script>
-    </div>
-
-    <p><a href="#" id="show_comments_link" onmousedown="if(document.getElementById('collapsable_comments').style.display == 'none'){ document.getElementById('collapsable_comments').style.display = 'block'; document.getElementById('show_comments_link').style.display = 'none'; }">Add comment</a>
-    <?php */?> #}
   </div>
 </section>
 

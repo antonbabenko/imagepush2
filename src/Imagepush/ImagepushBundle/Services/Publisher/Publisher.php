@@ -2,7 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Services\Publisher;
 
-use Imagepush\ImagepushBundle\Entity\Image;
+use Imagepush\ImagepushBundle\Document\Image;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Publish best image to the client
@@ -10,33 +11,49 @@ use Imagepush\ImagepushBundle\Entity\Image;
 class Publisher
 {
 
-    public function __construct(\AppKernel $kernel)
-    {
+    /**
+     * @var Container $container
+     */
+    public $container;
 
-        $this->kernel = $kernel;
-        $this->logger = $kernel->getContainer()->get('logger');
-        $this->redis = $kernel->getContainer()->get('snc_redis.default_client');
-        $this->imagesManager = $kernel->getContainer()->get('imagepush.images.manager');
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->logger = $container->get('logger');
+        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
     }
 
     public function publishLatestUpcomingImage($skipDelay = false)
     {
 
-        $data = $this->imagesManager->getImages("upcoming", 1);
-        \D::dump($data);
+        //$data = $this->imagesManager->getImages("upcoming", 1);
+        $images = $this->dm
+            ->getRepository('ImagepushBundle:Image')
+            ->findImages("upcoming", 1);
 
-        if (!empty($data[0]["id"])) {
-            $id = $data[0]["id"];
+        if (count($images)) {
+            $images = array_values($images);
+            $image = $images[0];
         } else {
             $this->logger->info("There are no upcoming images to publish now.");
 
             return false;
         }
 
-        $image = new Image($this->kernel);
-        $image->load($id);
-        $image->migrateUpcomingToAvailable();
-        //  self::publishSingleImage($id[0], $skipDelay);
+        //\D::dump($image->getId());
+        //\D::dump($image->getMongoId());
+
+        // update timestamp to now
+        $image->setTimestamp(time());
+
+        $image->setIsAvailable(true);
+        $image->setIsInProcess(false);
+
+        $this->dm->persist($image);
+        $this->dm->flush();
+        $this->dm->refresh($image);
+
+        return $image;
     }
 
 }

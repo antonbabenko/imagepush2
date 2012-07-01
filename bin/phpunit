@@ -1,4 +1,3 @@
 #!/bin/sh
 
-phpunit -c app --tap --debug
-# phpunit -c app --tap
+phpunit -c app --tap

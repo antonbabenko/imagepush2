@@ -1,5 +1,23 @@
 imagepush:
   settings:
+    # Image
+    image.allowed_content_types: ["image/gif", "image/jpeg", "image/jpg", "image/png"]
+    image.min_width: 450
+    image.min_height: 180
+    image.min_ratio: 0.3
+    image.max_ratio: 2.5
+    image.min_filesize: 20480   # 20KB in bytes
+    image.max_filesize: 8388608 # 8MB in bytes
+    
+    # Thumbs (Array of thumbnails to generate during processing)
+    thumbs: [["in", 463, 1548], ["out", 140, 140], ["in", 625, 2090]]
+        
+    fetcher.digg:
+      limit: 10 # Max items to fetch every time
+      min_diggs: 1 # Minimum diggs score to save. 4-5 is OK.
+      min_delay: 10 # 1800. Minimum delay between API requests. Set to 30 mins, but cron runs every 5 minutes, so there are 6 attempts in each interval
+    
+    # Tags
     twitter.min_title_length: 15
     reddit.min_subreddit_score: 5
     
