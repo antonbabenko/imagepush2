@@ -162,28 +162,28 @@ class Processor
 
             foreach ($functions as $function) {
 
-                $imagesUrl = $content->htmlContent->$function();
+                $images = $content->htmlContent->$function();
 
                 //\D::dump($function);
-                //\D::dump($imagesUrl);
+                //\D::dump($images);
 
-                if ($imagesUrl) {
+                if ($images) {
 
-                    foreach ($imagesUrl as $imageUrl) {
+                    foreach ($images as $url) {
 
-                        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($imageUrl["url"])) {
+                        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($url)) {
                             continue;
                         }
 
                         $contentInside = $this->container->get('imagepush.processor.content');
-                        $contentInside->get($imageUrl["url"]);
+                        $contentInside->get($url);
 
                         if (!$contentInside->isImageType()) {
                             continue;
                         }
 
                         if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
-                            $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $imageUrl["url"]));
+                            $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
 
                             continue;
                         }
@@ -191,9 +191,9 @@ class Processor
                         $result = $this->processFoundImage($image, $contentInside);
 
                         if ($result) {
-                            $this->logger->warn(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $imageUrl["url"]));
+                            $this->logger->warn(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $url));
 
-                            $link = new Link($imageUrl["url"], Link::INDEXED);
+                            $link = new Link($url, Link::INDEXED);
                             $this->dm->persist($link);
                             $this->dm->flush();
 
@@ -207,7 +207,7 @@ class Processor
 
         \D::dump($result);
 
-        $result = true;
+        //$result = true;
 
         /**
          * No images found - remove link and image key
@@ -294,9 +294,10 @@ class Processor
      */
     public function generateRequiredThumbs(Image $image)
     {
-        $thumbTypes = Config::$thumbTypes;
+        $thumbs = $this->container->getParameter('imagepush.thumbs');
+        //Config::$thumbTypes;
 
-        foreach ($thumbTypes as $attributes) {
+        foreach ($thumbs as $attributes) {
             $url = $this->container
                 ->get('twig.extension.imagepush')
                 ->imagepushFilter('i/' . $image->getFile(), $attributes[0], $attributes[1], $attributes[2], $image->getId());

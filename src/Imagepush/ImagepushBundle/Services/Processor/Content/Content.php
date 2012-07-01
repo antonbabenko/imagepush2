@@ -2,7 +2,6 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor\Content;
 
-use Imagepush\ImagepushBundle\Services\Processor\Config;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Content
@@ -86,7 +85,7 @@ class Content
 
     public function isImageType()
     {
-        return (!empty($this->data["Content-type"]) && in_array($this->data["Content-type"], Config::$allowedImageContentTypes));
+        return (!empty($this->data["Content-type"]) && in_array($this->data["Content-type"], (array) $this->container->getParameter('imagepush.image.allowed_content_types')));
     }
 
     public function isHTMLType()
@@ -98,7 +97,8 @@ class Content
     {
         $this->link = $link;
         $response = $this->fetcher->getRequest($link);
-        //\D::dump($response);
+        //\D::debug($link);
+        //\D::debug($response);
 
         if (is_array($response)) {
             $this->data = $response;
@@ -118,6 +118,7 @@ class Content
      */
     public function head($link)
     {
+
         return $this->fetcher->headRequest($link);
     }
 

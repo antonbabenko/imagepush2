@@ -1,0 +1,27 @@
+{% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+    <id>http://imagepush.to/</id>
+    <link type="text/html" rel="alternate" href="{{ url('index') }}"/>
+    <link type="application/atom+xml" rel="self" href="{{ url('atomFeed') }}"/>
+    <title>Imagepush.to - Best images hourly</title>
+    <updated>{{ 'now'|date('c') }}</updated>
+    {% for imageKey, image in images %}
+    <entry>
+        <id>{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</id>
+        <published>{{ image.timestamp|date('c') }}</published>
+        <updated>{{ image.timestamp|date('c') }}</updated>
+        <link type="text/html" rel="alternate" href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
+        <title>{{ image.title }}</title>
+        <author>
+            <name>{{ image._originalHost|replace({'www.': ''}) }}</name>
+            <uri>{{ image.link }}</uri>
+        </author>
+        <content type="html">
+            &lt;a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}"&gt;
+            &lt;img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 463, 1548, "w") }}" height="{{ image.thumbSize("in", 463, 1548, "h") }}" border="0" /&gt;
+            &lt;/a&gt;
+        </content>
+    </entry>
+    {% endfor %}
+</feed>

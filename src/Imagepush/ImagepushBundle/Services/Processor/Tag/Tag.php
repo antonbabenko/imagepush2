@@ -2,7 +2,6 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor\Tag;
 
-//use Imagepush\ImagepushBundle\Services\Processor\Config;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\LatestTag;
 use Imagepush\ImagepushBundle\Document\Tag as DocumentTag;
@@ -33,7 +32,6 @@ class Tag
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        //$this->tagsManager = $container->get('imagepush.tags.manager');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
     }
 
@@ -91,7 +89,7 @@ class Tag
                 $latestTag = new LatestTag();
                 $latestTag->setTimestamp(time());
                 $latestTag->setTag($tag);
-                \D::dump($latestTag);
+                //\D::dump($latestTag);
 
                 $tag->addImagesRef($image);
                 $tag->incUsedInUpcoming(1);

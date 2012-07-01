@@ -52,22 +52,6 @@ class ImageRepository extends DocumentRepository
     /**
      * @return array()|false
      */
-    /* public function getOneImage($id)
-      {
-
-      $key = $this->getImageKey($id);
-
-      if ($this->redis->sismember('available_images', $key)) {
-      $image = $this->redis->hgetall($key);
-      return $this->normalizeImage($image);
-      } else {
-      return false;
-      }
-      } */
-
-    /**
-     * @return array()|false
-     */
     public function getOneImageRelatedToTimestamp($direction, $timestamp)
     {
 

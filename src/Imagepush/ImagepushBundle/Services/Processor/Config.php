@@ -27,9 +27,9 @@ class Config
     /**
      * Set $modifyDB to false for prod.
      */
-    public static $modifyDB = true;
-    //static $modifyDB = false;
+    //public static $modifyDB = true;
 
+    /* // moved
     public static $allowedImageContentTypes = array("image/gif", "image/jpeg", "image/jpg", "image/png");
     public static $minWidth = 450;
     public static $minHeight = 180;
@@ -37,16 +37,18 @@ class Config
     public static $maxRatio = 2.5;
     public static $minFilesize = 20480;   // 20KB in bytes
     public static $maxFilesize = 8388608; // 8MB in bytes
+    */
 
     /**
      * Array of thumbnails to generate during processing
      * @var array
      */
+    /* // moved
     public static $thumbTypes = array(
         array("in", 463, 1548),
         array("out", 140, 140),
         array("in", 625, 2090)
-    );
+    );*/
 
     /*
       static $thumbTypes = array(

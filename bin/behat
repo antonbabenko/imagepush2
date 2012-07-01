@@ -1,3 +1,1 @@
-#!/bin/sh
-
-./app/console --env=test behat @PublicBundle
+../vendor/behat/behat/bin/behat

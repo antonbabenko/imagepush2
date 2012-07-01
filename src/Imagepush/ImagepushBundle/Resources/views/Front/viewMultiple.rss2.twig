@@ -1,0 +1,27 @@
+{% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Imagepush.to - Best images hourly</title>
+        <link>http://imagepush.to/</link>
+        <description>Best images hourly</description>
+        <atom:link href="{{ url('rss2Feed') }}" rel="self" type="application/rss+xml" />
+        <pubDate>{{ 'now'|date(constant('DATE_RFC2822')) }}</pubDate>
+        <managingEditor>anton@imagepush.to (Artificial Intelligence)</managingEditor>
+        <language>en</language>
+        {% for imageKey, image in images %}
+        <item>
+            <title><![CDATA[{{ image.title|raw }}]]></title>
+            <link>{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</link>
+            <description><![CDATA[{% spaceless %}
+                <a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}">
+                    <img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 463, 1548, "w") }}" height="{{ image.thumbSize("in", 463, 1548, "h") }}" border="0" />
+                </a>
+                {% endspaceless %}]]></description>
+            <guid isPermaLink="false">{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</guid>
+            <pubDate>{{ image.timestamp|date('c') }}</pubDate>
+            <enclosure url="{{ macros.thumb_url(image, "in", 463, 1548) }}"></enclosure>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>

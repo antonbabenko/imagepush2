@@ -13,7 +13,7 @@ services:
     
     # Fetcher
     imagepush.fetcher.digg:
-        class: Imagepush\ImagepushBundle\Services\Fetcher\Digg\DiggFetcher
+        class: Imagepush\ImagepushBundle\Services\Fetcher\DiggFetcher
         arguments: [@service_container]
 
     imagepush.fetcher.content:

@@ -2,7 +2,6 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor\Content;
 
-use Imagepush\ImagepushBundle\Services\Processor\Config;
 use Imagepush\ImagepushBundle\Services\Processor\Content\Content;
 use Imagepush\ImagepushBundle\External\CustomStrings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,14 +38,12 @@ class Html
     /**
      * Get DOM object for the content
      * 
-     * @param boolean $reload
-     * 
      * @return \DOMDocument $dom
      */
-    public function getDom($reload = false)
+    public function getDom()
     {
-        if (!$this->dom || $reload) {
-
+        if (!$this->dom) {
+            //\D::debug($this->content->getContent());
             $content = $this->content->getContent();
 
             libxml_use_internal_errors(true); // to allow html5 tags
@@ -69,7 +66,6 @@ class Html
         $domxpath = new \DOMXPath($this->getDom());
         $filtered[] = $domxpath->query("//link[@rel='image_src']");
         $filtered[] = $domxpath->query("//meta[@property='og:image']");
-        //\D::dump($filtered);
 
         if (count($filtered)) {
             foreach ($filtered as $blocks) {
@@ -77,9 +73,7 @@ class Html
 
                     ($href = $link->getAttribute("content")) || ($href = $link->getAttribute("href"));
 
-                    $imgUrl = $this->generateFullUrl($href, $this->content->getLink());
-
-                    $images[] = array("url" => $imgUrl, "xpath" => $link->getNodePath());
+                    $images[] = $this->generateFullUrl($href, $this->content->getLink());
                 }
             }
         }
@@ -88,7 +82,7 @@ class Html
     }
 
     /**
-     * Find large image, which pass the checking (sizes, format, ratio) and save it
+     * Find large images, which has correct aspect ratio and min width/height
      */
     public function getBestImageFromDom()
     {
@@ -96,17 +90,16 @@ class Html
         /**
          * Priority for the best image on the page:
          * 1) get all img inside body
-         * 2) keep images, which have aspect ratio between 0.3 and 2.5 AND width >= 450
+         * 2) keep images, which have good aspect ratio and min width/height
          * 3) get xpath for selected large images
-         * 4) find tags inside content area by patterns ("labels:", "keywords:", ...)
-         *
+         * 4) todo: find tags inside content area by patterns ("labels:", "keywords:", ...)
          */
         $domxpath = new \DOMXPath($this->getDom());
         $filtered = $domxpath->query("//img[@src]");
 
         $images = array();
 
-        //\D::dump($filtered);
+        //\D::debug($filtered);
 
         if (!count($filtered)) {
             return false;
@@ -123,65 +116,83 @@ class Html
                 continue;
             }
 
-            $imgUrl = $this->generateFullUrl($src, $this->content->getLink());
+            $url = $this->generateFullUrl($src, $this->content->getLink());
 
-            //\D::dump($imgUrl);
+            //\D::debug($url);
             //\D::dump($w);
             //\D::dump($h);
             //\D::dump($r);
-            // Push to array images with good ratio, width, height or when width or height is empty (banners, placeholders, etc)
-            if ($r && $r >= Config::$minRatio && $r <= Config::$maxRatio && $w >= Config::$minWidth && $h >= Config::$minHeight) {
-                $images[] = array("url" => $imgUrl, "xpath" => $link->getNodePath());
+            // Check image ratio, min width, min height
+            if ($r &&
+                $r >= $this->container->getParameter('imagepush.image.min_ratio') &&
+                $r <= $this->container->getParameter('imagepush.image.max_ratio') &&
+                $w >= $this->container->getParameter('imagepush.image.min_width') &&
+                $h >= $this->container->getParameter('imagepush.image.min_height')) {
+                $images[] = $url;
                 continue;
             }
 
-            // do HEAD request and check min filesize and content-type
-            if ((!$w || !$h) &&
-                ($imgSrcHead = $this->content->head($imgUrl)) &&
-                in_array($imgSrcHead["Content-type"], Config::$allowedImageContentTypes) &&
-                $imgSrcHead["Content-length"] >= Config::$minFilesize &&
-                $imgSrcHead["Content-length"] <= Config::$maxFilesize) {
-                $images[] = array("url" => $imgUrl, "xpath" => $link->getNodePath());
-                continue;
+            // Check min filesize and allowed content type (via HEAD request)
+            if ($w || $h) {
+                $imgSrcHead = $this->content->head($url);
+
+                //\D::debug($imgSrcHead);
+                if (in_array($imgSrcHead["Content-type"], (array) $this->container->getParameter('imagepush.image.allowed_content_types')) &&
+                    $imgSrcHead["Content-length"] >= $this->container->getParameter('imagepush.image.min_filesize') &&
+                    $imgSrcHead["Content-length"] <= $this->container->getParameter('imagepush.image.max_filesize')) {
+                    $images[] = $url;
+                    //echo $url . "====\n";
+                    continue;
+                }
             }
         }
 
-        //\D::dump($images);
-        // fetch images
+        //\D::debug($images);
+
         if (!count($images)) {
             $message = sprintf("No suitable image found (among %d available) on this link: %s", count($filtered), $this->content->getLink());
-            $this->kernel->getContainer()->get('logger')->warn($message);
+            $this->container->get('logger')->warn($message);
+
+            return false;
         }
 
-        return (!empty($images) ? $images : false);
+        return $images;
     }
 
     /**
      * Generate full url (with scheme, host, path)
      * 
-     * @param sting  $href        Link to modify
-     * @param string $fetchedLink Link, where this $href was found
+     * @param string  $link    Link to modify
+     * @param string $location Full URI where this $href was found
      * 
      * @return string 
      */
-    public function generateFullUrl($href, $fetchedLink)
+    public function generateFullUrl($link, $location)
     {
 
-        // Is full url?
-        if (preg_match('@^' . CustomStrings::$urlPattern . '$@ui', $href)) {
-            $fullUrl = $href;
-        } else {
-            if (preg_match('@^/@', $href)) {
-                // link is absolute, so get the host name
-                $prefix = parse_url($fetchedLink, PHP_URL_SCHEME) . "://" . parse_url($fetchedLink, PHP_URL_HOST);
-            } else {
-                // link is relative
-                $prefix = dirname($fetchedLink) . "/";
-            }
-            $fullUrl = $prefix . $href;
+        $prefixHost = $prefix = "";
+
+        // Complete link
+        if (preg_match('@^' . CustomStrings::$urlPattern . '$@ui', $link)) {
+            return $link;
         }
 
-        return $fullUrl;
+        // Link starts with "/"
+        if (preg_match('@^/@', $link)) {
+            // Get the complete host name
+            preg_match("@^.*://[^/]+/@ui", $location, $host);
+            $prefixHost = $host[0];
+        } elseif (preg_match('@^\./@', $link)) { // Link is relative to current location
+            $link = str_replace("./", "/", $link);
+        }
+
+        if ($prefixHost != "") {
+            $prefix = $prefixHost;
+        } else {
+            $prefix = (preg_match("@/$@ui", $location) ? $location : dirname($location) . "/");
+        }
+
+        return $prefix . ltrim($link, "/");
     }
 
 }

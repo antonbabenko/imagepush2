@@ -76,6 +76,9 @@
     target=/bundles/Symfony/Bundle/DoctrineMongoDBBundle
     version=origin/2.0
 
+[goutte]
+    git=http://github.com/fabpot/Goutte.git
+
 [digg]
     git=http://github.com/digg/Services_Digg2.git
 
@@ -100,7 +103,7 @@
 ;    git=http://github.com/antonbabenko/LiipImagineBundle.git
 ;    target=/bundles/liip_anton/ImagineBundle
 
-[aws-sdk]
+?version [aws-sdk]
     git=http://github.com/amazonwebservices/aws-sdk-for-php
     version=1.5.5
     ; 1.5.0.1 worked well before!
@@ -121,22 +124,33 @@
     git=http://github.com/stof/StofDoctrineExtensionsBundle.git
     target=/bundles/Stof/DoctrineExtensionsBundle
 
-[zend-feed]
-    git=http://github.com/KnpLabs/zend-feed.git
-    target=Zend/Feed
+;[zend-feed]
+;    git=http://github.com/KnpLabs/zend-feed.git
+;    target=Zend/Feed
 
-[zend-loader]
-    git=http://github.com/KnpLabs/zend-loader.git
-    target=Zend/Loader
+;[zend-loader]
+;    git=http://github.com/KnpLabs/zend-loader.git
+;    target=Zend/Loader
 
-[zend-stdlib]
-    git=http://github.com/KnpLabs/zend-stdlib.git
-    target=Zend/Stdlib
+;[zend-stdlib]
+;    git=http://github.com/KnpLabs/zend-stdlib.git
+;    target=Zend/Stdlib
 
-[zend-date]
-    git=http://github.com/KnpLabs/zend-date.git
-    target=Zend/Date
+;[zend-date]
+;    git=http://github.com/KnpLabs/zend-date.git
+;    target=Zend/Date
 
-[zend-locale]
-    git=http://github.com/KnpLabs/zend-locale.git
-    target=Zend/Locale
+;[zend-locale]
+;    git=http://github.com/KnpLabs/zend-locale.git
+;    target=Zend/Locale
+
+;[zend-uri]
+;    git=http://github.com/KnpLabs/zend-uri.git
+;    target=Zend/Uri
+
+;[zend-validator]
+;    git=http://github.com/KnpLabs/zend-validator.git
+;    target=Zend/Validator
+
+;[zend-registry]
+;    git=http://github.com/KnpLabs/zend-registry.git

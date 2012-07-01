@@ -12,6 +12,12 @@ class CustomStrings
     public static $forbiddenEndingsPattern =
         '@[{(\[]\s*(nsfw)+\s*[)\]}]@ui';
     public static $urlPattern =
+        '(https?://([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
+
+    /**
+     * @var $urlPatternInText URI, which is usually in title (protocol part is not required)
+     */
+    public static $urlPatternInText =
         '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
     public static $removeStart = '
     The Underfold
@@ -150,13 +156,13 @@ class CustomStrings
         $endsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeEnd))));
 
         // just url
-        $patterns[] = '@^' . self::$urlPattern . '$@ui';
+        $patterns[] = '@^' . self::$urlPatternInText . '$@ui';
 
         // "read more"
-        $patterns[] = '@(Read more:*\s*' . self::$urlPattern . '*\s*)$@ui';
+        $patterns[] = '@(Read more:*\s*' . self::$urlPatternInText . '*\s*)$@ui';
 
         // separator with url
-        $patterns[] = '@(' . self::$separatorPattern . '\s*' . self::$urlPattern . '*\s*)$@ui';
+        $patterns[] = '@(' . self::$separatorPattern . '\s*' . self::$urlPatternInText . '*\s*)$@ui';
 
         // (pics, images, etc)
         $patterns[] = self::$generalEndingsPattern;

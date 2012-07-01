@@ -3,7 +3,7 @@
 namespace Imagepush\ImagepushBundle\Services\Processor\Tag;
 
 use Imagepush\ImagepushBundle\Document\Image;
-use Imagepush\ImagepushBundle\Services\Fetcher\Digg\ImagepushDigg;
+use Imagepush\ImagepushBundle\Services\Digg\ImagepushDigg;
 
 class DiggTag extends Tag implements TagInterface
 {
