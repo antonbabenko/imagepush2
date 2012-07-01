@@ -7,7 +7,7 @@ class ImagepushAmazonS3 extends \AmazonS3
 
     public function __construct()
     {
-        define("AWS_CERTIFICATE_AUTHORITY", true);
+        //define("AWS_CERTIFICATE_AUTHORITY", true);
 
         parent::__construct();
 

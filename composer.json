@@ -41,7 +41,8 @@
         "stof/doctrine-extensions-bundle": "1.0.x-dev",
         
         "digg/Services_Digg2": "*",
-        "fabpot/Goutte": "*"
+        "fabpot/Goutte": "*",
+        "guzzle/guzzle": "2.6.*"
         
     },
     
@@ -94,7 +95,8 @@
     
     "autoload": {
         "psr-0": {
-            "": "src/"
+            "": "src/",
+            "Goutte": "vendor/fabpot/Goutte/"
         }
     },
     
