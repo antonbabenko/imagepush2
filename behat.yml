@@ -4,8 +4,8 @@ default:
         paths: false
     context:
       class: 'Imagepush\ImagepushBundle\Features\Context\FeatureContext'
-      parameters:
-        base_url:  'http://test-anton.imagepush.to'
+      #parameters:
+        #base_url:  'http://dev-anton.imagepush.to'
     extensions:
       Behat\Symfony2Extension\Extension:
         mink_driver: true
@@ -15,21 +15,5 @@ default:
           debug: true
       Behat\MinkExtension\Extension:
         default_session: symfony2
-        base_url:  'http://test-anton.imagepush.to'
+        base_url:  'http://dev-anton.imagepush.to'
         #goutte:    ~
-
-#
-#simple:
-#    filters:
-#        tags: '~@web'
-
-#web:
-#    filters:
-#        tags: '@web'
-#    context:
-#        class: 'Mcash\PublicBundle\Features\Context\FeatureContext'
-#    extensions:
-#        Behat\Symfony2Extension\Extension:
-#            mink_driver: true
-#        Behat\MinkExtension\Extension:
-#            default_session: 'symfony2'

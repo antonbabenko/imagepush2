@@ -200,7 +200,8 @@ class Image
      */
     public function getDatetime()
     {
-        return new \DateTime("@" . $this->timestamp->__toString());
+        // @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
+        return $this->timestamp instanceof \MongoTimestamp ? new \DateTime("@" . $this->timestamp->__toString()) : new \DateTime;
     }
 
     /**
