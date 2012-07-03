@@ -178,8 +178,11 @@
     <script src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
     {% endraw %}
     
-    {# <?php a_include_javascripts(); ?> #}
-
   </body>
 </html>
 {# {% endspaceless %} #}
+{#
+{{ app.request.attributes.get('_controller') }}
+
+{{ app.request.getUri }}
+#}

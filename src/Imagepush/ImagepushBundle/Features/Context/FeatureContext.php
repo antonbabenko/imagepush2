@@ -5,24 +5,18 @@ namespace Imagepush\ImagepushBundle\Features\Context;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
 use Behat\MinkExtension\Context\MinkContext;
-
+use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Behat\Context\BehatContext,
     Behat\Behat\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
 
-//
-// Require 3rd-party libraries here:
-//
-//   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
-//
+require_once 'PHPUnit/Autoload.php';
+require_once 'PHPUnit/Framework/Assert/Functions.php';
 
-/**
- * Feature context.
- */
-class FeatureContext extends MinkContext implements KernelAwareInterface
+class FeatureContext extends RawMinkContext implements KernelAwareInterface
 {
+
     private $kernel;
     private $parameters;
 
@@ -34,6 +28,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function __construct(array $parameters)
     {
         $this->parameters = $parameters;
+
+        $this->useContext('mink', new MinkContext());
+        //$this->useContext('web_api', new WebApiContext($this->parameters["base_url"]));
     }
 
     /**
@@ -47,16 +44,4 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->kernel = $kernel;
     }
 
-//
-// Place your definition and hook methods here:
-//
-//    /**
-//     * @Given /^I have done something with "([^"]*)"$/
-//     */
-//    public function iHaveDoneSomethingWith($argument)
-//    {
-//        $container = $this->kernel->getContainer();
-//        $container->get('some_service')->doSomethingWith($argument);
-//    }
-//
 }
