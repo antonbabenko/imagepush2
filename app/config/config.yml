@@ -59,6 +59,7 @@ doctrine_mongodb:
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
     hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
     default_database: imagepush_%kernel.environment%
+    #default_database: imagepush_dev
     document_managers:
         default:
             metadata_cache_driver: apc
