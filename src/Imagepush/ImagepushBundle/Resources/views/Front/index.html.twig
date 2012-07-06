@@ -1,5 +1,11 @@
 {% extends "ImagepushBundle::layoutFront.html.twig" %}
 
+{% block og_image %}
+{% if images.0 is defined %}
+<meta property="og:image" content="{{ macros.thumb_url(images.0, "in", 463, 1548, true) }}" />
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 {% if images %}

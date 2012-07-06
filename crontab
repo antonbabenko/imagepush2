@@ -1,2 +1,3 @@
 # Fetch from digg to run every 5 mins, but minDelay should be 30 mins. 6 attempts if it fails.
 */5  * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:fetch-from-digg
+*/60 * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:generate:sitemap --spaceless=1

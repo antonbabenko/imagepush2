@@ -99,6 +99,11 @@ services:
         arguments: [@service_container]
         tags:
             - { name: twig.extension }
+    twig.extension.sitemap:
+        class: Imagepush\SitemapBundle\Twig\Extension\SitemapExtension
+        tags:
+            - { name: twig.extension }
+        arguments: ["%site_url%"]
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:

@@ -9,9 +9,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * Image
  * 
- * @MongoDB\Document(collection="images", repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
+ * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
+ *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"})
  * })
@@ -200,8 +201,9 @@ class Image
      */
     public function getDatetime()
     {
-        // @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
-        return $this->timestamp instanceof \MongoTimestamp ? new \DateTime("@" . $this->timestamp->__toString()) : new \DateTime;
+        return new \DateTime("@" . $this->timestamp->__toString());
+        // done... @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
+        //return $this->timestamp instanceof \MongoTimestamp ? new \DateTime("@" . $this->timestamp->__toString()) : new \DateTime;
     }
 
     /**

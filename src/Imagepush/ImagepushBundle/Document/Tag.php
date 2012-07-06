@@ -8,9 +8,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * Tag
  * 
- * @MongoDB\Document(collection="tags", repositoryClass="Imagepush\ImagepushBundle\Document\TagRepository")
+ * @MongoDB\Document(collection="tags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\TagRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"text"="asc"}),
+ *   @MongoDB\Index(keys={"usedInAvailable"="asc"}),
+ *   @MongoDB\Index(keys={"usedInUpcoming"="asc"}),
  *   @MongoDB\UniqueIndex(keys={"text"="asc"}, dropDups=true)
  * })
  */

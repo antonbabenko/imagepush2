@@ -25,7 +25,7 @@ class ImportController extends Controller
         $this->importTags();
         $this->importLatestTags();
         $this->importLinks(); // indexed, failed
-        $this->importImages();
+        $this->importImages(999999);
         $this->importProcessedHashes();
 
         echo "All done :)";
@@ -217,7 +217,7 @@ class ImportController extends Controller
 
                     $dm->persist($new);
 
-                    if (++$i % 1000 == 0) {
+                    if (++$i % 300 == 0) {
                         $dm->flush();
                         $dm->clear();
                     }
@@ -245,7 +245,7 @@ class ImportController extends Controller
         $dm->getDocumentCollection("ImagepushBundle:LatestTag")->drop();
 
         // latest trend: get last 300 from the list and count how often they used
-        $latestTags = $redis->lrange("latest_tags", -300, -1); // put 0 instead of -300 for complete import
+        $latestTags = $redis->lrange("latest_tags", 0, -1); // put 0 instead of -300 for complete import
         //\D::dump($latestTags);
         //die();
         if (count($latestTags)) {
@@ -285,9 +285,6 @@ class ImportController extends Controller
         $i = 0;
 
         $dm->getDocumentCollection("ImagepushBundle:Link")->drop();
-
-//    $redis->sismember('indexed_links', $item->link) &&
-//    $redis->sismember('failed_links', $item->link)
 
         $allLinks = array(
             "indexed" => $redis->smembers("indexed_links"),
