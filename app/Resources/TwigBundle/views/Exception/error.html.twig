@@ -1,0 +1,24 @@
+{% extends "ImagepushBundle::layoutFront.html.twig" %}
+
+{% block content %}
+
+<section id="mainContent">
+  <div class="contentWrapper">
+    <article>
+      <header>
+        <ul>
+          <li><a href="/">Home</a> /</li>
+          <li><h1>Error {{ status_code }}</h1></li>
+        </ul>
+      </header>
+
+      <h2>This is not the page you are looking for...</h2>
+      <p>{{ exception.message|e|replace({"\n": '<br/ >'})|format_file_from_text }}
+
+    </article>
+  </div>
+</section>
+
+{% render "ImagepushBundle:Front:_thumbBox" with {'withAd': false} %}
+
+{% endblock %}
