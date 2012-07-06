@@ -61,7 +61,7 @@ doctrine_mongodb:
     default_database: imagepush_%kernel.environment%
     document_managers:
         default:
-            metadata_cache_driver: array
+            metadata_cache_driver: apc
             auto_mapping: true
             mappings:
                 StofDoctrineExtensionsBundle: false
@@ -145,81 +145,3 @@ knp_gaufrette:
     filesystems:
         images:
             adapter:    %filesystems_images_adapter%
-#
-#services:
-#    imagepush.images.manager:
-#        class: Imagepush\ImagepushBundle\Entity\ImagesManager
-#        arguments: [@router, @snc_redis.default_client, @imagepush.tags.manager]
-#
-#    imagepush.tags.manager:
-#        class: Imagepush\ImagepushBundle\Entity\TagsManager
-#        arguments: [@snc_redis.default_client]
-#
-#    # Robot services
-#    imagepush.fetcher.digg:
-#        class: Imagepush\ImagepushBundle\Services\Fetcher\Digg\DiggFetcher
-#        arguments: [@service_container]
-#
-#    imagepush.fetcher.content:
-#        class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
-#        arguments: [@service_container]
-#
-#    imagepush.processor:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Processor
-#        arguments: [@service_container, %kernel.debug%]
-#
-#    imagepush.processor.content:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Content\Content
-#        arguments: [@service_container]
-#        prototype: true
-#
-#    imagepush.processor.content.html:
-#        class: Imagepush\ImagepushBundle\Services\Processor\Content\Html
-#        arguments: [@service_container]
-#        prototype: true
-#
-#    imagepush.processor.tag:
-#        class: Imagepush\ImagepushBundle\Services\Processor\TagProcessor
-#        arguments: [@service_container]
-#
-#    imagepush.publisher:
-#        class: Imagepush\ImagepushBundle\Services\Publisher\Publisher
-#        arguments: [@service_container]
-#
-#    # Amazon S3
-#    imagepush.amazon.s3:
-#        class: Imagepush\ImagepushBundle\Imagine\ImagepushAmazonS3
-#
-#    #
-#    imagepush.imagine.controller:
-#      class: Imagepush\ImagepushBundle\Imagine\CustomController
-#      arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, @doctrine.odm.mongodb.document_manager, @liip_imagine, @logger, %kernel.debug%]
-#      
-#    # Imagine data loader (via Gaufrette with name "images")
-#    imagepush.imagine.files.data.loader:
-#        class: Imagepush\ImagepushBundle\Imagine\CustomDataLoader
-#        arguments: [@liip_imagine, %liip_imagine.formats%, @gaufrette.images_filesystem]
-#        tags:
-#            - { name: liip_imagine.data.loader, loader: custom_data_loader }
-# 
-#    # Imagine cache resolver (via Gaufrette with name "images")
-#    imagepush.imagine.files.cache.resolver:
-#        class: Imagepush\ImagepushBundle\Imagine\CustomCacheResolver
-#        arguments: [@service_container, @gaufrette.images_filesystem]
-#        tags:
-#            - { name: liip_imagine.cache.resolver, resolver: custom_cache_resolver }
-#
-#    # Twig
-#    twig.extension.imagepush:
-#        class: Imagepush\ImagepushBundle\Templating\ImagepushExtension
-#        arguments: [@service_container]
-#        tags:
-#            - { name: twig.extension }
-#    twig.extension.debug:
-#        class: Twig_Extensions_Extension_Debug
-#        tags:
-#            - { name: twig.extension }
-#    twig.extension.text:
-#        class: Twig_Extensions_Extension_Text
-#        tags:
-#            - { name: twig.extension }

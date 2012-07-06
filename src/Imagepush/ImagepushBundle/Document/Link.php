@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Original links (indexed, failed, blocked).
  * 
- * @MongoDB\Document(collection="link", repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
+ * @MongoDB\Document(collection="link", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"link"="asc"}),
  *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true)

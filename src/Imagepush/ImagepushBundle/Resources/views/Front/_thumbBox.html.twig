@@ -11,7 +11,7 @@
     <header>
       <h3>
         {% if initialTags|length == 0 %}
-        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag.0|url_encode()}) }}">{{group.tag.0}}</a>
+        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag|url_encode()}) }}">{{group.tag}}</a>
         {% else %}
         RELATED IMAGES BY {{group.usedTags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
 
@@ -28,6 +28,7 @@
       <ul>
         {% for image in group.images %}
 
+        {#
         {% if withAd and currentImagePlacement == bannerPlacement %}
         <li>
           <div class="adWrapper">
@@ -35,6 +36,7 @@
           </div>
         </li>
         {% else %}
+        #}
         <li>
           <div class="thumbWrapper">
             <div class="details">
@@ -46,10 +48,12 @@
             </a>
           </div>
         </li>
+        {#
         {% endif %}
 
         {% set currentImagePlacement = currentImagePlacement + 1 %}
-
+        #}
+        
         {% endfor %}
       </ul>
     </section>

@@ -21,6 +21,9 @@
             <guid isPermaLink="false">{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</guid>
             <pubDate>{{ image.timestamp|date('c') }}</pubDate>
             <enclosure url="{{ macros.thumb_url(image, "in", 463, 1548) }}"></enclosure>
+            {% for tag in image.tags %}
+            <category><![CDATA[{{tag}}]]></category>
+            {% endfor %}
         </item>
         {% endfor %}
     </channel>

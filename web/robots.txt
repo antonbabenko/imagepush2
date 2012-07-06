@@ -10,5 +10,5 @@ Disallow: /tag/*/upcoming
 User-agent: Mediapartners-Google
 Disallow:
 
-Sitemap: http://imagepush.to/sitemap.xml
+Sitemap: http://imagepush.to/sitemap.xml.gz
 

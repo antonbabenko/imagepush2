@@ -217,13 +217,13 @@ class FrontController extends Controller
                 return;
             }
 
-            $tags = array_flip($tags);
+            $tags = array_keys($tags);
 
             $groupTags = true;
             $maxImages = 4;
         }
 
-
+        //$tagImages = 
         $allImages = $usedImages = array();
         $totalImages = 0;
 
@@ -232,68 +232,75 @@ class FrontController extends Controller
             $usedImages[] = $skipImageId;
         }
 
-        foreach ($tags as $tagId => $tag) {
+        //\D::dump($tags);
+        // Get all images by tags
+        $images = $dm
+            ->getRepository('ImagepushBundle:Image')
+            ->findImages("current", 10 * count($tags), array("tag" => $tags));
+        $images = array_values($images);
 
-            $tagImages = $foundTags = array();
+        //\D::dump($images);
 
-            if (count($allImages) >= 10) {
-                break;
-            }
+        if ($groupTags) {
+            // Group by tags
+            foreach ($tags as $tag) {
 
-            // make just one search, if thumbs will be shown in one merged box
-            if (!$groupTags) {
-                $lookupTags = $tags;
-            } else {
-                $lookupTags = array($tag);
-            }
+                $tagImages = array();
 
-            $images = $dm
-                ->getRepository('ImagepushBundle:Image')
-                ->findImages("current", 10 * count($lookupTags), array("tag" => $lookupTags));
+                // Max 10 groups of images
+                if (count($allImages) >= 10) {
+                    break;
+                }
 
-            if (count($images) >= 3) {
-                // make sure that each image is shown just once in all tags, if image belongs to multiple tags
-                foreach (array_values($images) as $image) {
+                // Make sure that each image is shown just once, if image belongs to multiple tags
+                foreach ($images as $image) {
 
-                    if (count($tagImages) == $maxImages) {
+                    if (count($tagImages) >= $maxImages) {
                         break;
                     }
 
                     if (!in_array($image->getId(), $usedImages)) {
-                        $tagImages[] = $image;
-                        $usedImages[] = $image->getId();
-                        $foundTags = array_merge($foundTags, $image->getTags());
+                        if (in_array($tag, $image->getTags())) {
+                            $tagImages[] = $image;
+                            $usedImages[] = $image->getId();
+                        }
                     }
                 }
-                //\D::dump($tagImages);
-                //\D::dump($foundTags);
 
-                if (count($tagImages) >= 3) {
-                    $foundTags = array_count_values($foundTags);
-                    arsort($foundTags);
-                    $foundTags = array_slice(array_flip($foundTags), 0, 5);
+                // Skip groups where not enough images
+                if (count($tagImages) < $maxImages) {
+                    continue;
+                }
 
-                    $allImages[] = array("tag" => $foundTags, "images" => $tagImages);
+                $allImages[] = array("tag" => $tag, "images" => $tagImages);
+            }
+        } else {
+            // Do not group images, but order by timestamp
+            $tagImages = $foundTags = array();
 
-                    $totalImages += count($tagImages);
+            // Prepare images for "related images" box, where they all are in one group
+            foreach ($images as $image) {
+
+                if (count($tagImages) >= $maxImages) {
+                    break;
+                }
+
+                if (!in_array($image->getId(), $usedImages)) {
+                    $tagImages[] = $image;
+                    $usedImages[] = $image->getId();
+
+                    $foundTags = array_merge($foundTags, (array) $image->getTags());
                 }
             }
 
-            // Break the loop, if group of images received
-            if (!$groupTags) {
-                break;
-            }
-        }
+            // Reorder tags
+            $foundTags = array_count_values($foundTags);
+            arsort($foundTags);
+            $foundTags = array_slice(array_flip($foundTags), 0, 5);
 
-        // Images related to other images by tags are not grouped
-        if (!$groupTags && count($allImages)) {
-            $allImagesList = $usedTags = array();
-            foreach ($allImages as $images) {
-                $usedTags = $images["tag"];
-                $allImagesList = array_merge($allImagesList, $images["images"]);
-            }
-            unset($allImages);
-            $allImages[] = array("usedTags" => $usedTags, "images" => $allImagesList);
+            $allImages[] = array("usedTags" => $foundTags, "images" => $tagImages);
+            $totalImages += count($tagImages);
+            //\D::dump($allImages);
         }
 
         //\D::dump($allImages);
