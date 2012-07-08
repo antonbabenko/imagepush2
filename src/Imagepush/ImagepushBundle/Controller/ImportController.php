@@ -22,10 +22,13 @@ class ImportController extends Controller
      */
     public function indexAction()
     {
+        // Whether to get images from S3 to get filesize (expensive operation from outside of Amazon!)
+        $getImageFileSize = false;
+
         $this->importTags();
         $this->importLatestTags();
         $this->importLinks(); // indexed, failed
-        $this->importImages(999999);
+        $this->importImages(999999, $getImageFileSize);
         $this->importProcessedHashes();
 
         echo "All done :)";
@@ -96,10 +99,12 @@ class ImportController extends Controller
     /**
      * Import images
      */
-    private function importImages($limit = 10)
+    private function importImages($limit = 10, $getImageFileSize = false)
     {
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $fs = $this->get('knp_gaufrette.filesystem_map')->get('images');
+
         $i = 0;
         $missing = array();
 
@@ -136,10 +141,26 @@ class ImportController extends Controller
                         $new->setTimestamp((int) $image["timestamp"]);
                     }
                     if (!empty($image["m_file"])) {
-                        $new->setFile($image["m_file"]);
+                        $file = $image["m_file"];
                     } elseif (!empty($image["file"])) {
-                        $new->setFile($image["file"]);
+                        $file = $image["file"];
+                    } else {
+                        $file = "";
+                        $missing[] = $image;
+                        continue;
                     }
+
+                    $new->setFile($file);
+
+                    $ext = strtolower(strchr($file, "."));
+                    if ($ext == ".gif") {
+                        $new->setMimeType("image/gif");
+                    } elseif ($ext == ".png") {
+                        $new->setMimeType("image/png");
+                    } else {
+                        $new->setMimeType("image/jpeg");
+                    }
+
                     if (!empty($image["source_type"])) {
                         $new->setSourceType($image["source_type"]);
                     } else {
@@ -175,16 +196,46 @@ class ImportController extends Controller
 
                     if ($createdMW) {
                         // main
-                        $new->addThumbs("in", "463x1548", $createdMW, $createdMH);
+                        $filesize = 0;
+
+                        if ($getImageFileSize) {
+                            try {
+                                $filesize = strlen($fs->read("in/463x1548/i/" . $file));
+                            } catch (\Exception $e) {
+                                $this->get('logger')->err('[IMPORT] ' . $e->getMessage());
+                            }
+                        }
+
+                        $new->addThumbs("in", "463x1548", $createdMW, $createdMH, $filesize);
                     }
 
                     if ($createdTW) {
                         // thumb
+                        $filesize = 0;
+
+                        if ($getImageFileSize) {
+                            try {
+                                $filesize = strlen($fs->read("out/140x140/i/" . $file));
+                            } catch (\Exception $e) {
+                                $this->get('logger')->err('[IMPORT] ' . $e->getMessage());
+                            }
+                        }
+
                         $new->addThumbs("out", "140x140", $createdTW, $createdTH);
                     }
 
                     if ($createdAW) {
                         // article
+                        $filesize = 0;
+
+                        if ($getImageFileSize) {
+                            try {
+                                $filesize = strlen($fs->read("in/625x2090/i/" . $file));
+                            } catch (\Exception $e) {
+                                $this->get('logger')->err('[IMPORT] ' . $e->getMessage());
+                            }
+                        }
+
                         $new->addThumbs("in", "625x2090", $createdAW, $createdAH);
                     }
 

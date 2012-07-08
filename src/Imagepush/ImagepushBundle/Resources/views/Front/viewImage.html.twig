@@ -71,7 +71,7 @@
       
       <div style="text-align:center;">
         <figure class="bigImg">
-          <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 625, 2090, "w") }}" height="{{ image.thumbSize("in", 625, 2090, "h") }}" />
+          <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 625, 2090, "w") }}" height="{{ image.thumbProperty("in", 625, 2090, "h") }}" />
         </figure>
 
         {% render "ImagepushBundle:Front:_comments" with {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) } %}

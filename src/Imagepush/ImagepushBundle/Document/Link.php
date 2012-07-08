@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @MongoDB\Document(collection="link", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"link"="asc"}),
+ *   @MongoDB\Index(keys={"status"="asc"}),
  *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true)
  * })
  */

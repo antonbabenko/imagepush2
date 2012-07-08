@@ -26,8 +26,8 @@ class FrontController extends Controller
         /* $i = array_values($images);
           $image = $i[0];
           echo "<br>==".$mainImage = $this->get('twig.extension.imagepush')->imagepushFilter($image->getFile(), 'in', 463, 1548, $image->getId());
-          echo "<br>==".$mainImageWidth = $image->getThumbSize("in", 463, 1548, "w");
-          echo "<br>==".$mainImageHeight = $image->getThumbSize("in", 463, 1548, "h");
+          echo "<br>==".$mainImageWidth = $image->getThumbProperty("in", 463, 1548, "w");
+          echo "<br>==".$mainImageHeight = $image->getThumbProperty("in", 463, 1548, "h");
          */
         return array("images" => array_values($images));
     }
@@ -102,8 +102,6 @@ class FrontController extends Controller
             ->getRepository('ImagepushBundle:Image')
             ->findImages($type, 30, $params);
 
-        //\D::dump($images);
-
         return array(
             "type" => $type,
             "tag" => $tag,
@@ -125,7 +123,7 @@ class FrontController extends Controller
             ->findOneBy(array("id" => (int) $id, "isAvailable" => true));
 
         //\D::dump($id);
-        //\D::dump($image);
+        //\D::dump($image->getMimeType());
 
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');

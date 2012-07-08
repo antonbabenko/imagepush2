@@ -76,7 +76,7 @@ services:
 
     #
     imagepush.imagine.controller:
-      class: Imagepush\ImagepushBundle\Imagine\CustomController
+      class: Imagepush\ImagepushBundle\Controller\ImagineController
       arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, @doctrine.odm.mongodb.document_manager, @liip_imagine, @logger, %kernel.debug%]
       
     # Imagine data loader (via Gaufrette with name "images")

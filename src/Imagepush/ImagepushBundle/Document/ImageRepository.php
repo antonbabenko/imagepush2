@@ -108,6 +108,7 @@ class ImageRepository extends DocumentRepository
             ->field('isInProcess')->notEqual(true)
             ->sort('timestamp', 'DESC')
             ->limit(1)
+            ->requireIndexes(false)
             ->getQuery()
             ->getSingleResult();
 

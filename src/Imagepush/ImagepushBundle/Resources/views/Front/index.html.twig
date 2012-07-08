@@ -50,7 +50,7 @@
       </header>
       <a href="{{ path('viewImage', {'id': images.0.id, 'slug': images.0.slug}) }}" id="main_image_link">
         <figure class="bigImg">
-          <img src="{{ macros.thumb_url(images.0, "in", 463, 1548) }}" alt="{{images.0.title}}" id="main_image_img" width="{{ images.0.thumbSize("in", 463, 1548, "w") }}" height="{{ images.0.thumbSize("in", 463, 1548, "h") }}" />
+          <img src="{{ macros.thumb_url(images.0, "in", 463, 1548) }}" alt="{{images.0.title}}" id="main_image_img" width="{{ images.0.thumbProperty("in", 463, 1548, "w") }}" height="{{ images.0.thumbProperty("in", 463, 1548, "h") }}" />
         </figure>
       </a>
 

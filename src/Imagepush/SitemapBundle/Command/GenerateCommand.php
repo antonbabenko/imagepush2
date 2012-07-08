@@ -20,7 +20,7 @@ class GenerateCommand extends ContainerAwareCommand
         parent::configure();
         $this
             ->setName('imagepush:generate:sitemap')
-            ->setDescription('Generate imagepush sitemap.')
+            ->setDescription('Generate sitemap')
             ->setDefinition(array(
                 new InputOption(
                     'dm', null, InputOption::VALUE_OPTIONAL,

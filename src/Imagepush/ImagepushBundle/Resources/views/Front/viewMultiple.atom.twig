@@ -19,7 +19,7 @@
         </author>
         <content type="html">
             &lt;a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}"&gt;
-            &lt;img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 463, 1548, "w") }}" height="{{ image.thumbSize("in", 463, 1548, "h") }}" border="0" /&gt;
+            &lt;img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 463, 1548, "w") }}" height="{{ image.thumbProperty("in", 463, 1548, "h") }}" border="0" /&gt;
             &lt;/a&gt;
         </content>
     </entry>

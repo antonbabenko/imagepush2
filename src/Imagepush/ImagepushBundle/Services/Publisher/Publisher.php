@@ -23,10 +23,9 @@ class Publisher
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
     }
 
-    public function publishLatestUpcomingImage($skipDelay = false)
+    public function publishLatestUpcomingImage()
     {
 
-        //$data = $this->imagesManager->getImages("upcoming", 1);
         $images = $this->dm
             ->getRepository('ImagepushBundle:Image')
             ->findImages("upcoming", 1);
@@ -42,7 +41,6 @@ class Publisher
 
         //\D::dump($image->getId());
         //\D::dump($image->getMongoId());
-
         // update timestamp to now
         $image->setTimestamp(time());
 
@@ -53,7 +51,10 @@ class Publisher
         $this->dm->flush();
         $this->dm->refresh($image);
 
-        return $image;
+        $log = sprintf("Image id: %d has been published", $image->getId());
+        $this->logger->info($log);
+
+        return $log;
     }
 
 }
