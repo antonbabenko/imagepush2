@@ -15,12 +15,13 @@
             <link>{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</link>
             <description><![CDATA[{% spaceless %}
                 <a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}">
-                    <img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbSize("in", 463, 1548, "w") }}" height="{{ image.thumbSize("in", 463, 1548, "h") }}" border="0" />
+                    <img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 463, 1548, "w") }}" height="{{ image.thumbProperty("in", 463, 1548, "h") }}" border="0" />
                 </a>
                 {% endspaceless %}]]></description>
             <guid isPermaLink="false">{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</guid>
             <pubDate>{{ image.timestamp|date('c') }}</pubDate>
-            <enclosure url="{{ macros.thumb_url(image, "in", 463, 1548) }}"></enclosure>
+            {% set length = image.thumbProperty("in", 463, 1548, "s") %}
+            <enclosure url="{{ macros.thumb_url(image, "in", 463, 1548) }}" type="{{image.mimeType|default('image/jpeg')}}"{% if length %} length="{{length}}"{% endif %}></enclosure>
             {% for tag in image.tags %}
             <category><![CDATA[{{tag}}]]></category>
             {% endfor %}

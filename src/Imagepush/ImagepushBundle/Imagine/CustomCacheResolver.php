@@ -24,8 +24,8 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
     /**
      * Constructs
      *
-     * @param ContainerInterface     $container
-     * @param Filesystem    $fs
+     * @param ContainerInterface $container
+     * @param Filesystem         $fs
      */
     public function __construct($container, Filesystem $fs)
     {
@@ -37,8 +37,8 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
      * Resolves filtered path for rendering in the browser
      *
      * @param Request $request
-     * @param string $path
-     * @param string $filter
+     * @param string  $path
+     * @param string  $filter
      *
      * @return string target path
      */
@@ -54,8 +54,8 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
 
     /**
      * @param Response $response
-     * @param string $targetPath
-     * @param string $filter
+     * @param string   $targetPath
+     * @param string   $filter
      *
      * @return Response
      */
@@ -72,7 +72,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
             'Expires' => gmdate(DATE_RFC822, strtotime("+1 year"))
         );
 
-        $this->fs->write($targetPath, $response->getContent(), true, $metadata);
+        $filesize = $this->fs->write($targetPath, $response->getContent(), true, $metadata);
 
         // Set ACL to public, if using Amazon S3
         if ($this->fs->getAdapter() instanceof \Gaufrette\Adapter\AmazonS3) {
@@ -95,7 +95,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
 
         $response->setStatusCode(201);
 
-        return $response;
+        return array("response" => $response, "filesize" => $filesize);
     }
 
 }

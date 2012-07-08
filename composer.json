@@ -13,11 +13,10 @@
         
         "symfony/symfony":               "2.0.15",
         "twig/twig":                     "1.8.3",
-        "monolog/monolog":               "1.0.2",
-        "doctrine/orm":                  "2.1.7",
+        "monolog/monolog":               "1.1.0",
+        "doctrine/orm":                  "*",
         "symfony/doctrine-bridge":       "*",
-        "doctrine/mongodb-odm":          "dev-fix/prepare-indexes",
-		"doctrine/mongodb-odm-bundle":   "*",
+		"doctrine/mongodb-odm-bundle":   "2.0.x-dev",
         "swiftmailer/swiftmailer":       "4.1.7",
         "kriswallsmith/assetic":         "1.0.3",
         "twig/extensions":               "dev-master",
@@ -36,6 +35,7 @@
         
         "amazonwebservices/aws-sdk-for-php": "1.5.8.1",
         
+        "knplabs/gaufrette": "v0.1",
         "knplabs/knp-gaufrette-bundle": "dev-master",
         
         "stof/doctrine-extensions-bundle": "1.0.x-dev",

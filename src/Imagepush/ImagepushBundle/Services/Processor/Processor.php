@@ -29,7 +29,7 @@ class Processor
 
     /**
      * Is debug mode?
-     * Database is not heavily modified (no data removed when debug mode is on)
+     * Database is not heavily modified (almost no data removed when debug mode is on)
      * 
      * @var boolean $isDebug
      */
@@ -68,66 +68,32 @@ class Processor
         if ($image) {
             $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink()));
         } else {
-            $this->logger->info("There is no unprocessed images to work on");
+            $log = "Ok, but there is no unprocessed images to work on...";
+            $this->logger->info($log);
 
-            return false;
+            return $log;
         }
 
         if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($image->getLink())) {
             return false;
         }
 
-        \D::dump($image->getMongoId());
-
-        /* if ($image->sourceDomainIsBlocked())
+        /*
+          if ($image->sourceDomainIsBlocked())
           {
           $this->logger->warn(sprintf("ID: %d. %s is blacklisted domain (porn, spam, etc)", $image->id, $image->link));
           return false;
-          } */
-
-        /*
-          $this->link = "http://www.web-developer.no/img/portfolio/flynytt.jpg";
-          $this->link = "http://i.imgur.com/bCK24.jpg";
-          $this->link = "http://adayinthalifeof.files.wordpress.com/2009/06/picture-15.png";
-
-          // image_src or og:image
-          //$this->link = "http://imagepush.to/i/40033/well-cosplayed-sir";
-
-          // text/html
-          $this->link = "http://www.web-developer.no/";
-          $this->link = "http://slapblog.com/?p=7888";
-          $this->link = "http://localhost/testpages/page1.htm";
-          //$this->link = "http://localhost/testpages/page2.htm"; // image_src
-          //$this->link = "http://localhost/testpages/page3.html";
+          }
          */
-        // image_src or og:image
-        //$this->link = "http://imagepush.to/i/40033/well-cosplayed-sir";
-        // two similar images:
-        //$this->link = "http://soshable.com/what-if-facebook-were-a-city/";
-        // skip top logo, because it has been indexed already
-        //$this->link = "http://www.geekfill.com/2011/03/12/hold-still-sonny-comic/";
-        // Hotlinking forbidden
-        //$this->link = "http://www.flickr.com/photos/mtaphotos/6086067175/";
-        // ssl problem:
-        //$this->link = "http://delaware.metromix.com/music/essay_photo_gallery/most-anticipated-albums-of/2389330/photo/2393050";
-        // parse url problem
-        //$this->link = "http://www.totalprosports.com/2011/01/19/is-that-a-rocket-in-caroline-wozniackis-pocket-pic/";
-        //
-        //$sourceLink = "http://i.imgur.com/SsvPB.jpg";
-        $sourceLink = "http://imagepush.to/i/40033/well-cosplayed-sir";
-        //$image->setId(99999);
-        //$sourceLink = "http://adayinthalifeof.files.wordpress.com/2009/06/picture-15.png";
 
         /**
          * Get content from the link
          */
-        //$sourceLink = $image->getLink();
-
         $content = $this->container->get('imagepush.processor.content');
-        $content->get($sourceLink);
+        $content->get($image->getLink());
 
         if (!$content->isSuccessStatus()) {
-            $this->logger->warn(sprintf("ID: %d. Link %s returned status code %d", $image->getId(), $image->getLink(), $content->getData()));
+            $this->logger->info(sprintf("ID: %d. Link %s returned status code %d", $image->getId(), $image->getLink(), $content->getData()));
 
             return false;
         }
@@ -138,7 +104,7 @@ class Processor
         if ($content->isImageType()) {
 
             if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
-                $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
+                $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
 
                 return false;
             }
@@ -183,7 +149,7 @@ class Processor
                         }
 
                         if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
-                            $this->logger->warn(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
+                            $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
 
                             continue;
                         }
@@ -191,7 +157,7 @@ class Processor
                         $result = $this->processFoundImage($image, $contentInside);
 
                         if ($result) {
-                            $this->logger->warn(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $url));
+                            $this->logger->info(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $url));
 
                             $link = new Link($url, Link::INDEXED);
                             $this->dm->persist($link);
@@ -205,41 +171,42 @@ class Processor
             }
         }
 
-        \D::dump($result);
-
-        //$result = true;
-
         /**
-         * No images found - remove link and image key
+         * Not found
          */
-        if ($result) {
-            if (!$this->isDebug) {
-                $link = new Link($image->getLink(), Link::INDEXED);
-                $this->dm->persist($link);
-                $this->dm->flush();
-            }
-        } else {
-            $this->logger->info(sprintf("ID: %d. No images found, so link %s should be removed.", $image->getId(), $image->getLink()));
+        if (!$result) {
+            $log = sprintf("ID: %d. No images found, so link %s should be removed.", $image->getId(), $image->getLink());
+            $this->logger->info($log);
 
-            if (!$this->isDebug) {
-                $this->dm->remove($image);
+            // Remove image
+            $this->dm->remove($image);
 
-                $link = new Link($image->getLink(), Link::FAILED);
-                $this->dm->persist($link);
+            // Mark link as failed
+            $link = new Link($image->getLink(), Link::FAILED);
+            $this->dm->persist($link);
 
-                $this->dm->flush();
+            $this->dm->flush();
 
-                return false;
-            }
+            return $log;
         }
 
         /**
-         * Find tags (optional)
+         * Mark link as indexed
          */
-        $processorTag = $this->container->get('imagepush.processor.tag');
-        $processorTag->processTags($image);
+        $link = new Link($image->getLink(), Link::INDEXED);
+        $this->dm->persist($link);
+        $this->dm->flush();
 
-        return ($result ? $image->getId() : false);
+        /**
+         * Find tags
+         */
+        $this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
+        $this->container->get('imagepush.processor.tag')->processTags($image);
+
+        $log = sprintf("ID: %d. Source processed.", $image->getId());
+        $this->logger->info($log);
+
+        return $log;
     }
 
     /**
@@ -255,12 +222,18 @@ class Processor
     {
         $imagine = $this->container->get('liip_imagine');
         $foundImage = $imagine->load($content->getContent());
-        \D::dump($foundImage->getSize()->getWidth());
+        //\D::debug($foundImage->getSize()->getWidth());
 
-        if ($foundImage->getSize()->getWidth() >= Config::$minWidth && $foundImage->getSize()->getHeight() >= Config::$minHeight) {
+        if ($foundImage->getSize()->getWidth() >= $this->container->getParameter('imagepush.image.min_width') &&
+            $foundImage->getSize()->getHeight() >= $this->container->getParameter('imagepush.image.min_height')) {
 
-            // Update filename based on content type
-            $image->updateFilename($content->getContentType());
+            // Set mime-type from content-type
+            $image->setMimeType($content->getContentType());
+
+            // Update filename based on mime-type
+            $image->updateFilename();
+
+            $this->logger->info(sprintf("ID: %d. Saving original file as: %s", $image->getId(), $image->getFile()));
 
             // Save original file (to set corrent permissions as for other thumbnails)
             $this->container
@@ -295,14 +268,13 @@ class Processor
     public function generateRequiredThumbs(Image $image)
     {
         $thumbs = $this->container->getParameter('imagepush.thumbs');
-        //Config::$thumbTypes;
 
         foreach ($thumbs as $attributes) {
             $url = $this->container
                 ->get('twig.extension.imagepush')
                 ->imagepushFilter('i/' . $image->getFile(), $attributes[0], $attributes[1], $attributes[2], $image->getId());
 
-            \D::dump($url);
+            $this->logger->info(sprintf("ID: %d. Generating thumb (via request): %s", $image->getId(), $url));
 
             $this->container
                 ->get('imagepush.fetcher.content')

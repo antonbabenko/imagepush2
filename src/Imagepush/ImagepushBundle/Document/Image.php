@@ -14,7 +14,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
- *   @MongoDB\Index(keys={"isAvailable"="asc"})
+ *   @MongoDB\Index(keys={"isAvailable"="asc"}),
+ *   @MongoDB\Index(keys={"isInProcess"="asc"}),
+ *   @MongoDB\Index(keys={"sourceType"="asc"})
  * })
  */
 class Image
@@ -44,6 +46,11 @@ class Image
      * @MongoDB\String
      */
     protected $file;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $mimeType;
 
     /**
      * @MongoDB\String
@@ -387,16 +394,36 @@ class Image
     }
 
     /**
-     * Generate filename based on ID and content type
+     * Set mimeType
+     *
+     * @param string $mimeType
+     */
+    public function setMimeType($mimeType)
+    {
+        $this->mimeType = $mimeType;
+    }
+
+    /**
+     * Get mimeType
+     *
+     * @return string $mimeType
+     */
+    public function getMimeType()
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * Generate filename based on ID and specified mime-type
      *
      * @return string $file
      */
-    public function updateFilename($contentType)
+    public function updateFilename()
     {
 
-        if (in_array($contentType, array("image/gif"))) {
+        if (in_array($this->getMimeType(), array("image/gif"))) {
             $fileExt = "gif";
-        } elseif (in_array($contentType, array("image/png"))) {
+        } elseif (in_array($this->getMimeType(), array("image/png"))) {
             $fileExt = "png";
         } else {
             $fileExt = "jpg";
@@ -425,12 +452,22 @@ class Image
 
     /**
      * Add created thumb.
+     *
+     * @param type $filter       Filter name ("in", "out")
+     * @param type $size         Filter size (eg, "120x150")
+     * @param type $actualWidth  Actual width
+     * @param type $actualHeight Actual height
+     * @param type $filesize     File size
      */
-    public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0)
+    public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0, $filesize = 0)
     {
         $key = $filter . "/" . $size;
 
-        $this->thumbs[$key] = array("w" => (int) $actualWidth, "h" => (int) $actualHeight);
+        $this->thumbs[$key] = array(
+            "w" => (int) $actualWidth,
+            "h" => (int) $actualHeight,
+            "s" => (int) $filesize
+        );
     }
 
     /**
@@ -452,17 +489,17 @@ class Image
     }
 
     /**
-     * Get thumb information.
-     * If thumb has been already created then we have actual image property (width/height).
+     * Get thumb property.
+     * If thumb has been already created then there were properties saved (width/height/filesize).
      *
      * @param string  $filter   Filter Name
      * @param integer $width    Width
      * @param integer $height   Height
-     * @param string  $property Property name for the height is "h", for width is "w"
+     * @param string  $property Property name (height => "h", width => "w", filesize => "s")
      * 
-     * @return array|false $thumbs
+     * @return integer|false
      */
-    public function getThumbSize($filter, $width, $height, $property)
+    public function getThumbProperty($filter, $width, $height, $property)
     {
 
         $key = $filter . "/" . $width . "x" . $height;

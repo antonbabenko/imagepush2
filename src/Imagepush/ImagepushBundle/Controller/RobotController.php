@@ -18,6 +18,8 @@ class RobotController extends Controller
     public function indexAction($action)
     {
 
+        //return new Response("Use CLI commands instead of this");
+
         $content = "";
 
         switch ($action) {

@@ -14,6 +14,7 @@ class ContentFetcher
 
     /**
      * Send GET request
+     * 
      * @return array|integer Array with data or status code
      */
     public function getRequest($uri)
@@ -25,6 +26,7 @@ class ContentFetcher
 
     /**
      * Send HEAD request
+     * 
      * @return array|integer Array with data or status code
      */
     public function headRequest($uri)
@@ -36,6 +38,7 @@ class ContentFetcher
 
     /**
      * Make HTTP request to url
+     * 
      * @return array|integer Array with data or status code
      */
     protected function makeRequest($uri)
@@ -45,8 +48,13 @@ class ContentFetcher
 
         $crawler = $client->request($this->requestType, $uri);
 
-        $response = $client->getResponse();
-        //\D::dump($response->getContent());
+        try {
+            $response = $client->getResponse();
+            //\D::dump($response->getContent());
+        } catch (\Guzzle\Http\Exception\CurlException $e) {
+            // @todo: catch errors and log them
+            return 500;
+        }
 
         if (200 == $response->getStatus()) {
             return array(
