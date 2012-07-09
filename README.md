@@ -83,6 +83,9 @@ Probably, there should be services to:
 7) Update image data based on tags
 
 ---
+scp ~/bin/dump.rdb anton-server:/mnt/redis_data
+scp ~/bin/appendonly.aof anton-server:/mnt/redis_data
+---
 Export from mongo:
 mongodump --db imagepush_dev
 Import on anton-server:
