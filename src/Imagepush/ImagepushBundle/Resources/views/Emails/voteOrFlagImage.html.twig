@@ -1,0 +1,37 @@
+{% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
+<html>
+    <body>
+        {% if type == "flag" %}
+        <b style="color: #c00">FLAGGED</b>
+        {% elseif type == "vote_up" %}
+        <b style="color: #0c0">VOTE UP</b>
+        {% elseif type == "vote_down" %}
+        <b style="color: #bb0">VOTE DOWN</b>
+        {% endif %}
+        
+        <br /><br />
+        
+        ID: {{image.id}}<br><br>
+        Title: {{image.title}}<br><br>
+
+        Date: {{image.datetime|date('Y/m/d \\a\\t H:i')}}<br><br>
+
+        <a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}">
+            <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 625, 2090, "w") }}" height="{{ image.thumbProperty("in", 625, 2090, "h") }}" />
+        </a><br /><br />
+        
+        Fetched from: <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image.link}}</a><br><br>
+    
+        Tags:<br>
+        {% for tag in image.tags %}
+        {% set tag = tag|replace({"\n": " "})|lower %}
+        <a href="{{ url('viewByTag', {'tag': tag|url_encode()}) }}">{{tag}}</a><br />
+        {% endfor %}
+
+        <hr />
+        
+        <br>User IP: {{app.request.getClientIp}}<br><br>
+        Mail sent: {{"now"|date('Y/m/d \\a\\t H:i')}}<br><br>
+
+    </body>
+</html>

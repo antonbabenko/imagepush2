@@ -4,6 +4,7 @@ namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -141,15 +142,6 @@ class FrontController extends Controller
     }
 
     /**
-     * @Route("/about", name="about")
-     * @Template()
-     */
-    public function aboutAction()
-    {
-        return array();
-    }
-
-    /**
      * Latest images feeds (rss2.0, rss, atom formats)
      *
      * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
@@ -162,6 +154,47 @@ class FrontController extends Controller
         $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('type' => 'current', '_format' => $_format));
 
         return $response;
+    }
+
+    /**
+     * Send email to myself, when user mark image as unappropriate or vote up/down.
+     *
+     * @Route("/flag", name="flagImage", defaults={"type"="flag"})
+     * @Route("/vote", name="voteImage", defaults={"type"="vote"})
+     */
+    public function voteOrFlagImageAction(Request $request, $type)
+    {
+
+        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+
+        $image = $dm
+            ->getRepository('ImagepushBundle:Image')
+            ->findOneById((int) $request->query->get('id'));
+
+        if ($image) {
+
+            if ($type == "flag") {
+                $subject = 'Image is flagged!';
+            } else {
+                if (strtolower($request->query->get('vote')) == "down") {
+                    $type = "vote_down";
+                    $subject = 'Vote down';
+                } else {
+                    $type = "vote_up";
+                    $subject = 'Vote up';
+                }
+            }
+
+            $message = \Swift_Message::newInstance()
+                ->setSubject($subject)
+                ->setFrom(array('noreply@imagepush.to' => "Imagepush votes"))
+                ->setTo('anton@imagepush.to')
+                ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type)))
+                ->setContentType("text/html");
+            $this->get('mailer')->send($message);
+        }
+
+        return new Response();
     }
 
     /**
@@ -311,6 +344,15 @@ class FrontController extends Controller
             "skipImageId" => $skipImageId,
             "withAd" => $withAd,
             "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
+    }
+
+    /**
+     * @Route("/about", name="about")
+     * @Template()
+     */
+    public function aboutAction()
+    {
+        return array();
     }
 
 }

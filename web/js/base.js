@@ -103,7 +103,7 @@ Imagepush.Flag = function(image_id) {
   $.ajax({
     url: "/flag",
     type: "POST",
-    data: "flag=1&id="+image_id,
+    data: "id="+image_id,
     context: document.body,
     success: function(msg){
      $("#item-"+image_id).slideUp("fast");
