@@ -22,7 +22,7 @@ set :use_sudo,      false
 set :user, "ec2-user"
 ssh_options[:forward_agent] = true
 default_run_options[:pty] = true
-ssh_options[:keys] = ENV["EC2_NE_CERT_FILE"]
+ssh_options[:keys] = ENV["EC2_ANTON_CERT_FILE"]
 
 set :shared_files,        ["app/config/parameters.ini"]
 set :shared_children,     [app_path + "/logs", "web/uploads", "vendor"]
