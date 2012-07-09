@@ -52,7 +52,7 @@ assetic:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://localhost:27017
+            server: mongodb://%database_user%:%database_password%@localhost:27017
             options:
                 connect: true
                 persist: true
