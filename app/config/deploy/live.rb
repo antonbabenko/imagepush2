@@ -6,4 +6,4 @@ set :vendors_mode, "install"
 
 set :branch, "master"
 
-set :shared_children,     [app_path + "/logs", "web/sitemap.xml.gz"]
+set :shared_children,     [app_path + "/logs"]
