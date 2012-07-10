@@ -1,6 +1,10 @@
+MAILTO="anton@imagepush.to"
+
 # Fetch from digg to run every 5 mins, but minDelay should be 30 mins. 6 attempts if it fails.
 */5  * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:fetch-from-digg --env=prod
 
 */5  * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:process-source --env=prod
+
+*/60 * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:publish-image --env=prod
 
 */60 * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:generate:sitemap --spaceless=1 --env=prod
