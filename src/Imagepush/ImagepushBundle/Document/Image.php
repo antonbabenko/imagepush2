@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
+ *   @MongoDB\UniqueIndex(keys={"link"="asc"}),
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"}),
@@ -109,27 +110,12 @@ class Image
     }
 
     /**
-     * Start: Custom methods
+     * Get original host (to show in template)
      */
     public function get_originalHost()
     {
         return $this->link ? @parse_url($this->link, PHP_URL_HOST) : null;
     }
-
-    /* public function get_shareUrl()
-      {
-      return "http://imagepush.to" . $this->get_viewUrl();
-      } */
-
-    /* public function get_viewUrl()
-      {
-      return "/i/" . $this->id . "/" . $this->slug;
-      //$this->container->get('router')->generate('viewImage', array('id' => $this->id, 'slug' => $this->slug), true) : null);
-      } */
-
-    /**
-     * End: Custom methods
-     */
 
     /**
      * Get mongoId
