@@ -8,26 +8,6 @@ use Imagepush\ImagepushBundle\External\CustomStrings;
 
 class DiggFetcher extends AbstractFetcher implements FetcherInterface
 {
-    /**
-     * Limit for API call. 200 - max, but often fails. Try with 20-40.
-     * 
-     * @var integer $fetchLimit
-     */
-    //public $fetchLimit = 10;
-
-    /**
-     * Minimum diggs score to save. 4-5 is OK.
-     * 
-     * @var integer $minDiggs
-     */
-    //public $minDiggs = 1; // 4
-
-    /**
-     * Minimum delay between API requests. Set to 30 mins, but cron runs every 5 minutes, so there are 6 attempts in each interval
-     * 
-     * @var integer $minDelay
-     */
-    //public $minDelay = 10; //1800;
 
     /**
      * Recent source data to show in the output.
@@ -55,14 +35,13 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
             return false;
         }
 
-        $isIndexedOrFailed = $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($item->link);
-
         $minDiggs = $this->getParameter("min_diggs", 1);
 
         $worthToSave = (
             isset($item->diggs) &&
             $item->diggs >= $minDiggs &&
-            false === $isIndexedOrFailed
+            false === (bool) $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($item->link) &&
+            false === (bool) $this->dm->getRepository('ImagepushBundle:Image')->findOneBy(array("link" => $item->link))
             );
 
         if ($worthToSave) {
@@ -81,28 +60,51 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
     }
 
     /**
-     * @return boolean 
+     * @return array|boolean
      */
     public function fetchData()
     {
 
-        $digg = new ImagepushDigg();
-        $digg->setVersion('2.0');
+        $attempt = 0;
 
-        try {
-            $response = $digg->search->search(array(
-                'media' => 'images',
-                'domain' => '*',
-                'sort' => 'date-desc', //'promote_date-asc',
-                'min_date' => time() - 6000,
-                'count' => $this->getParameter("limit", 10)
-                ));
-        } catch (\Services_Digg2_Exception $e) {
-            $this->logger->err("DiggFetcher. Error: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
+        while ($attempt < 10) {
+            $digg = new ImagepushDigg();
+            $digg->setVersion('2.0');
 
-            return array("message" => $e->getMessage(), "code" => $e->getCode());
+            try {
+
+                $response = $digg->search->search(array(
+                    'media' => 'images',
+                    'domain' => '*',
+                    'sort' => 'date-desc', //'promote_date-asc',
+                    'min_date' => time() - 6000,
+                    'count' => $this->getParameter("limit", 10)
+                    ));
+            } catch (\Services_Digg2_Exception $e) {
+
+                /**
+                 * Expected error codes from Digg:
+                 * 408 - Request timeout
+                 * 0 - Service Unavailable
+                 */
+                if ($e->getCode() == 408 || $e->getCode() == 0) {
+                    $attempt += 1;
+                    $delay = mt_rand(0, 2);
+
+                    $this->logger->err("DiggFetcher. Error: " . $e->getMessage() . " (Code: " . $e->getCode() . "). Next retry in " . $delay . " seconds. Attempt: " . $attempt);
+
+                    sleep($delay);
+                    continue;
+                }
+
+                $this->logger->err("DiggFetcher. Error: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
+
+                return array("message" => $e->getMessage(), "code" => $e->getCode());
+            }
+
+            // Success => break the loop
+            break;
         }
-
         //\D::dump($digg->getLastResponse()->getHeader());
 
         if (empty($response->count)) {
@@ -132,9 +134,6 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
         if (!isset($this->data) || $this->data == false) {
             return false;
         }
-
-        //$images = $this->kernel->getContainer()->get('imagepush.images');
-        //$tags = $this->kernel->getContainer()->get('imagepush.tags');
 
         foreach ($this->data as $item) {
 
