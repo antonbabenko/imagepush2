@@ -25,10 +25,10 @@ class ImportController extends Controller
         // Whether to get images from S3 to get filesize (expensive operation from outside of Amazon!)
         $getImageFileSize = false;
 
-        $this->importTags();
-        $this->importLatestTags();
-        $this->importLinks(); // indexed, failed
-        $this->importImages(999999, $getImageFileSize);
+        //$this->importTags();
+        //$this->importLatestTags();
+        //$this->importLinks(); // indexed, failed
+        //$this->importImages(999999, $getImageFileSize);
         $this->importProcessedHashes();
 
         echo "All done :)";
@@ -279,7 +279,7 @@ class ImportController extends Controller
             }
         }
 
-        \D::dump($missing);
+        //\D::dump($missing);
     }
 
     /**
