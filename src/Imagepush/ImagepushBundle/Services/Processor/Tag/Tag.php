@@ -33,6 +33,7 @@ class Tag
     {
         $this->container = $container;
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+        $this->logger = $container->get('logger');
     }
 
     /**
