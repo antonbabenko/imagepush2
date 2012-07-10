@@ -13,7 +13,7 @@ imagepush:
     thumbs: [["in", 463, 1548], ["out", 140, 140], ["in", 625, 2090]]
         
     fetcher.digg:
-      limit: 10 # Max items to fetch every time
+      limit: 50 # Max items to fetch every time
       min_diggs: 5 # Minimum diggs score to save. 4-5 is OK.
       min_delay: 10 # 1800. Minimum delay between API requests. Set to 30 mins, but cron runs every 5 minutes, so there are 6 attempts in each interval
     
