@@ -70,6 +70,7 @@ class GenerateCommand extends ContainerAwareCommand
         // gzip the sitemap
         if (function_exists('gzopen')) {
             $output->write("<info>Gzipping the generated sitemap [{$sitemapFile}.gz]..</info>" . PHP_EOL);
+            umask(0000);
             $gz = gzopen($sitemapFile . '.gz', 'w9');
             gzwrite($gz, $sitemap);
             gzclose($gz);
