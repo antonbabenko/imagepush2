@@ -23,7 +23,7 @@ class ImportController extends Controller
     public function indexAction()
     {
         // Whether to get images from S3 to get filesize (expensive operation from outside of Amazon!)
-        $getImageFileSize = true;
+        $getImageFileSize = false;
 
         $this->importTags();
         $this->importLatestTags();
