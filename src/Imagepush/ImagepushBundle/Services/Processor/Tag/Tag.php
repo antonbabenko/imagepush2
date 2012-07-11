@@ -65,18 +65,18 @@ class Tag
 
             $message = "All found tags (" . $service . "): " . print_r($allTags[$service], true);
             $this->logger->info($message);
-            $log[] = $message;
         }
 
         $allTags = $this->calculateTagsScore($allTags);
+        //\D::debug($allTags);
 
         $bestTags = $this->filterTagsByScore($allTags, 20);
+        //\D::debug($bestTags);
 
         $bestTags = array_keys($bestTags);
 
         $message = "Best found tags: " . implode(", ", $bestTags);
         $this->logger->info($message);
-        $log[] = $message;
 
         if (count($bestTags)) {
 
@@ -108,7 +108,7 @@ class Tag
             $this->dm->flush();
         }
 
-        return implode("\n", $log);
+        return $bestTags;
     }
 
     /**

@@ -7,25 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class TagTest extends WebTestCase
 {
 
-    /*
-    protected function getDmMock()
-    {
-        $dmMock = $this->getMock('\Doctrine\ODM\DocumentManager', array('getRepository', 'getClassMetadata', 'persist', 'flush'), array(), '', false);
-//        $dmMock->expects($this->any())
-//            ->method('getRepository')
-//            ->will($this->returnValue(new FakeRepository()));
-        $dmMock->expects($this->any())
-            ->method('getClassMetadata')
-            ->will($this->returnValue((object) array('name' => 'aClass')));
-        $dmMock->expects($this->any())
-            ->method('persist')
-            ->will($this->returnValue(null));
-        $dmMock->expects($this->any())
-            ->method('flush')
-            ->will($this->returnValue(null));
-        return $dmMock;
-    }*/
-
     public function testRequiredContainerParameters()
     {
         $client = static::createClient();
@@ -40,18 +21,17 @@ class TagTest extends WebTestCase
         $client = static::createClient();
         $service = $client->getContainer()->get('imagepush.processor.tag');
         $dm = $client->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        
+
         $image = new \Imagepush\ImagepushBundle\Document\Image();
         $image->setLink('http://www.google.com/');
         $image->setTitle('Google is what you probably need');
         $image->setSourceTags(array("Technology", "Search"));
         $dm->persist($image);
         $dm->flush();
-        
+
         $tags = $service->processTags($image);
 
         $this->assertGreaterThan(1, count($tags));
-        $this->assertArrayHasKey("search", $tags);
     }
 
     public function testFixTagsArray()
