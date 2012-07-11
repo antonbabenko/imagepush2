@@ -169,14 +169,14 @@ class FrontController extends Controller
 
         $image = $dm
             ->getRepository('ImagepushBundle:Image')
-            ->findOneById((int) $request->query->get('id'));
+            ->findOneById((int) $request->request->get('id'));
 
         if ($image) {
 
             if ($type == "flag") {
                 $subject = 'Image is flagged!';
             } else {
-                if (strtolower($request->query->get('vote')) == "down") {
+                if (strtolower($request->request->get('vote')) == "down") {
                     $type = "vote_down";
                     $subject = 'Vote down';
                 } else {
