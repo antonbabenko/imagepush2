@@ -12,10 +12,10 @@ robot:
     prefix:   /robot
     type:     annotation
 
-import:
-    resource: "@ImagepushBundle/Controller/ImportController.php"
-    prefix:   /import
-    type:     annotation
+#import:
+#    resource: "@ImagepushBundle/Controller/ImportController.php"
+#    prefix:   /import
+#    type:     annotation
 
 _imagine:
     resource: .
