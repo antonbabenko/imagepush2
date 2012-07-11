@@ -16,6 +16,9 @@ after "deploy:finalize_update" do
   # run "cd #{latest_release} && #{php_bin} #{symfony_console} foq:elastica:populate"
 
   # run "sudo chmod -R 777 #{latest_release}/#{cache_path}"
+
+  # Increase timeout in Goutte curl client - (fixed: https://github.com/antonbabenko/imagepush2/issues/16)
+  run "cd #{latest_release} && sed -ie 's/->set(CURLOPT_TIMEOUT, 30);/->set(CURLOPT_TIMEOUT, 300);/' vendor/fabpot/Goutte/Goutte/Client.php"
 end
 
 load 'app/config/deploy'
