@@ -1,5 +1,0 @@
-curl --silent http://imagepush.to/robot.php/fetcher/processContent
-sleep 1
-curl --silent http://imagepush.to/robot.php/fetcher/processContent
-sleep 1
-curl --silent http://imagepush.to/robot.php/fetcher/processContent

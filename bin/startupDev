@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Script to start Elastic search installed in special location
-
-if [ "$1" = "anton" ]; then
-  /Users/Bob/bin/redis-server /Users/Bob/bin/redis.conf &
-
-  /Users/Bob/elasticsearch/bin/elasticsearch -f
-fi

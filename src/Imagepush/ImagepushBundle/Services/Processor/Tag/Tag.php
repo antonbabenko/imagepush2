@@ -62,18 +62,21 @@ class Tag
             }
 
             $allTags[$service] = $this->container->get("imagepush.processor.tag." . $service)->find($image);
+
+            $message = "All found tags (" . $service . "): " . print_r($allTags[$service], true);
+            $this->logger->info($message);
+            $log[] = $message;
         }
 
         $allTags = $this->calculateTagsScore($allTags);
-        //\D::debug($allTags);
 
         $bestTags = $this->filterTagsByScore($allTags, 20);
-        //\D::debug($bestTags);
-        //echo serialize($allTags);
 
         $bestTags = array_keys($bestTags);
 
-        //$bestTags = array("science", "sport", "technology");
+        $message = "Best found tags: " . implode(", ", $bestTags);
+        $this->logger->info($message);
+        $log[] = $message;
 
         if (count($bestTags)) {
 
@@ -105,7 +108,7 @@ class Tag
             $this->dm->flush();
         }
 
-        return $allTags;
+        return implode("\n", $log);
     }
 
     /**

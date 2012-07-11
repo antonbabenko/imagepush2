@@ -28,9 +28,6 @@
         "symfony/twig-bundle":           "2.0.*",
         "symfony/assetic-bundle":        "2.0.x-dev",
         
-        "snc/redis-bundle":              "2.0.x-dev",
-        "predis/predis":                 "v0.7.x-dev",
-        
         "liip/imagine-bundle":           "dev-master",
         
         "amazonwebservices/aws-sdk-for-php": "1.5.8.1",

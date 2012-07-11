@@ -59,7 +59,6 @@ doctrine_mongodb:
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
     hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
     default_database: imagepush_%kernel.environment%
-    #default_database: imagepush_dev
     document_managers:
         default:
             metadata_cache_driver: apc
@@ -77,34 +76,6 @@ swiftmailer:
 jms_security_extra:
     secure_controllers:  true
     secure_all_services: false
-
-# Redis DB
-#snc_redis:
-#    connections:
-#        default:
-#            alias: default
-#            host: 127.0.0.1
-#            port: 6379
-#            database: 0
-#            #password: HeReisTHEMegasuperPuperPassw0rd8595$$@ssssdg7&&.,m!!m
-#            connection_timeout: 5
-#            read_write_timeout: 30
-#            logging: %kernel.debug%
-#    clients:
-#        default:
-#            alias: default
-#            connection: default
-#            options:
-#              profile: 2.2
-              
-snc_redis:
-    clients:
-        default:
-            type: predis
-            alias: default
-            dsn: redis://localhost
-            options:
-              profile: 2.2
 
 stof_doctrine_extensions:
     default_locale: en_US

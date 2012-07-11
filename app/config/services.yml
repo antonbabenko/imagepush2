@@ -1,11 +1,4 @@
 services:
-    imagepush.images.manager:
-        class: Imagepush\ImagepushBundle\Entity\ImagesManager
-        arguments: [@router, @snc_redis.default_client, @imagepush.tags.manager]
-
-    imagepush.tags.manager:
-        class: Imagepush\ImagepushBundle\Entity\TagsManager
-        arguments: [@snc_redis.default_client]
 
     ##################
     # Robot services #
