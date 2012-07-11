@@ -191,10 +191,12 @@ class FrontController extends Controller
                 ->setTo('anton@imagepush.to')
                 ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type)))
                 ->setContentType("text/html");
-            $this->get('mailer')->send($message);
+            $result = $this->get('mailer')->send($message);
+        } else {
+            $result = "NOT_FOUND";
         }
 
-        return new Response();
+        return new Response($result);
     }
 
     /**
