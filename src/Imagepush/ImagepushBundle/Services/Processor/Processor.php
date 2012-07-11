@@ -201,7 +201,8 @@ class Processor
          * Find tags
          */
         $this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
-        $log = $this->container->get('imagepush.processor.tag')->processTags($image);
+        $tags = $this->container->get('imagepush.processor.tag')->processTags($image);
+        $log = "Best tags: ".implode(", ", $tags)."\n\n";
 
         $log .= sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);

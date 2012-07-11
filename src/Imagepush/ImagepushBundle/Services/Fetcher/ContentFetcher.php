@@ -46,7 +46,15 @@ class ContentFetcher
 
         $client = new Client();
 
-        $crawler = $client->request($this->requestType, $uri);
+        // Increase curl timeout
+        $guzzleClient = $client->getClient();
+        $guzzleClient->getConfig()->set('curl.CURLOPT_TIMEOUT', 337);
+
+        $client->setClient($guzzleClient);
+
+        //\D::debug($client->getClient()->getConfig()->getAll());
+
+        $client->request($this->requestType, $uri);
 
         try {
             $response = $client->getResponse();
