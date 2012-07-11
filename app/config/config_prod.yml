@@ -27,7 +27,7 @@ monolog:
             handler: swift
         swift:
             type:       swift_mailer
-            from_email: post@mcash.no
+            from_email: noreply@imagepush.to
             to_email:   anton@imagepush.to
             subject:    imagepush.to errors
             level:      critical

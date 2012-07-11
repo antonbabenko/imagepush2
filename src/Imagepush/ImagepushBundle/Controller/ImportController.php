@@ -29,7 +29,7 @@ class ImportController extends Controller
         //$this->importLatestTags();
         //$this->importLinks(); // indexed, failed
         //$this->importImages(999999, $getImageFileSize);
-        $this->importProcessedHashes();
+        //$this->importProcessedHashes();
 
         echo "All done :)";
 
