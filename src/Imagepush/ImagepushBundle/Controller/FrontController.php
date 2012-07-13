@@ -169,14 +169,14 @@ class FrontController extends Controller
 
         $image = $dm
             ->getRepository('ImagepushBundle:Image')
-            ->findOneById((int) $request->request->get('id'));
+            ->findOneById((int) $request->get('id'));
 
         if ($image) {
 
             if ($type == "flag") {
                 $subject = 'Image is flagged!';
             } else {
-                if (strtolower($request->request->get('vote')) == "down") {
+                if (strtolower($request->get('vote')) == "down") {
                     $type = "vote_down";
                     $subject = 'Vote down';
                 } else {
@@ -189,7 +189,7 @@ class FrontController extends Controller
                 ->setSubject($subject)
                 ->setFrom(array('noreply@imagepush.to' => "Imagepush votes"))
                 ->setTo('anton@imagepush.to')
-                ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type)))
+                ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type, "hash" => md5($image->getId()))))
                 ->setContentType("text/html");
             $result = $this->get('mailer')->send($message);
         } else {

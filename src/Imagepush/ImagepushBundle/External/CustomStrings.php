@@ -8,9 +8,9 @@ class CustomStrings
     public static $separatorPattern =
         '[|\-«»—~:\@]+';
     public static $generalEndingsPattern =
-        '@[{(\[][\d\s]*(pic|pics|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]$@ui';
+        '@[-{(\[][\d\s]*(pic|pics|pic\.|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]*$@ui';
     public static $forbiddenEndingsPattern =
-        '@[{(\[]\s*(nsfw)+\s*[)\]}]@ui';
+        '@[-{(\[]\s*(nsfw)+\s*[)\]}]@ui';
     public static $urlPattern =
         '(https?://([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
 
@@ -21,6 +21,8 @@ class CustomStrings
         '((https?://)*([-\w\.]+\.[\w]{2,})+(:\d+)?(/([-\w/_\.]*((\?|\#)*\S+)?)?)?)';
     public static $removeStart = '
     The Underfold
+    Photos
+    Photo
 ';
     public static $removeEnd = '
     The Oatmeal
@@ -91,6 +93,7 @@ class CustomStrings
     Blogvibe
     State Gardienz
     koikoikoi.com - Visual Arts Magazine, graphic design, illustration, photography, interviews, inspiration, tutorials
+    The Fonda Theatre
 ';
 
     /**

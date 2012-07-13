@@ -26,6 +26,18 @@ class Publisher
     public function publishLatestUpcomingImage()
     {
 
+        /* $image = $this->dm
+          ->getRepository('ImagepushBundle:BestImage')
+          ->createQuery()
+          ->findOne();
+
+          $dm->createQueryBuilder('ImagepushBundle:BestImage')
+          //->field('isAvailable')->equals(false)
+          ->sort('timestamp', 'DESC')
+          ->getQuery()
+          ->getSingleResult();
+         */
+
         $images = $this->dm
             ->getRepository('ImagepushBundle:Image')
             ->findImages("upcoming", 1);

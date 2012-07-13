@@ -14,6 +14,8 @@
         ID: {{image.id}}<br><br>
         Title: {{image.title}}<br><br>
 
+        <a href="{{ url('markBestImage', {'id': image.id, 'hash': hash}) }}" title="{{image.title}}">Mark as best image</a><br><br>
+
         Date: {{image.datetime|date('Y/m/d \\a\\t H:i')}}<br><br>
 
         <a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}">

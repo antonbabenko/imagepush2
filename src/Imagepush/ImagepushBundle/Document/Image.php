@@ -427,6 +427,20 @@ class Image
     }
 
     /**
+     * Set thumbs
+     *
+     * @param hash $thumbs
+     * 
+     * @return Image
+     */
+    public function setThumbs($thumbs)
+    {
+        $this->thumbs = $thumbs;
+
+        return $this;
+    }
+
+    /**
      * Get array of created thumbs.
      *
      * @return array $thumbs
