@@ -8,45 +8,55 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Original links (indexed, failed, blocked).
  * 
- * @MongoDB\Document(collection="link", repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
+ * @MongoDB\Document(collection="link", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"text"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"text"="asc"}, dropDups=true)
+ *   @MongoDB\Index(keys={"link"="asc"}),
+ *   @MongoDB\Index(keys={"status"="asc"}),
+ *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true)
  * })
  */
 class Link
 {
-  
-  /**
-   * @MongoDB\Id(strategy="AUTO")
-   */
-  protected $mongoId;
 
-  /**
-   * @MongoDB\String
-   */
-  protected $link;
+    const FAILED = "failed";
+    const INDEXED = "indexed";
+    const BLOCKED = "blocked";
 
-  /**
-   * Link status - indexed, failed, blocked
-   * @MongoDB\String
-   */
-  protected $status;
+    /**
+     * @MongoDB\Id(strategy="AUTO")
+     */
+    protected $mongoId;
 
-  public function __construct()
-  {
-  }
+    /**
+     * @MongoDB\String
+     */
+    protected $link;
 
-  /**
-   * Get mongoId
-   *
-   * @return id $mongoId
-   */
-  public function getMongoId()
-  {
-    return $this->mongoId;
-  }
+    /**
+     * Link status - indexed, failed, blocked
+     * @MongoDB\String
+     */
+    protected $status;
 
+    /**
+     * @param string $link   Link
+     * @param string $status Status
+     */
+    public function __construct($link = null, $status = null)
+    {
+        $this->setLink($link);
+        $this->setStatus($status);
+    }
+
+    /**
+     * Get mongoId
+     *
+     * @return id $mongoId
+     */
+    public function getMongoId()
+    {
+        return $this->mongoId;
+    }
 
     /**
      * Set link
@@ -87,4 +97,5 @@ class Link
     {
         return $this->status;
     }
+
 }

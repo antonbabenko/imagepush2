@@ -6,24 +6,17 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Users votes
+ * Best images (defined by admin).
+ * Admin add best images from "vote up" email. This is temporary solution to increase quality of images (13.7.2012).
  * 
- * ---------------------
- * 9 July 2012: This is not completed yet, because it is not in much use! Use redis to count votes.
- * ---------------------
- * 
- * @MongoDB\Document(collection="vote", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\VoteRepository")
+ * @MongoDB\Document(collection="bestImage")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"imageId"="asc"}),
- *   @MongoDB\Index(keys={"userIp"="asc"}),
  *   @MongoDB\Index(keys={"timestamp"="asc"})
  * })
  */
-class Vote
+class BestImage
 {
-
-    const SCORE_GOOD = 1;
-    const SCORE_BAD = -3;
 
     /**
      * @MongoDB\Id(strategy="AUTO")
@@ -36,18 +29,6 @@ class Vote
     protected $imageId;
 
     /**
-     * @MongoDB\String
-     */
-    protected $userIp;
-
-    /**
-     * Vote score
-     * @MongoDB\Int
-     */
-    protected $score;
-
-    /**
-     * Vote timestamp
      * @MongoDB\Timestamp
      */
     protected $timestamp;
@@ -67,7 +48,7 @@ class Vote
      *
      * @param int $imageId
      * 
-     * @return Vote
+     * @return BestImage
      */
     public function setImageId($imageId)
     {
@@ -87,59 +68,11 @@ class Vote
     }
 
     /**
-     * Set userIp
-     *
-     * @param string $userIp
-     * 
-     * @return Vote
-     */
-    public function setUserIp($userIp)
-    {
-        $this->userIp = $userIp;
-
-        return $this;
-    }
-
-    /**
-     * Get userIp
-     *
-     * @return string $userIp
-     */
-    public function getUserIp()
-    {
-        return $this->userIp;
-    }
-
-    /**
-     * Set score
-     *
-     * @param int $score
-     * 
-     * @return Vote
-     */
-    public function setScore($score)
-    {
-        $this->score = $score;
-
-        return $this;
-    }
-
-    /**
-     * Get score
-     *
-     * @return int $score
-     */
-    public function getScore()
-    {
-        return $this->score;
-    }
-
-    /**
      * Set timestamp
      *
      * @param timestamp $timestamp
      * 
-     * @return Vote
+     * @return BestImage
      */
     public function setTimestamp($timestamp)
     {

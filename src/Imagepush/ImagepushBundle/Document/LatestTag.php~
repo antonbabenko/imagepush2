@@ -8,7 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Sequence of latest tags, which is used to show as latest trend
  * 
- * @MongoDB\Document(collection="latestTags", repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
+ * @MongoDB\Document(collection="latestTags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
+ * @MongoDB\Indexes({
+ *   @MongoDB\Index(keys={"timestamp"="desc"})
+ * })
  */
 class LatestTag
 {

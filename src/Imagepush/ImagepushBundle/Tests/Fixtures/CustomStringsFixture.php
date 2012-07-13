@@ -64,6 +64,8 @@ class CustomStringsFixture
             "title @ CNET (images)" => "title",
             "title @ CNET (10 images)" => "title",
             "title @ CNET [10 pics]" => "title",
+            "title -PICS" => "title",
+            "title - PICS" => "title",
             "http://www.site.com/" => "Untitled",
             "www.site.com" => "Untitled",
             "site.com" => "Untitled",
@@ -74,6 +76,10 @@ class CustomStringsFixture
             "http://www.site.com?yo=man" => "http://www.site.com?yo=man",
             // cut first 200 chars
             "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GO",
+            "Photos: title" => "title",
+            "Photos - title" => "title",
+            "title. (Pic.)" => "title.",
+            //"[pic] title" => "title",
         );
 
         return $data;

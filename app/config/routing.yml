@@ -7,6 +7,11 @@ front:
     resource: "@ImagepushBundle/Controller/FrontController.php"
     type:     annotation
 
+# Temporary controller to mark best images
+bestImage:
+    resource: "@ImagepushBundle/Controller/BestImageController.php"
+    type:     annotation
+
 robot:
     resource: "@ImagepushBundle/Controller/RobotController.php"
     prefix:   /robot
