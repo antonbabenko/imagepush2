@@ -14,7 +14,9 @@ class CustomStringsFixture
             "Hello!" => "hello",
             "åøæ!123" => "åøæ-123",
             "'\"quote\"'" => "quote",
-            "Anton" => "anton",
+            "---(Anton)---" => "anton",
+            // cut first 200 chars
+            "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-go",
         );
 
         return $data;
@@ -70,6 +72,8 @@ class CustomStringsFixture
             "ftp://site.no" => "ftp://site.no",
             "www.site.com?yo=man" => "www.site.com?yo=man",
             "http://www.site.com?yo=man" => "http://www.site.com?yo=man",
+            // cut first 200 chars
+            "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GO",
         );
 
         return $data;
