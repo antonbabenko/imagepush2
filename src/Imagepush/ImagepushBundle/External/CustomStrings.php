@@ -192,6 +192,9 @@ class CustomStrings
             $text = "Untitled";
         }
 
+        // keep it max 200 chars
+        $text = substr($text, 0, 200);
+
         return $text;
     }
 

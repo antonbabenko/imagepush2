@@ -147,7 +147,7 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
             // @codingStandardsIgnoreStart
             $image->setTimestamp((int) $item->submit_date);
             // @codingStandardsIgnoreEnd
-            $image->setTitle($item->title);
+            $image->setTitle(CustomStrings::cleanTitle($item->title));
             $image->setSlug(CustomStrings::slugify($item->title));
 
             if (!empty($item->topic->name)) {

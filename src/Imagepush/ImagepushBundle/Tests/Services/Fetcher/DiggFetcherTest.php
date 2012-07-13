@@ -21,11 +21,13 @@ class DiggFetcherTest extends WebTestCase
 
         if (isset($digg->data)) {
             $this->assertTrue($diggResult);
-        } elseif (is_array($diggResult)) {
-            $this->markTestSkipped('Digg service is not available or return wrong response. Response message: ' . $diggResult["message"] . "; code: " . $diggResult["code"]);
         } else {
             $this->fail();
         }
+        /**
+          } elseif (is_array($diggResult)) {
+          $this->markTestSkipped('Digg service is not available or return wrong response. Response message: ' . $diggResult["message"] . "; code: " . $diggResult["code"]);
+         */
     }
 
     public function testDiggResponseHasAllRequiredProperies()
