@@ -9,7 +9,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  * 
  * @MongoDB\Document(collection="processedHash", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ProcessedHashRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, dropDups=true)
+ *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, dropDups=true, safe=false)
  * })
  */
 class ProcessedHash
@@ -24,6 +24,16 @@ class ProcessedHash
      * @MongoDB\String
      */
     protected $hash;
+
+    /**
+     * Get mongoId
+     *
+     * @return id $mongoId
+     */
+    public function __construct($hash = "")
+    {
+        $this->hash = $hash;
+    }
 
     /**
      * Get mongoId
