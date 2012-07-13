@@ -26,32 +26,54 @@ class Publisher
     public function publishLatestUpcomingImage()
     {
 
-        /* $image = $this->dm
-          ->getRepository('ImagepushBundle:BestImage')
-          ->createQuery()
-          ->findOne();
+        $useBestImageId = false;
 
-          $dm->createQueryBuilder('ImagepushBundle:BestImage')
-          //->field('isAvailable')->equals(false)
-          ->sort('timestamp', 'DESC')
-          ->getQuery()
-          ->getSingleResult();
-         */
+        $bestImages = $this->dm
+            ->getRepository('ImagepushBundle:BestImage')
+            ->findAll()
+            ->toArray();
 
-        $images = $this->dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("upcoming", 1);
+        if (count($bestImages)) {
 
-        if (count($images)) {
-            $images = array_values($images);
-            $image = $images[0];
-        } else {
-            $this->logger->info("There are no upcoming images to publish now.");
+            $bestImages = array_values($bestImages);
 
-            return false;
+            foreach ($bestImages as $bestImage) {
+
+                $image = $this->dm
+                    ->createQueryBuilder('ImagepushBundle:Image')
+                    ->field('id')->equals($bestImage->getImageId())
+                    ->field('isAvailable')->equals(false)
+                    ->getQuery()
+                    ->getSingleResult();
+
+                if (!count($image)) {
+                    continue;
+                } else {
+                    $useBestImageId = $bestImage->getImageId();
+                    break;
+                }
+            }
         }
 
-        //\D::dump($image->getId());
+        if (empty($image)) {
+            $this->logger->info("There are no BEST upcoming images to publish now, so we try with the latest upcoming");
+
+            $images = $this->dm
+                ->getRepository('ImagepushBundle:Image')
+                ->findImages("upcoming", 1);
+
+            if (count($images)) {
+                $images = array_values($images);
+                $image = $images[0];
+            } else {
+                $this->logger->info("There are no upcoming images to publish now.");
+
+                return false;
+            }
+        }
+
+        //\D::debug($image->getId());
+        //die();
         //\D::dump($image->getMongoId());
         // update timestamp to now
         $image->setTimestamp(time());
@@ -63,7 +85,19 @@ class Publisher
         $this->dm->flush();
         $this->dm->refresh($image);
 
-        $log = sprintf("Image id: %d has been published", $image->getId());
+        if ($useBestImageId) {
+            // remove from BestImage
+            $this->dm->createQueryBuilder('ImagepushBundle:BestImage')
+                ->remove()
+                ->field('imageId')->equals($useBestImageId)
+                ->getQuery()
+                ->execute();
+
+            $log = sprintf("BEST Image id: %d has been published", $image->getId());
+        } else {
+            $log = sprintf("NOT_BEST_IMAGE id: %d has been published", $image->getId());
+        }
+
         $this->logger->info($log);
 
         return $log;
