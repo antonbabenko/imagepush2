@@ -29,8 +29,9 @@ class Publisher
         $useBestImageId = false;
 
         $bestImages = $this->dm
-            ->getRepository('ImagepushBundle:BestImage')
-            ->findAll()
+            ->createQueryBuilder('ImagepushBundle:BestImage')
+            ->sort("timestamp", "DESC")
+            ->getQuery()
             ->toArray();
 
         if (count($bestImages)) {
