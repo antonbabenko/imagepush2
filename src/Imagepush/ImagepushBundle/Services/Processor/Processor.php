@@ -245,21 +245,21 @@ class Processor
             // Thumbnails won't be regenerated, if there is already same file exists
             $this->generateRequiredThumbs($image);
 
-            // Store processed hash
-            try {
-                $processedHash = new ProcessedHash($content->getContentMd5());
-                $this->dm->persist($processedHash);
-                $this->dm->flush();
-            } catch (\MongoCursorException $e) {
-                $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
-            }
-
             // Update image object
             $image->setIsInProcess(false);
             $image->setIsAvailable(false);
 
             $this->dm->persist($image);
             $this->dm->flush();
+
+            // Store processed hash
+            try {
+                $processedHash = new ProcessedHash($content->getContentMd5());
+                $this->dm->persist($processedHash);
+                $this->dm->flush();
+            } catch (\MongoCursorException $e) {
+                $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
+            }
 
             return true;
         } else {
