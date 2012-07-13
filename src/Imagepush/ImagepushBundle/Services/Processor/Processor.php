@@ -105,14 +105,13 @@ class Processor
 
             if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
                 $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
+            } else {
 
-                return false;
-            }
+                $result = $this->processFoundImage($image, $content);
 
-            $result = $this->processFoundImage($image, $content);
-
-            if ($result) {
-                $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->getId(), $image->getLink()));
+                if ($result) {
+                    $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->getId(), $image->getLink()));
+                }
             }
         }
 
