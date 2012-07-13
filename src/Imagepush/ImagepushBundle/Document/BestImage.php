@@ -11,8 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * 
  * @MongoDB\Document(collection="bestImage")
  * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"imageId"="asc"}),
- *   @MongoDB\Index(keys={"timestamp"="asc"})
+ *   @MongoDB\UniqueIndex(keys={"imageId"="asc"}, dropDups=true, safe=false)
  * })
  */
 class BestImage
