@@ -202,7 +202,7 @@ class Processor
          */
         $this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
         $tags = $this->container->get('imagepush.processor.tag')->processTags($image);
-        $log = "Best tags: ".implode(", ", $tags)."\n\n";
+        $log = "Best tags: " . implode(", ", $tags) . "\n\n";
 
         $log .= sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);
@@ -246,9 +246,13 @@ class Processor
             $this->generateRequiredThumbs($image);
 
             // Store processed hash
-            $processedHash = new ProcessedHash;
-            $processedHash->setHash($content->getContentMd5());
-            $this->dm->persist($processedHash);
+            try {
+                $processedHash = new ProcessedHash($content->getContentMd5());
+                $this->dm->persist($processedHash);
+                $this->dm->flush();
+            } catch (\MongoCursorException $e) {
+                $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
+            }
 
             // Update image object
             $image->setIsInProcess(false);
