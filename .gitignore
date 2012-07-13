@@ -21,3 +21,4 @@ nbproject
 .tmp_staging/
 composer.phar
 composer.lock
+*~
