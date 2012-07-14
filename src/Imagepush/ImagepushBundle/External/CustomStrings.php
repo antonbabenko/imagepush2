@@ -94,6 +94,7 @@ class CustomStrings
     State Gardienz
     koikoikoi.com - Visual Arts Magazine, graphic design, illustration, photography, interviews, inspiration, tutorials
     The Fonda Theatre
+    Imgur
 ';
 
     /**
