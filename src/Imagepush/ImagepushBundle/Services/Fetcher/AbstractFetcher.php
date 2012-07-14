@@ -41,7 +41,7 @@ class AbstractFetcher
      */
     public function __construct($container, $fetcherType = null)
     {
-        $this->logger = $container->get('logger');
+        $this->logger = $container->get('imagepush.fetcher_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
 
         if (!$this->fetcherType = $fetcherType) {

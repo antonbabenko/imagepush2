@@ -45,13 +45,13 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
             );
 
         if ($worthToSave) {
-            $log = sprintf("[DiggFetcher] YES. Diggs: %d. Link: %s. Title: %s", $item->diggs, $item->link, $item->title);
+            $log = sprintf("[Digg] YES. Diggs: %d. Link: %s. Title: %s", $item->diggs, $item->link, $item->title);
             $this->logger->info($log);
             $this->output[] = $log;
 
             return true;
         } else {
-            $log = sprintf("[DiggFetcher] NO. Diggs: %d. Link: %s. Title: %s", $item->diggs, $item->link, $item->title);
+            $log = sprintf("[Digg] NO. Diggs: %d. Link: %s. Title: %s", $item->diggs, $item->link, $item->title);
             $this->logger->info($log);
             $this->output[] = $log;
 
@@ -91,13 +91,13 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
                     $attempt += 1;
                     $delay = mt_rand(0, 2);
 
-                    $this->logger->err("DiggFetcher. Error: " . $e->getMessage() . " (Code: " . $e->getCode() . "). Next retry in " . $delay . " seconds. Attempt: " . $attempt);
+                    $this->logger->err("[Digg] Error: " . $e->getMessage() . " (Code: " . $e->getCode() . "). Next retry in " . $delay . " seconds. Attempt: " . $attempt);
 
                     sleep($delay);
                     continue;
                 }
 
-                $this->logger->err("DiggFetcher. Error: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
+                $this->logger->err("[Digg] Error: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
 
                 return array("message" => $e->getMessage(), "code" => $e->getCode());
             }
@@ -201,7 +201,7 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
         $minDelay = $this->getParameter("min_delay", 1800);
 
         if ($image instanceof Image && time() < $image->getTimestamp()->sec + $minDelay) {
-            $this->output[] = sprintf("[DiggFetcher] %s: Last access attempt was OK, so wait %d secords between requests (%d sec to wait).", date(DATE_RSS), $minDelay, $image->getTimestamp()->sec + $minDelay - time());
+            $this->output[] = sprintf("[Digg] %s: Last access attempt was OK, so wait %d secords between requests (%d sec to wait).", date(DATE_RSS), $minDelay, $image->getTimestamp()->sec + $minDelay - time());
         } else {
 
             $status = $this->fetchData();
@@ -213,12 +213,12 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
                 $this->checkAndSaveData();
 
                 if ($this->savedCounter == 0) {
-                    $this->output[] = sprintf("[DiggFetcher] %s: %d sources received, but nothing has been saved (all filtered out).", date(DATE_RSS), $this->fetchedCounter);
+                    $this->output[] = sprintf("[Digg] %s: %d sources received, but nothing has been saved (all filtered out).", date(DATE_RSS), $this->fetchedCounter);
                 } else {
-                    $this->output[] = sprintf("[DiggFetcher] %s: %d of %d items have been saved. Recent source date was on %s", date(DATE_RSS), $this->savedCounter, $this->fetchedCounter, date(DATE_RSS, $this->recentSourceDate));
+                    $this->output[] = sprintf("[Digg] %s: %d of %d items have been saved. Recent source date was on %s", date(DATE_RSS), $this->savedCounter, $this->fetchedCounter, date(DATE_RSS, $this->recentSourceDate));
                 }
             } else {
-                $this->output[] = sprintf("[DiggFetcher] %s: Digg replied with error: %s. Code: %s", date(DATE_RSS), $status["message"], $status["code"]);
+                $this->output[] = sprintf("[Digg] %s: Digg replied with error: %s. Code: %s", date(DATE_RSS), $status["message"], $status["code"]);
             }
         }
 

@@ -38,7 +38,7 @@ class Processor
     public function __construct(ContainerInterface $container, $isDebug)
     {
         $this->container = $container;
-        $this->logger = $container->get('logger');
+        $this->logger = $container->get('imagepush.processor_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
 
         $this->isDebug = $isDebug;
@@ -46,14 +46,12 @@ class Processor
 
     /**
      * 1) get one latest urls, which is unprocessed and not blocked by other working process
-     * 2) check what kind of site is it - blocked (nudes, porn) or good
+     * //2) check what kind of site is it - blocked (nudes, porn) or good
      * 3) get content from URL
      * 4) check type of content - image or html
-     * 4a) if single image -> then it is "unsorted" category
-     * 4b) if html:
-     * 5) try to find large image(s)
-     * 6) try to make thumbs from large image
-     * //7) try to find category/tags for the page
+     * 4a) if single image -> verify image size and save
+     * 4b) if html -> try to find large image(s) and save thumbs
+     * 5) try to find tags for the URL
      */
     public function processSource()
     {
