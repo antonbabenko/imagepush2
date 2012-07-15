@@ -101,6 +101,8 @@ class Processor
          */
         if ($content->isImageType()) {
 
+            $this->logger->info(sprintf("ID: %d. Hash: %s. isDebug: %d", $image->getId(), $content->getContentMd5(), (int) $this->isDebug));
+
             if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
                 $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
             } else {
@@ -108,6 +110,18 @@ class Processor
                 $result = $this->processFoundImage($image, $content);
 
                 if ($result) {
+
+                    // Store processed hash
+                    try {
+                        $processedHash = new ProcessedHash($content->getContentMd5());
+                        $this->dm->persist($processedHash);
+                        $this->dm->flush();
+
+                        $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $content->getContentMd5()));
+                    } catch (\MongoCursorException $e) {
+                        $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
+                    }
+
                     $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->getId(), $image->getLink()));
                 }
             }
@@ -145,6 +159,8 @@ class Processor
                             continue;
                         }
 
+                        $this->logger->info(sprintf("ID: %d. Hash: %s. isDebug: %d", $image->getId(), $contentInside->getContentMd5(), (int) $this->isDebug));
+
                         if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
                             $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
 
@@ -154,6 +170,18 @@ class Processor
                         $result = $this->processFoundImage($image, $contentInside);
 
                         if ($result) {
+
+                            // Store processed hash
+                            try {
+                                $processedHash = new ProcessedHash($contentInside->getContentMd5());
+                                $this->dm->persist($processedHash);
+                                $this->dm->flush();
+
+                                $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $contentInside->getContentMd5()));
+                            } catch (\MongoCursorException $e) {
+                                $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $contentInside->getContentMd5(), $e->getMessage()));
+                            }
+
                             $this->logger->info(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $url));
 
                             $link = new Link($url, Link::INDEXED);
@@ -248,15 +276,6 @@ class Processor
 
             $this->dm->persist($image);
             $this->dm->flush();
-
-            // Store processed hash
-            try {
-                $processedHash = new ProcessedHash($content->getContentMd5());
-                $this->dm->persist($processedHash);
-                $this->dm->flush();
-            } catch (\MongoCursorException $e) {
-                $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
-            }
 
             return true;
         } else {
