@@ -70,7 +70,7 @@ services:
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-            - [pushProcessor, [@log_memory_peak_usage_processor]]
+            #- [pushProcessor, [@log_memory_peak_usage_processor]]
         
     imagepush.fetcher_logger:
         class: Monolog\Logger
@@ -78,7 +78,7 @@ services:
         calls:
             - [pushHandler, [@imagepush.fetcher_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-            - [pushProcessor, [@log_memory_peak_usage_processor]]
+            #- [pushProcessor, [@log_memory_peak_usage_processor]]
 
     imagepush.processor_log_handler:
         class: Monolog\Handler\StreamHandler
