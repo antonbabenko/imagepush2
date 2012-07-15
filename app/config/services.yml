@@ -69,16 +69,16 @@ services:
         arguments: [processor]
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
-            #- [pushProcessor, [@log_web_processor]]
-            #- [pushProcessor, [@log_memory_usage_processor]]
+            - [pushProcessor, [@log_introspection_processor]]
+            - [pushProcessor, [@log_memory_peak_usage_processor]]
         
     imagepush.fetcher_logger:
         class: Monolog\Logger
         arguments: [fetcher]
         calls:
             - [pushHandler, [@imagepush.fetcher_log_handler]]
-            #- [pushProcessor, [@log_web_processor]]
-            #- [pushProcessor, [@log_memory_usage_processor]]
+            - [pushProcessor, [@log_introspection_processor]]
+            - [pushProcessor, [@log_memory_peak_usage_processor]]
 
     imagepush.processor_log_handler:
         class: Monolog\Handler\StreamHandler
@@ -86,14 +86,20 @@ services:
 
     imagepush.fetcher_log_handler:
         class: Monolog\Handler\StreamHandler
-        arguments: [%kernel.logs_dir%/digg_%kernel.environment%.log, 100]
+        arguments: [%kernel.logs_dir%/fetcher_%kernel.environment%.log, 100]
     
     # General log processors
     log_web_processor:
         class: Monolog\Processor\WebProcessor
         
+    log_introspection_processor:
+        class: Monolog\Processor\IntrospectionProcessor
+        
     log_memory_usage_processor:
         class: Monolog\Processor\MemoryUsageProcessor
+        
+    log_memory_peak_usage_processor:
+        class: Monolog\Processor\MemoryPeakUsageProcessor
 
     # Amazon S3
     imagepush.amazon.s3:
