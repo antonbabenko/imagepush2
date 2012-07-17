@@ -101,7 +101,7 @@ class ImageRepository extends DocumentRepository
      * 
      * @return Image|false
      */
-    public function initUnprocessedSource($isDebug = false)
+    public function initUnprocessedSource()
     {
         $image = $this->createQueryBuilder()
             ->field('isAvailable')->exists(false)
@@ -113,17 +113,11 @@ class ImageRepository extends DocumentRepository
             ->getSingleResult();
 
         if ($image) {
+            $image->setIsInProcess(true);
 
-            /**
-             * There is no database update in debug mode 
-             */
-            if (!$isDebug) {
-                $image->setIsInProcess(true);
-
-                $this->dm->persist($image);
-                $this->dm->flush();
-                $this->dm->refresh($image);
-            }
+            $this->dm->persist($image);
+            $this->dm->flush();
+            $this->dm->refresh($image);
 
             return $image;
         } else {

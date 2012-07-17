@@ -12,7 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"link"="asc"}),
+ *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true),
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"}),
