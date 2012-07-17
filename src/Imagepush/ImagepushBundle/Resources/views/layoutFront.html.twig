@@ -43,7 +43,7 @@
     
     {# <meta name="viewport" content="initial-scale=1.0, width=device-width"> #}
 
-    <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://feeds.feedburner.com/imagepush" />
+    <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://imagepush.to/rss" />
     <meta name="google-site-verification" content="tT08cSzzAI9CaHWx62miVpZuZc9dI0sC5I6AD7AMKbo" />
     <meta property="og:site_name" content="Imagepush.to - Best images hourly" />
     <meta property="fb:admins" content="676763506" />
@@ -104,23 +104,15 @@
         <p><span class="h2">Imagepush.to</span> aggregates images from the most popular sites on the web, arranges them by categories, and pushes the best of the best to you hourly.</p>
         {# <p>If you have a site or blog, you can take our free widgets. <a href="#" class="more">Read more</a></p> #}
         <section id="subscribe">
-          <form action="http://feedburner.google.com/fb/a/mailverify" method="post" target="fbpopupwindow" onsubmit="window.open('http://feedburner.google.com/fb/a/mailverify?uri=imagepush', 'fbpopupwindow', 'scrollbars=yes,width=550,height=520');return true">
-            <h3> <a href="http://feeds.feedburner.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" title="Subscribe to our RSS-feed" style="vertical-align: top;" class="share-rss-16"></a>&nbsp; Subscribe to our daily updates:</h3>
-            <p>
-              <input type="email" name="email" placeholder="Enter your E-mail" />
-              <input type="hidden" value="imagepush" name="uri"/>
-              <input type="hidden" name="loc" value="en_US"/>
-              <input type="submit" value="Subscribe" /></p>
-            <p>
             <p style="margin-bottom: 0;">
+              <a class="share-rss" href="http://imagepush.to/rss" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Latest images on RSS"></a>
               <a class="share-twitter-alt" href="http://twitter.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Twitter"></a>
               <a class="share-fb" href="http://www.facebook.com/imagepush.to" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Facebook"></a>
               <a class="share-follow-digg" href="http://digg.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow me on Digg"></a>
+              {#
               <br />
               <a class="share-netvibes" href="http://www.netvibes.com/subscribe.php?module=UWA&moduleUrl=http%3A%2F%2Fimagepush.to%2Fnetvibes%2Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
               <a class="share-google" href="http://www.google.com/ig/add?moduleurl=http%3A%2F%2Fnvmodules.netvibes.com%2Fwidget%2Fgspec%3FuwaUrl%3Dhttp%253A%252F%252Fimagepush.to%252Fnetvibes%252Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
-
-              {#
               <a class="share-digg" href="http://digg.com/imagepush" target="_blank" rel="me external nofollow" title="Follow us on Digg"></a>
               <a class="share-gbuzz" href="https://profiles.google.com/imagepush.to/buzz" target="_blank" rel="me external nofollow" title="Follow us on Google Buzz"></a>
               <a class="share-tumblr" href="http://imagepush.tumblr.com" target="_blank" rel="me external nofollow" title="Follow us on Tumblr"></a>
@@ -129,9 +121,7 @@
               <a href="http://www.delicious.com/imagepush" target="_blank" title="Follow us on Delicious"><img src="/images/icons/32/del.icio.us.png" alt="" height="32" /></a>
               <a href="http://www.stumbleupon.com/stumbler/imagepush/" target="_blank" title="Follow us on StumbleUpon"><img src="/images/icons/32/StumbleUpon.png" alt="" height="32" /></a>
               #}
-            </p>
             {# <p class="more"><a href="#">View more subscribing options</a></p> #}
-          </form>
         </section>
         <figure>
           {{ siteHelper.html('right_300x250') }}
