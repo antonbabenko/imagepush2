@@ -7,9 +7,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * Processed image hashes (in order to not index same images more then once)
  * 
- * @MongoDB\Document(collection="processedHash", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ProcessedHashRepository")
+ * @MongoDB\Document(collection="processedHash", repositoryClass="Imagepush\ImagepushBundle\Document\ProcessedHashRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, dropDups=true, safe=false)
+ *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, safe=true)
  * })
  */
 class ProcessedHash

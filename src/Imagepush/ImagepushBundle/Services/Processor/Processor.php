@@ -27,21 +27,11 @@ class Processor
      */
     public $container;
 
-    /**
-     * Is debug mode?
-     * Database is not heavily modified (almost no data removed when debug mode is on)
-     * 
-     * @var boolean $isDebug
-     */
-    public $isDebug;
-
-    public function __construct(ContainerInterface $container, $isDebug)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get('imagepush.processor_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
-
-        $this->isDebug = $isDebug;
     }
 
     /**
@@ -61,7 +51,7 @@ class Processor
         /**
          * Create image object based on unprocessed source
          */
-        $image = $this->dm->getRepository('ImagepushBundle:Image')->initUnprocessedSource($this->isDebug);
+        $image = $this->dm->getRepository('ImagepushBundle:Image')->initUnprocessedSource();
 
         if ($image) {
             $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink()));
@@ -72,7 +62,7 @@ class Processor
             return $log;
         }
 
-        if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($image->getLink())) {
+        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($image->getLink())) {
             return false;
         }
 
@@ -101,9 +91,9 @@ class Processor
          */
         if ($content->isImageType()) {
 
-            $this->logger->info(sprintf("ID: %d. Hash: %s. isDebug: %d", $image->getId(), $content->getContentMd5(), (int) $this->isDebug));
+            $this->logger->info(sprintf("ID: %d. Hash: %s.", $image->getId(), $content->getContentMd5()));
 
-            if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
+            if ($this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
                 $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
             } else {
 
@@ -159,9 +149,9 @@ class Processor
                             continue;
                         }
 
-                        $this->logger->info(sprintf("ID: %d. Hash: %s. isDebug: %d", $image->getId(), $contentInside->getContentMd5(), (int) $this->isDebug));
+                        $this->logger->info(sprintf("ID: %d. Hash: %s.", $image->getId(), $contentInside->getContentMd5()));
 
-                        if (!$this->isDebug && $this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
+                        if ($this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
                             $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
 
                             continue;

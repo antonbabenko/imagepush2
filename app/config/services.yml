@@ -16,7 +16,7 @@ services:
     # Processor
     imagepush.processor:
         class: Imagepush\ImagepushBundle\Services\Processor\Processor
-        arguments: [@service_container, %kernel.debug%]
+        arguments: [@service_container]
 
     imagepush.processor.content:
         class: Imagepush\ImagepushBundle\Services\Processor\Content\Content
