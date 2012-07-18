@@ -363,7 +363,16 @@ class FrontController extends Controller
      */
     public function testAction()
     {
-        return new Response("Date: ".date('r')."<br />Hash: ".md5(rand()));
+        return new Response("Date: " . date('r') . "<br />Hash: " . md5(rand()));
+    }
+
+    /**
+     * @Route("/varnishtest", name="varnishtest")
+     * @Template()
+     */
+    public function varnishtestAction()
+    {
+        return array("hash" => md5(rand()));
     }
 
 }
