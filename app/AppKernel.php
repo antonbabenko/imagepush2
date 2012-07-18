@@ -22,6 +22,7 @@ class AppKernel extends Kernel
             new Liip\ImagineBundle\LiipImagineBundle(),
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+            new Liip\CacheControlBundle\LiipCacheControlBundle(),
             new Imagepush\ImagepushBundle\ImagepushBundle(),
             new Imagepush\SitemapBundle\SitemapBundle(),
         );

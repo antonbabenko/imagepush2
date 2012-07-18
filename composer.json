@@ -36,6 +36,7 @@
         "knplabs/knp-gaufrette-bundle": "dev-master",
         
         "stof/doctrine-extensions-bundle": "1.0.x-dev",
+        "liip/cache-control-bundle": "dev-master",
         
         "digg/Services_Digg2": "*",
         "fabpot/Goutte": "*",
