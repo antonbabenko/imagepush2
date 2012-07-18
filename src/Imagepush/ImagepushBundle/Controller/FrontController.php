@@ -357,4 +357,13 @@ class FrontController extends Controller
         return array();
     }
 
+    /**
+     * @Route("/test", name="test")
+     * @Template()
+     */
+    public function testAction()
+    {
+        return new Response("Date: ".date('r')."<br />Hash: ".md5(rand()));
+    }
+
 }

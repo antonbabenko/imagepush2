@@ -95,6 +95,8 @@ class CustomStrings
     koikoikoi.com - Visual Arts Magazine, graphic design, illustration, photography, interviews, inspiration, tutorials
     The Fonda Theatre
     Imgur
+    The Standard Downtown
+    Slideshows
 ';
 
     /**
