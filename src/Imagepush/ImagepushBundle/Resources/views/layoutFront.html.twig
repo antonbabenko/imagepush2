@@ -83,7 +83,7 @@
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>
         
-        {% render "ImagepushBundle:Front:_trendingNow" with {'max': 20} %}
+        {% render "ImagepushBundle:Front:_trendingNow" with {'max': 20}, {'standalone': true} %}
         
       </header>
 
@@ -101,73 +101,15 @@
       <div id="content">{% block content %}{% endblock %}</div>
 
       <aside id="asideInfo">
-        <p><span class="h2">Imagepush.to</span> aggregates images from the most popular sites on the web, arranges them by categories, and pushes the best of the best to you hourly.</p>
-        {# <p>If you have a site or blog, you can take our free widgets. <a href="#" class="more">Read more</a></p> #}
-        <section id="subscribe">
-            <p style="margin-bottom: 0;">
-              <a class="share-rss" href="http://imagepush.to/rss" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Latest images on RSS"></a>
-              <a class="share-twitter-alt" href="http://twitter.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Twitter"></a>
-              <a class="share-fb" href="http://www.facebook.com/imagepush.to" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow us on Facebook"></a>
-              <a class="share-follow-digg" href="http://digg.com/imagepush" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external nofollow" title="Follow me on Digg"></a>
-              {#
-              <br />
-              <a class="share-netvibes" href="http://www.netvibes.com/subscribe.php?module=UWA&moduleUrl=http%3A%2F%2Fimagepush.to%2Fnetvibes%2Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
-              <a class="share-google" href="http://www.google.com/ig/add?moduleurl=http%3A%2F%2Fnvmodules.netvibes.com%2Fwidget%2Fgspec%3FuwaUrl%3Dhttp%253A%252F%252Fimagepush.to%252Fnetvibes%252Flatest.html" onclick="recordOutboundLink(this, 'Sidebar', this.href);return false;" target="_blank" rel="me external" title="Add to Google"></a>
-              <a class="share-digg" href="http://digg.com/imagepush" target="_blank" rel="me external nofollow" title="Follow us on Digg"></a>
-              <a class="share-gbuzz" href="https://profiles.google.com/imagepush.to/buzz" target="_blank" rel="me external nofollow" title="Follow us on Google Buzz"></a>
-              <a class="share-tumblr" href="http://imagepush.tumblr.com" target="_blank" rel="me external nofollow" title="Follow us on Tumblr"></a>
-              <a class="share-lj" href="http://imagepush.livejournal.com/" target="_blank" rel="me external nofollow" title="Follow us on Livejournal"></a>
-              <a class="share-myspace" href="http://myspace.com/imagepush" target="_blank" rel="me external nofollow" title="Follow us on MySpace"></a>
-              <a href="http://www.delicious.com/imagepush" target="_blank" title="Follow us on Delicious"><img src="/images/icons/32/del.icio.us.png" alt="" height="32" /></a>
-              <a href="http://www.stumbleupon.com/stumbler/imagepush/" target="_blank" title="Follow us on StumbleUpon"><img src="/images/icons/32/StumbleUpon.png" alt="" height="32" /></a>
-              #}
-            {# <p class="more"><a href="#">View more subscribing options</a></p> #}
-        </section>
-        <figure>
-          {{ siteHelper.html('right_300x250') }}
-        </figure>
-
-        {# {{ siteHelper.html('facebook_likebox') }} #} 
-
+        {% render "ImagepushBundle:Front:_sidebar" with {}, {'standalone': true} %}
       </aside>
       <div class="footerFix"></div>
       {# <?php include_slot("verticalShare"); ?> #}
 
     </div>
 
+   {% render "ImagepushBundle:Front:_footer" with {}, {'standalone': true} %}
 
-    <footer>
-      <menu>
-        <li><a href="/about">About</a></li>
-        {# <li><a href="/about#advert" title="Advertising on this site">Advertising here</a></li>
-        <? /* <li><a href="#" title="Resources for sites owners">Resources</a> |</li>
-        <li><a href="#" title="Resources for developers">For developers</a></li> */ ?> #}
-      </menu>
-      <div class="copyright">&copy; 2011&ndash;{{ "now"|date("Y") }} &mdash; Created and sponsored by <a href="http://www.web-developer.no/" target="_blank">Anton Babenko</a></div>
-    </footer>
-
-    {# <? /* <script type="text/javascript" src="/js/base.js"></script> */ ?> #}
-    {% raw %}
-    <script type="text/javascript">
-      var addthis_share = {
-        templates: {
-          twitter: '{{title}} {{url}} via @imagepush'
-        },
-        url_transforms: {
-          clean: true,
-          shorten: {
-            twitter: 'bitly'
-          }
-        },
-        shorteners: {
-          bitly: { username: 'antonbabenko', apiKey: 'R_5962066cd056895f0f0c5b62c1bd6341' }
-        }
-      };
-      var addthis_config = { data_ga_property: 'UA-20823942-1', data_track_clickback: true, data_track_addressbar: true, ui_508_compliant: true, services_exclude: 'print', ui_use_image_picker : true };
-    </script>
-    <script src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
-    {% endraw %}
-    
   </body>
 </html>
 {# {% endspaceless %} #}

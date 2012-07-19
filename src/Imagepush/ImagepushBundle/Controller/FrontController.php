@@ -17,6 +17,7 @@ class FrontController extends Controller
      * @Route("/", name="index")
      * @Template()
      * @Cache(expires="+1 hour")
+     * @Cache(smaxage="3600")
      */
     public function indexAction()
     {
@@ -68,8 +69,10 @@ class FrontController extends Controller
 
     /**
      * Universal function to show images by tags/ by type (upcoming/current)
+     * 
      * @Template()
      * @Cache(expires="+5 minutes")
+     * @Cache(smaxage="300")
      */
     public function viewMultipleAction($type, $tag = null)
     {
@@ -113,7 +116,8 @@ class FrontController extends Controller
     /**
      * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, name="viewImage")
      * @Template()
-     * @Cache(expires="+1 day")
+     * @Cache(expires="+1 hour")
+     * @Cache(smaxage="86400")
      */
     public function viewImageAction($id)
     {
@@ -122,9 +126,6 @@ class FrontController extends Controller
         $image = $dm
             ->getRepository('ImagepushBundle:Image')
             ->findOneBy(array("id" => (int) $id, "isAvailable" => true));
-
-        //\D::dump($id);
-        //\D::dump($image->getMimeType());
 
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');
@@ -148,6 +149,7 @@ class FrontController extends Controller
      * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
      * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
      * @Cache(expires="+30 minutes")
+     * @Cache(maxage="1800")
      */
     public function latestImagesFeedAction($_format)
     {
@@ -208,8 +210,6 @@ class FrontController extends Controller
 
     /**
      * Display top box with trending tags
-     * 
-     * @Template()
      */
     public function _trendingNowAction($max = 20)
     {
@@ -219,23 +219,29 @@ class FrontController extends Controller
             ->getRepository('ImagepushBundle:LatestTag')
             ->getLatestTrends($max);
 
-        return array("tags" => $tags);
+        $parameters = array("tags" => $tags);
+
+        $response = $this->render('ImagepushBundle:Front:_trendingNow.html.twig', $parameters);
+        $response->setSharedMaxAge(3600);
+
+        return $response;
     }
 
     /**
      * Display comment box
-     * 
-     * @Template()
      */
     public function _commentsAction($href)
     {
-        return array("href" => $href);
+        $parameters = array("href" => $href);
+
+        $response = $this->render('ImagepushBundle:Front:_comments.html.twig', $parameters);
+        $response->setSharedMaxAge(86400);
+
+        return $response;
     }
 
     /**
      * Display thumb box
-     * 
-     * @Template()
      */
     public function _thumbBoxAction($initialTags = array(), $skipImageId = false, $withAd = false)
     {
@@ -347,18 +353,54 @@ class FrontController extends Controller
         //\D::dump($withAd);
         //\D::dump($initialTags);
 
-        return array(
+        $parameters = array(
             "allImages" => $allImages,
             "initialTags" => $initialTags,
             "skipImageId" => $skipImageId,
             "withAd" => $withAd,
             "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
+
+        $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
+
+        /**
+         * Related images view cache for longer, because they updates seldom
+         */
+        if (count($initialTags)) {
+            $response->setSharedMaxAge(86400);
+        } else {
+            $response->setSharedMaxAge(600);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Display sidebar box
+     */
+    public function _sidebarAction()
+    {
+        $response = $this->render('ImagepushBundle:Front:_sidebar.html.twig');
+        $response->setSharedMaxAge(3600);
+
+        return $response;
+    }
+
+    /**
+     * Display footer
+     */
+    public function _footerAction()
+    {
+        $response = $this->render('ImagepushBundle:Front:_footer.html.twig');
+        $response->setSharedMaxAge(3600);
+
+        return $response;
     }
 
     /**
      * @Route("/about", name="about")
      * @Template()
-     * @Cache(expires="+1 month")
+     * @Cache(expires="+1 week")
+     * @Cache(smaxage="86400")
      */
     public function aboutAction()
     {
