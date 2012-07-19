@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
 class FrontController extends Controller
 {
@@ -15,6 +16,7 @@ class FrontController extends Controller
     /**
      * @Route("/", name="index")
      * @Template()
+     * @Cache(expires="+1 hour")
      */
     public function indexAction()
     {
@@ -46,7 +48,6 @@ class FrontController extends Controller
 
     /**
      * @Route("/tag/{tag}/upcoming", name="viewUpcomingByTag")
-     * @Template()
      */
     public function viewUpcomingByTagAction($tag)
     {
@@ -57,7 +58,6 @@ class FrontController extends Controller
 
     /**
      * @Route("/tag/{tag}", name="viewByTag")
-     * @Template()
      */
     public function viewByTagAction($tag)
     {
@@ -69,6 +69,7 @@ class FrontController extends Controller
     /**
      * Universal function to show images by tags/ by type (upcoming/current)
      * @Template()
+     * @Cache(expires="+5 minutes")
      */
     public function viewMultipleAction($type, $tag = null)
     {
@@ -114,6 +115,7 @@ class FrontController extends Controller
     /**
      * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, name="viewImage")
      * @Template()
+     * @Cache(expires="+1 hour")
      */
     public function viewImageAction($id)
     {
@@ -147,6 +149,7 @@ class FrontController extends Controller
      * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
      * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
      * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
+     * @Cache(expires="+1 hour")
      */
     public function latestImagesFeedAction($_format)
     {
@@ -351,6 +354,7 @@ class FrontController extends Controller
     /**
      * @Route("/about", name="about")
      * @Template()
+     * @Cache(expires="+1 month")
      */
     public function aboutAction()
     {
@@ -369,6 +373,7 @@ class FrontController extends Controller
     /**
      * @Route("/varnishtest", name="varnishtest")
      * @Template()
+     * @Cache(expires="+1 minute")
      */
     public function varnishtestAction()
     {
