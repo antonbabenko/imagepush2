@@ -125,7 +125,7 @@ liip_cache_control:
         #- { path: ^/test, reverse_proxy_ttl: 30, controls: { public: true, max_age: 10, s_maxage: 20, last_modified: "now" }, vary: [Accept-Encoding, Accept-Language] }
         #- { path: ^/varnishtest, reverse_proxy_ttl: 30, controls: { public: true, max_age: 10, s_maxage: 20, last_modified: "now" }, vary: [Accept-Encoding, Accept-Language] }
         # - { path: ^/, reverse_proxy_ttl: 300, controls: { public: true }, vary: [Accept-Encoding, Accept-Language] }
-        #- { path: ^/, controls: { public: true }, vary: [Accept-Encoding, Accept-Language] }
+        - { path: ^/, controls: { public: true }, vary: [Accept-Encoding, Accept-Language] }
     varnish:
         domain: %site_url%     # http://imagepush.to
         ips: 127.0.0.1         # comma separated list of ips, or an array of ips
