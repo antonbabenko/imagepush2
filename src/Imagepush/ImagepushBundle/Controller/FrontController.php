@@ -92,8 +92,6 @@ class FrontController extends Controller
                 throw new NotFoundHttpException(sprintf('There are no %s images to show by tag: %s', $type, $tag));
             }
 
-            //$typeField = 'getUsedIn' . ($type == "current" ? "Available" : "Upcoming");
-            // && $tagObject->{$typeField}() > 0))
             // Opposite type field has number of images in each tag, so we can show or hide the opposite type link
             $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
 
@@ -115,7 +113,7 @@ class FrontController extends Controller
     /**
      * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, name="viewImage")
      * @Template()
-     * @Cache(expires="+1 hour")
+     * @Cache(expires="+1 day")
      */
     public function viewImageAction($id)
     {
@@ -149,12 +147,18 @@ class FrontController extends Controller
      * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
      * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
      * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
-     * @Cache(expires="+1 hour")
+     * @Cache(expires="+30 minutes")
      */
     public function latestImagesFeedAction($_format)
     {
 
         $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('type' => 'current', '_format' => $_format));
+
+        if ($_format == "rss2" || $_format == "rss") {
+            $response->headers->set('Content-Type', 'application/rss+xml');
+        } elseif ($_format == "atom") {
+            $response->headers->set('Content-Type', 'application/atom+xml');
+        }
 
         return $response;
     }
