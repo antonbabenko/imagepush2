@@ -93,6 +93,6 @@
   </div>
 </section>
 
-{% render "ImagepushBundle:Front:_thumbBox" with {'initialTags': image.tags, 'skipImageId': image.id, 'withAd': true} %}
+{% render "ImagepushBundle:Front:_thumbBox" with {'initialTags': image.tags, 'skipImageId': image.id, 'withAd': true}, {'standalone': true} %}
 
 {% endblock %}

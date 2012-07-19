@@ -1,0 +1,31 @@
+<footer>
+    <menu>
+        <li><a href="/about">About</a></li>
+        {# <li><a href="/about#advert" title="Advertising on this site">Advertising here</a></li>
+        <? /* <li><a href="#" title="Resources for sites owners">Resources</a> |</li>
+          <li><a href="#" title="Resources for developers">For developers</a></li> */ ?> #}
+    </menu>
+    <div class="copyright">&copy; 2011&ndash;{{ "now"|date("Y") }} &mdash; Created and sponsored by <a href="http://www.web-developer.no/" target="_blank">Anton Babenko</a></div>
+</footer>
+
+{# <? /* <script type="text/javascript" src="/js/base.js"></script> */ ?> #}
+{% raw %}
+<script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} {{url}} via @imagepush'
+        },
+        url_transforms: {
+            clean: true,
+            shorten: {
+                twitter: 'bitly'
+            }
+        },
+        shorteners: {
+            bitly: { username: 'antonbabenko', apiKey: 'R_5962066cd056895f0f0c5b62c1bd6341' }
+        }
+    };
+    var addthis_config = { data_ga_property: 'UA-20823942-1', data_track_clickback: true, data_track_addressbar: true, ui_508_compliant: true, services_exclude: 'print', ui_use_image_picker : true };
+</script>
+<script src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
+{% endraw %}
