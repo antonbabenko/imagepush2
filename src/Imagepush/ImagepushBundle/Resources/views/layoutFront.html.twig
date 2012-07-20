@@ -50,11 +50,7 @@
     <meta property="fb:app_id" content="118412418235312" />
 
     <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
-    <script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
-
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-
+    
     <!--[if lt IE 8]>
 		<link rel="stylesheet" href="{{ asset('css/ie67.css') }}" />
 	<![endif]-->
@@ -78,7 +74,7 @@
   <body>
     <div id="body">
       <header class="clearfix">
-        <div class="logo"><a href="{{ path('index') }}" title="Imagepush"><img src="{{ asset('images/imagepush-logo.png') }}" alt="Imagepush" /></a></div>
+        <div class="logo"><a href="{{ path('index') }}" title="Imagepush"><img src="{{ asset('images/imagepush-logo.png') }}" alt="Imagepush" width="94" height="59" class="not_lazy" /></a></div>
         <div class="search_box">
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>

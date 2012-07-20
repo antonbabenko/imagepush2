@@ -27,6 +27,7 @@ class AbstractFetcher
      */
     public $logger;
     public $dm;
+    public $varnish;
     public $parameters;
 
     /**
@@ -43,6 +44,7 @@ class AbstractFetcher
     {
         $this->logger = $container->get('imagepush.fetcher_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+        $this->varnish = $container->get('imagepush.varnish');
 
         if (!$this->fetcherType = $fetcherType) {
             throw new \Exception("AbstractFetcher should have fetcherType defined before construct");

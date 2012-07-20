@@ -8,7 +8,15 @@
     <div class="copyright">&copy; 2011&ndash;{{ "now"|date("Y") }} &mdash; Created and sponsored by <a href="http://www.web-developer.no/" target="_blank">Anton Babenko</a></div>
 </footer>
 
-{# <? /* <script type="text/javascript" src="/js/base.js"></script> */ ?> #}
+{# INCLUDE JQUERY FIRST #}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+    if (typeof jQuery == 'undefined') document.write(unescape("%3Cscript src='{{ asset('js/jquery-1.7.2.min.js') }}'"))
+</script>
+
+{# <script type="text/javascript" src="{{ asset('js/jquery.lazyload.min.js') }}"></script> #}
+<script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
+
 {% raw %}
 <script type="text/javascript">
     var addthis_share = {

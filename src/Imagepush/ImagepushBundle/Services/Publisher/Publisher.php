@@ -101,6 +101,9 @@ class Publisher
 
         $this->logger->info($log);
 
+        // Purge cached pages
+        $this->varnish->purgeWhenNewImageIsPublished($image);
+
         return $log;
     }
 
