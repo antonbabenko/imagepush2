@@ -21,6 +21,7 @@ class Publisher
         $this->container = $container;
         $this->logger = $container->get('logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+        $this->varnish = $container->get('imagepush.varnish');
     }
 
     public function publishLatestUpcomingImage()

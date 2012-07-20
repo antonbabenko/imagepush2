@@ -15,8 +15,7 @@ class CustomStringsFixture
             "åøæ!123" => "åøæ-123",
             "'\"quote\"'" => "quote",
             "---(Anton)---" => "anton",
-            // cut first 200 chars
-            "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-go",
+            "keep first 200 chars in this very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-go",
         );
 
         return $data;
@@ -78,7 +77,14 @@ class CustomStringsFixture
             "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GO",
             "Photos: title" => "title",
             "Photos - title" => "title",
-            "title. (Pic.)" => "title.",
+            "title." => "title",
+            "title..." => "title...",
+            "title.........." => "title...",
+            "title. (Pic.)" => "title",
+            "title. (i.imgur.com)" => "title",
+            "A.B.C." => "A.B.C.",
+            "title A.B.C." => "title A.B.C.",
+            "title abc." => "title abc",
             //"[pic] title" => "title",
         );
 

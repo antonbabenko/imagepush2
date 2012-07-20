@@ -16,7 +16,7 @@ class FrontController extends Controller
     /**
      * @Route("/", name="index")
      * @Template()
-     * @Cache(expires="+1 hour")
+     * @Cache(expires="+10 minutes")
      * @Cache(smaxage="3600")
      */
     public function indexAction()
@@ -27,12 +27,6 @@ class FrontController extends Controller
             ->getRepository('ImagepushBundle:Image')
             ->findImages("current", 7);
 
-        /* $i = array_values($images);
-          $image = $i[0];
-          echo "<br>==".$mainImage = $this->get('twig.extension.imagepush')->imagepushFilter($image->getFile(), 'in', 463, 1548, $image->getId());
-          echo "<br>==".$mainImageWidth = $image->getThumbProperty("in", 463, 1548, "w");
-          echo "<br>==".$mainImageHeight = $image->getThumbProperty("in", 463, 1548, "h");
-         */
         return array("images" => array_values($images));
     }
 
@@ -148,7 +142,7 @@ class FrontController extends Controller
      * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
      * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
      * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
-     * @Cache(expires="+30 minutes")
+     * @Cache(expires="+10 minutes")
      * @Cache(maxage="1800")
      */
     public function latestImagesFeedAction($_format)
@@ -399,31 +393,12 @@ class FrontController extends Controller
     /**
      * @Route("/about", name="about")
      * @Template()
-     * @Cache(expires="+1 week")
+     * @Cache(expires="+1 hour")
      * @Cache(smaxage="86400")
      */
     public function aboutAction()
     {
         return array();
-    }
-
-    /**
-     * @Route("/test", name="test")
-     * @Template()
-     */
-    public function testAction()
-    {
-        return new Response("Date: " . date('r') . "<br />Hash: " . md5(rand()));
-    }
-
-    /**
-     * @Route("/varnishtest", name="varnishtest")
-     * @Template()
-     * @Cache(expires="+1 minute")
-     */
-    public function varnishtestAction()
-    {
-        return array("hash" => md5(rand()));
     }
 
 }

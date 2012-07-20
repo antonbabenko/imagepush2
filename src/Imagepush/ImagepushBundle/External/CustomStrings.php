@@ -8,7 +8,7 @@ class CustomStrings
     public static $separatorPattern =
         '[|\-«»—~:\@]+';
     public static $generalEndingsPattern =
-        '@[-{(\[][\d\s]*(pic|pics|pic\.|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video)+\s*[)\]}]*$@ui';
+        '@[-{(\[][\d\s]*(pic|pics|pic\.|image|images|img|imgs|graphic|graphics|graph|photo|photos|picture|pictures|gif|gifs|flowchart|comic|cartoon|gallery|slideshow|infographic|infographics|info\-graphic|infograph|w/vid|w/video|w/ vid|w/ video|w/ pics&vid|vid + pics|chart|video|i\.imgur\.com)+\s*[)\]}]*$@ui';
     public static $forbiddenEndingsPattern =
         '@[-{(\[]\s*(nsfw)+\s*[)\]}]@ui';
     public static $urlPattern =
@@ -193,6 +193,12 @@ class CustomStrings
         $text = preg_replace('/\s\s+/', ' ', $text);
 
         $text = trim($text);
+
+        // remove single dot from the end, if not abbreviated
+        // INCOMPLETE!!!!!
+        $text = preg_replace('/(^[\.])+\.{3,}$/', '...', $text);
+        //$text = preg_replace('/\.{1}$/', '', $text);
+        //$text = preg_replace('/(\.[A-Z]{1}){0}\.$/', '', $text);
 
         if ($text == "") {
             $text = "Untitled";

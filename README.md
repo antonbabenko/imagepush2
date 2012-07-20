@@ -107,3 +107,15 @@ s3cmd sync --recursive -f -P -p -M -H --progress /var/www/imagepush/current/web/
      * http://sharedcount.com/?url=http%3A%2F%2Fimagepush.to%2F
      * http://www.linkedin.com/cws/share-count?url=http://www.facebook.com
      * 
+
+---
+Useful Varnish commands:
+
+List urls which miss:
+varnishtop -i txurl
+
+Activity by IP:
+varnishlog -b -m TxHeader:88.88.35.99
+
+curl -I -X PURGE http://imagepush.to/
+curl -I -X PURGE http://imagepush.to/about

@@ -62,6 +62,11 @@ class Varnish
         $this->purgeUrl("/");
         $this->purgeUrl("/upcoming");
 
+        // Feeds
+        $this->purgeUrl("/rss");
+        $this->purgeUrl("/rss2");
+        $this->purgeUrl("/atom");
+
         // Get prelast published image (to update prev/next links)
         if ($image) {
             $prevImage = $this->dm
