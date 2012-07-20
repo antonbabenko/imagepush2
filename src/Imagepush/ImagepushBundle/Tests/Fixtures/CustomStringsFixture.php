@@ -15,7 +15,7 @@ class CustomStringsFixture
             "åøæ!123" => "åøæ-123",
             "'\"quote\"'" => "quote",
             "---(Anton)---" => "anton",
-            "keep first 200 chars in this very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-go",
+            "keep first 200 chars in this very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here very LONG title GOES here (PHOTOS)" => "keep-first-200-chars-in-this-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title-goes-here-very-long-title",
         );
 
         return $data;
