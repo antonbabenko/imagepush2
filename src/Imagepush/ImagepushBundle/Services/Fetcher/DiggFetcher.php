@@ -216,6 +216,8 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
                     $this->output[] = sprintf("[Digg] %s: %d sources received, but nothing has been saved (all filtered out).", date(DATE_RSS), $this->fetchedCounter);
                 } else {
                     $this->output[] = sprintf("[Digg] %s: %d of %d items have been saved. Recent source date was on %s", date(DATE_RSS), $this->savedCounter, $this->fetchedCounter, date(DATE_RSS, $this->recentSourceDate));
+
+                    $this->varnish->purgeWhenNewImagesSavedAsUpcoming();
                 }
             } else {
                 $this->output[] = sprintf("[Digg] %s: Digg replied with error: %s. Code: %s", date(DATE_RSS), $status["message"], $status["code"]);

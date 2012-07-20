@@ -17,10 +17,9 @@ robot:
     prefix:   /robot
     type:     annotation
 
-#import:
-#    resource: "@ImagepushBundle/Controller/ImportController.php"
-#    prefix:   /import
-#    type:     annotation
+varnish:
+    resource: "@ImagepushBundle/Controller/VarnishController.php"
+    type:     annotation
 
 _imagine:
     resource: .

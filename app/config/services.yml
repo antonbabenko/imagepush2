@@ -62,6 +62,10 @@ services:
         class: Imagepush\ImagepushBundle\Services\Publisher\Publisher
         arguments: [@service_container]
 
+    # Varnish
+    imagepush.varnish:
+        class: Imagepush\ImagepushBundle\Services\Varnish\Varnish
+        arguments: [@service_container]
 
     # Loggers
     imagepush.processor_logger:
@@ -70,7 +74,6 @@ services:
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-            #- [pushProcessor, [@log_memory_peak_usage_processor]]
         
     imagepush.fetcher_logger:
         class: Monolog\Logger
@@ -78,7 +81,12 @@ services:
         calls:
             - [pushHandler, [@imagepush.fetcher_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-            #- [pushProcessor, [@log_memory_peak_usage_processor]]
+
+    imagepush.varnish_logger:
+        class: Monolog\Logger
+        arguments: [varnish]
+        calls:
+            - [pushHandler, [@imagepush.varnish_log_handler]]
 
     imagepush.processor_log_handler:
         class: Monolog\Handler\StreamHandler
@@ -87,6 +95,10 @@ services:
     imagepush.fetcher_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/fetcher_%kernel.environment%.log, 100]
+
+    imagepush.varnish_log_handler:
+        class: Monolog\Handler\StreamHandler
+        arguments: [%kernel.logs_dir%/varnish_%kernel.environment%.log, 100]
     
     # General log processors
     log_web_processor:
