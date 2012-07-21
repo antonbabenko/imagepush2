@@ -237,7 +237,7 @@ class FrontController extends Controller
     /**
      * Display thumb box
      */
-    public function _thumbBoxAction($initialTags = array(), $skipImageId = false, $withAd = false)
+    public function _thumbBoxAction($initialTags = array(), $skipImageId = false)
     {
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
@@ -344,26 +344,16 @@ class FrontController extends Controller
         }
 
         //\D::dump($allImages);
-        //\D::dump($withAd);
         //\D::dump($initialTags);
 
         $parameters = array(
             "allImages" => $allImages,
             "initialTags" => $initialTags,
             "skipImageId" => $skipImageId,
-            "withAd" => $withAd,
             "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
 
         $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
-
-        /**
-         * Related images view cache for longer, because they updates seldom
-         */
-        if (count($initialTags)) {
-            $response->setSharedMaxAge(86400);
-        } else {
-            $response->setSharedMaxAge(600);
-        }
+        $response->setSharedMaxAge(86400);
 
         return $response;
     }
