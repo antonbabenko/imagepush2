@@ -119,3 +119,13 @@ varnishlog -b -m TxHeader:88.88.35.99
 
 curl -I -X PURGE http://imagepush.to/
 curl -I -X PURGE http://imagepush.to/about
+
+---
+How to decide if image is a porn/nsfw ?
+1) Filter by domain name, where image was found.
+2) As of 21.07.2012 there is no "search by image" API comand in Google Custom Search, but it is possible to do this:
+2a) Search by image URL like this:
+https://www.google.no/searchbyimage?image_url=http://1.bp.blogspot.com/-MhfcaPKvuaI/T5UsS_prLUI/AAAAAAAAAOA/vLLhbC5Pnu0/s1600/pamela-anderson.jpg
+2b) Get list of domains in "Pages that include matching images"
+2c) Decide on good/bad domain name ratio.
+3) Twitter hash tags for this link
