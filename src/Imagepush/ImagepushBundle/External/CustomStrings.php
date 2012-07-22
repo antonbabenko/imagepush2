@@ -194,11 +194,12 @@ class CustomStrings
 
         $text = trim($text);
 
-        // remove single dot from the end, if not abbreviated
-        // INCOMPLETE!!!!!
-        $text = preg_replace('/(^[\.])+\.{3,}$/', '...', $text);
-        //$text = preg_replace('/\.{1}$/', '', $text);
-        //$text = preg_replace('/(\.[A-Z]{1}){0}\.$/', '', $text);
+        // replace many dots or punctuation marks (like "!", "?") with 3 items
+        $text = preg_replace('/([\w\s])(\p{P}){3,}$/ui', '${1}${2}${2}${2}', $text);
+
+        // remove dot from the end, if not abbreviated (\p{Ll} - means lower case letter)
+        $text = preg_replace('/([\p{Ll}\s])\.{0,2}$/ui', '${1}', $text);
+        $text = trim($text);
 
         if ($text == "") {
             $text = "Untitled";

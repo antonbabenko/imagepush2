@@ -1,20 +1,7 @@
 Imagepush.to using Symfony2 (stable).
 
-Rewrite from symfony 1.4 started 28th of July.
+Rewrite from symfony 1.4 started 28th of July, 2011.
 
----
-Redis notes:
-
-Symfony 1.4 used Redis 2.0.4, but Symfony 2 is using Redis 2.2.12 (to upgrade to 2.4) via this bundle (https://github.com/snc/SncRedisBundle)
-
-Upgrade Redis (http://redis.io/download):
-
-curl -O http://redis.googlecode.com/files/redis-2.2.12.tar.gz
-tar xzf redis-2.2.12.tar.gz
-cd redis-2.2.12
-make
-
----
 Install PEAR Digg Services:
 pear install -a -f -B pear.php.net/Services_Digg2-0.3.2
 pear install -a -f pear.php.net/HTTP_Request2-0.6.0
@@ -47,40 +34,10 @@ from deps:
     git=https://github.com/igorw/Goutte.git
 //    git=https://github.com/fabpot/Goutte.git
 
-        /**
-         * @todo: split $uselessTags into $whitelistedTags and $blacklistedTags for each source and global. Some tags are irrelevant to show on the site, but very good to use as twitter hashtags.
-         */
 ---
-todo on production:
-1) Remove null tag from redis:
-del tag_d41d8cd98f00b204e9800998ecf8427e
----
-
-1) Link added to link_list_to_process
-2) Link moved to upcoming_image_list after Processor->run() (sorted list of images with thumbs, but without tags and scores yet)
-3) TagProcessor->run() find tags for upcoming image and push to image_list - sorted list of images with add data (thumbs, tags, score) needed to show on the site.
-//4) Later: ScoreProcessor->run() calculate score for the image (periodically).
-5) Push from image_list based on score (later), but for now (just latest).
 
 Todo:
 rename to - Fetcher, Processor, Publisher
-
-
----
-10.6.2012:
-Probably, there should be services to:
-1) Get and save source data from:
-1.1) Digg
-1.2) RSS
-1.3) Pinterest
-2) Process source data
-3) Get unprocessed sources
-4) Get content by URI
-5) Save image data based on source
-6) Find tags for source:
-6.1) Digg
-6.2) Delicious, etc
-7) Update image data based on tags
 
 ---
 scp ~/bin/dump.rdb anton-server:/mnt/redis_data
@@ -120,6 +77,14 @@ varnishlog -b -m TxHeader:88.88.35.99
 curl -I -X PURGE http://imagepush.to/
 curl -I -X PURGE http://imagepush.to/about
 
+---
+Install munin:
+http://www.slideshare.net/kimlindholm/varnish-configuration-step-by-step
+Page 19
+wget https://raw.github.com/munin-monitoring/contrib/master/plugins/varnish/varnish_cachehitratio
+wget https://raw.github.com/munin-monitoring/contrib/master/plugins/varnish/varnish_healthy_backends
+wget https://raw.github.com/munin-monitoring/contrib/master/plugins/varnish/varnish_hitrate
+wget https://raw.github.com/munin-monitoring/contrib/master/plugins/varnish/varnish_total_objects
 ---
 How to decide if image is a porn/nsfw ?
 1) Filter by domain name, where image was found.
