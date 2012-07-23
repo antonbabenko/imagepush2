@@ -65,9 +65,11 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
         //\D::dump($response->headers->get('Content-Type'));
         //$targetPath = $filter . "/". $targetPath;
         //\D::dump($targetPath);
+        
+        $contentType = $response->headers->get('Content-Type', "image/jpeg");
 
         $metadata = array(
-            'Content-Type' => $response->headers->get('Content-Type', "image/jpeg"),
+            'Content-Type' => $contentType,
             'Cache-Control' => 'public',
             'Expires' => gmdate(DATE_RFC822, strtotime("+1 year"))
         );
@@ -86,6 +88,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
             //\D::dump(\AmazonS3::ACL_PUBLIC);
 
             $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
+            //$amazonS3->change_content_type($bucket, $targetPath, $contentType);
         }
 
         $response->setEtag(md5($targetPath));
