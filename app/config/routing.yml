@@ -21,6 +21,12 @@ varnish:
     resource: "@ImagepushBundle/Controller/VarnishController.php"
     type:     annotation
 
+# Small fixes here
+temporary:
+    resource: "@ImagepushBundle/Controller/TemporaryController.php"
+    prefix:   /temp
+    type:     annotation
+
 _imagine:
     resource: .
     type:     imagine
