@@ -35,18 +35,14 @@ from deps:
 //    git=https://github.com/fabpot/Goutte.git
 
 ---
+Export from mongo and upload to S3:
+cd ~/
+mongodump --db imagepush_dev -u root -p PASSWORD_HERE
+tar -cpz dump/ -f dump.tar.gz
+s3cmd put dump.tar.gz s3://i.imagepush.to/dump/
 
-Todo:
-rename to - Fetcher, Processor, Publisher
-
----
-scp ~/bin/dump.rdb anton-server:/mnt/redis_data
-scp ~/bin/appendonly.aof anton-server:/mnt/redis_data
----
-Export from mongo:
-mongodump --db imagepush_dev
 Import on anton-server:
-s3cmd get s3://...
+s3cmd get s3://i.imagepush.to/dump/dump.tar.gz
 mongorestore --directoryperdb imagepush_prod
 
 ---
@@ -60,10 +56,11 @@ s3cmd sync --recursive -f -P -p -M -H --progress /var/www/imagepush/current/web/
 s3cmd sync --recursive -f -P -p -M -H --progress /var/www/imagepush/current/web/uploads/m/ s3://i.imagepush.to/in/463x1548/i/
 
 ---
-     * @todo: see here:
-     * http://sharedcount.com/?url=http%3A%2F%2Fimagepush.to%2F
-     * http://www.linkedin.com/cws/share-count?url=http://www.facebook.com
-     * 
+
+* @todo: see here:
+* http://sharedcount.com/?url=http%3A%2F%2Fimagepush.to%2F
+* http://www.linkedin.com/cws/share-count?url=http://www.facebook.com
+* 
 
 ---
 Useful Varnish commands:
