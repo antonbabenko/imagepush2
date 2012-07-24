@@ -41,9 +41,10 @@ mongodump --db imagepush_dev -u root -p PASSWORD_HERE
 tar -cpz dump/ -f dump.tar.gz
 s3cmd put dump.tar.gz s3://i.imagepush.to/dump/
 
-Import on anton-server:
+Import on localhost:
 s3cmd get s3://i.imagepush.to/dump/dump.tar.gz
-mongorestore --directoryperdb imagepush_prod
+tar xvfz dump.tar.gz
+mongorestore --db imagepush_dev -u root -p root37 imagepush_prod/
 
 ---
 0) save largest version of the image as retrieved from original source and remove aWidth-like fields.
