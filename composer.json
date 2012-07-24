@@ -30,13 +30,12 @@
         
         "liip/imagine-bundle":           "dev-master",
         
-        "amazonwebservices/aws-sdk-for-php": "1.5.8.1",
+        "amazonwebservices/aws-sdk-for-php": "1.5.10",
         
         "knplabs/gaufrette": "v0.1",
         "knplabs/knp-gaufrette-bundle": "dev-master",
         
         "stof/doctrine-extensions-bundle": "1.0.x-dev",
-        "liip/cache-control-bundle": "dev-master",
         
         "digg/Services_Digg2": "*",
         "fabpot/Goutte": "*",

@@ -7,6 +7,12 @@ use Imagepush\ImagepushBundle\Document\Image;
 
 class ProcessorTest extends WebTestCase
 {
+
+    public function testOk()
+    {
+        $this->assertTrue(true);
+    }
+
     /* public function setup()
       {
       parent::setup();

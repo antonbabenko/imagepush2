@@ -27,13 +27,10 @@ class TemporaryController extends Controller
         // 2) Change content-type for thumbs
         // 3) Add header - Cache-Control: max-age=31536000, public
 
-        $getImageFileSize = false;
         $i = 0;
+        $results = $ids = array();
 
         $imageFilters = array("in/463x1548", "in/625x2090", "out/140x140");
-
-        //$targetPath = 'out/140x140/i/4/43/438/47.jpg';
-        $results = array();
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
@@ -44,7 +41,7 @@ class TemporaryController extends Controller
         $images = $dm->getRepository('ImagepushBundle:Image')
             ->createQueryBuilder()
             ->sort('id', 'ASC')
-            ->limit(1)
+            //->limit(10)
             ->getQuery()
             ->execute();
 
@@ -55,53 +52,83 @@ class TemporaryController extends Controller
         foreach ($images as $image) {
             //\D::dump($image);
             $mimeType = $image->getMimeType();
-            \D::dump($mimeType);
-
-            $thumbs = $image->getThumbs();
+            if (empty($mimeType)) {
+                $mimeType = "image/jpeg";
+            }
+            //\D::dump($mimeType);
 
             foreach ($imageFilters as $filter) {
 
                 $path = $filter . '/i/' . $image->getFile();
 
-                $metadata = $amazonS3->get_object_metadata($bucket, $path);
-                \D::dump($metadata);
+                //\D::dump($path);
 
+                $metadata = $amazonS3->get_object_metadata($bucket, $path);
+                //\D::dump($metadata);
+                //die();
                 // Update content type for thumb
-                if (empty($metadata["ContentType"]) || $metadata["ContentType"] == "image/jpg" || $metadata["ContentType"] != $mimeType) {
-                    //$result = $amazonS3->change_content_type($bucket, $path, $mimeType);
-                    //\D::dump($result);
+                if (empty($metadata["Headers"]["cache-control"]) ||
+                    strlen($metadata["Headers"]["cache-control"]) < 10 ||
+                    empty($metadata["ContentType"]) ||
+                    $metadata["ContentType"] == "image/jpg" ||
+                    $metadata["ContentType"] != $mimeType) {
+                    $opt['headers']['Cache-Control'] = "max-age=31536000, public";
+
+                    if (empty($metadata["ContentType"]) || $metadata["ContentType"] == "image/jpg" || $mimeType == "image/jpg") {
+                        $mimeType = "image/jpeg";
+                        $image->setMimeType($mimeType);
+                    }
+
+                    $result = $amazonS3->change_content_type($bucket, $path, $mimeType, $opt);
+
+                    if (!$result->isOK()) {
+                        $results[] = "Fail updating Content-Type or Cache-control (Status: " . $result->status . '. ID: ' . $image->getId() . '. File: ' . $path . ')';
+                        $ids[] = $image->getId();
+                    }
                 }
 
                 // Update filesize for thumb
                 if (empty($metadata["Size"])) {
                     $results[] = "Empty Size for file " . $path;
+                    $ids[] = $image->getId();
                 } else {
-                    if ((empty($thumbs[$filter]) || !array_key_exists("s", $thumbs[$filter]) || (int) $thumbs[$filter]["s"] == 0)) {
-                        $filterData = explode("/", $filter);
-                        $filterDataSizes = explode("x", $filterData[1]);
+                    $filterData = explode("/", $filter);
+                    $filterDataSizes = explode("x", $filterData[1]);
 
+                    if (!$image->getThumbProperty($filterData[0], $filterDataSizes[0], $filterDataSizes[1], "s")) {
                         $w = $image->getThumbProperty($filterData[0], $filterDataSizes[0], $filterDataSizes[1], "w");
                         $h = $image->getThumbProperty($filterData[0], $filterDataSizes[0], $filterDataSizes[1], "h");
 
-                        //$image->addThumbs($filterData[0], $filterData[1], $w, $h, $metadata["Size"]);
+                        //\D::dump($metadata["Size"] . "==" . $w . "==" . $h);
+
+                        $image->addThumbs($filterData[0], $filterData[1], $w, $h, $metadata["Size"]);
                     }
                 }
             }
 
-
-
             $dm->persist($image);
 
-            if (++$i % 300 == 0) {
-                //$dm->flush();
+            if (++$i % 10 == 0) {
+                $dm->flush();
                 $dm->clear();
+
+                $this->get('logger')->err('SUCCESSFULLY PROCESSED ID: ' . $image->getId());
             }
         }
 
-
-
-        //$dm->flush();
+        $dm->flush();
         $dm->clear();
+
+        $this->get('logger')->err('SUCCESSFULLY PROCESSED ALL!!!!');
+
+        $ids = array_unique($ids);
+        echo "<br>Failed IDs: " . serialize($ids);
+
+        echo "<pre>";
+        print_r($results);
+        echo "</pre>";
+
+        //\D::dump($results);
 
         return array();
     }

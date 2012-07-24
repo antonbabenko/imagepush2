@@ -65,12 +65,13 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
         //\D::dump($response->headers->get('Content-Type'));
         //$targetPath = $filter . "/". $targetPath;
         //\D::dump($targetPath);
-        
+
         $contentType = $response->headers->get('Content-Type', "image/jpeg");
 
+        // max-age=31536000 -> 1 year
         $metadata = array(
             'Content-Type' => $contentType,
-            'Cache-Control' => 'public',
+            'Cache-Control' => 'max-age=31536000, public',
             'Expires' => gmdate(DATE_RFC822, strtotime("+1 year"))
         );
 
@@ -79,6 +80,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
         // Set ACL to public, if using Amazon S3
         if ($this->fs->getAdapter() instanceof \Gaufrette\Adapter\AmazonS3) {
             $bucket = $this->container->getParameter('s3_bucket_name');
+            $opt['headers']['Cache-Control'] = "max-age=31536000, public";
 
             $amazonS3 = $this->container->get('imagepush.amazon.s3');
 
@@ -88,13 +90,13 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
             //\D::dump(\AmazonS3::ACL_PUBLIC);
 
             $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
-            //$amazonS3->change_content_type($bucket, $targetPath, $contentType);
+            $amazonS3->change_content_type($bucket, $targetPath, $contentType, $opt);
         }
 
         $response->setEtag(md5($targetPath));
         $response->setLastModified(new \DateTime("now"));
         $response->setExpires(new \DateTime("+1 year"));
-        $response->setSharedMaxAge(365 * 24 * 3600); // 1 year
+        $response->setMaxAge(365 * 24 * 3600); // 1 year // was sharedMaxAge
 
         $response->setStatusCode(201);
 
