@@ -9,6 +9,10 @@ services:
         class: Imagepush\ImagepushBundle\Services\Fetcher\DiggFetcher
         arguments: [@service_container]
 
+    imagepush.fetcher.reddit:
+        class: Imagepush\ImagepushBundle\Services\Fetcher\RedditFetcher
+        arguments: [@service_container]
+
     imagepush.fetcher.content:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@service_container]

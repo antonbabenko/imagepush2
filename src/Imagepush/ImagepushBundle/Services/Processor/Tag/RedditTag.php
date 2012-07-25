@@ -55,6 +55,8 @@ class RedditTag extends Tag implements TagInterface
 
         foreach ($subUrls as $subUrl) {
 
+            sleep(3);
+
             $contentHtml = $this->container->get('imagepush.processor.content.html');
             $contentHtml->setContent($content);
 

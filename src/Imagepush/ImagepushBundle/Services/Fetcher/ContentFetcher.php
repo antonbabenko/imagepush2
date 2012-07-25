@@ -11,6 +11,21 @@ class ContentFetcher
 {
 
     protected $requestType = "GET";
+    protected $userAgent = "imagepush bot v2.0";
+
+    /**
+     * Set user agent
+     */
+    public function setUserAgent($userAgent = true, $extra = "")
+    {
+        if ($userAgent !== true) {
+            $this->userAgent = $userAgent;
+        }
+
+        if ($extra !== "") {
+            $this->userAgent .= " " . $extra;
+        }
+    }
 
     /**
      * Send GET request
@@ -45,6 +60,8 @@ class ContentFetcher
     {
 
         $client = new Client();
+
+        $client->setServerParameters(array('HTTP_USER_AGENT' => $this->userAgent));
 
         // Increase curl timeout
         $guzzleClient = $client->getClient();

@@ -10,7 +10,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  * 
  * @MongoDB\Document(collection="latestTags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
  * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"timestamp"="desc"})
+ *   @MongoDB\Index(keys={"timestamp"="desc"}),
+ *   @MongoDB\Index(keys={"tag"="asc"})
  * })
  */
 class LatestTag

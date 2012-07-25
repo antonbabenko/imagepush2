@@ -32,6 +32,7 @@ class Processor
         $this->container = $container;
         $this->logger = $container->get('imagepush.processor_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+        $this->varnish = $container->get('imagepush.varnish');
     }
 
     /**
@@ -221,6 +222,8 @@ class Processor
 
         $log .= sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);
+
+        $this->varnish->purgeWhenNewImagesSavedAsUpcoming();
 
         return $log;
     }
