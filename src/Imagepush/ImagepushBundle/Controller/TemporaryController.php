@@ -23,6 +23,8 @@ class TemporaryController extends Controller
     public function updateLatestTagsAction()
     {
 
+        die();
+
         $i = 0;
 
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
@@ -41,13 +43,13 @@ class TemporaryController extends Controller
         foreach ($latestTags as $latestTag) {
             //\D::dump($latestTag->getId());
 
-            /*if ($latestTag->getTag() && !$latestTag->getText()) {
-                $text = $latestTag->getTag()->getText();
-                //  \D::dump($text);
-                //  \D::dump($latestTag->getText());
-            } else {
-                continue;
-            }*/
+            /* if ($latestTag->getTag() && !$latestTag->getText()) {
+              $text = $latestTag->getTag()->getText();
+              //  \D::dump($text);
+              //  \D::dump($latestTag->getText());
+              } else {
+              continue;
+              } */
 
             $latestTag->setTag(null);
             //$latestTag->setTag(null);
