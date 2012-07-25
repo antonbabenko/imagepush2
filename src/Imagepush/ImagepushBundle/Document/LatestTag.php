@@ -11,7 +11,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @MongoDB\Document(collection="latestTags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
- *   @MongoDB\Index(keys={"tag"="asc"}),
  *   @MongoDB\Index(keys={"text"="asc"})
  * })
  */
@@ -27,11 +26,6 @@ class LatestTag
    * @MongoDB\Timestamp
    */
   protected $timestamp;
-
-  /**
-   * @MongoDB\EmbedOne(targetDocument="Tag")
-   */
-  protected $tag;
 
   /**
    * @MongoDB\String
@@ -66,26 +60,6 @@ class LatestTag
   public function getTimestamp()
   {
     return $this->timestamp;
-  }
-
-  /**
-   * Set tag
-   *
-   * @param Imagepush\ImagepushBundle\Document\Tag $tag
-   */
-  public function setTag($tag)
-  {
-    $this->tag = $tag;
-  }
-
-  /**
-   * Get tag
-   *
-   * @return Imagepush\ImagepushBundle\Document\Tag $tag
-   */
-  public function getTag()
-  {
-    return $this->tag;
   }
 
   /**
