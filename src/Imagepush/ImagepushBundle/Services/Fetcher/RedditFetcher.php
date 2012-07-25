@@ -31,6 +31,8 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
             $item->score >= $minScore &&
             isset($item->over_18) &&
             $item->over_18 != true &&
+            isset($item->is_self) &&
+            $item->is_self != true &&
             false === (bool) $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($item->url) &&
             false === (bool) $this->dm->getRepository('ImagepushBundle:Image')->findOneBy(array("link" => $item->url))
             );
