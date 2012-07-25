@@ -92,7 +92,7 @@ class Tag
 
                 $latestTag = new LatestTag();
                 $latestTag->setTimestamp(time());
-                $latestTag->setTag($tag);
+                $latestTag->setText($bestTag);
                 //\D::dump($latestTag);
 
                 $tag->addImagesRef($image);
