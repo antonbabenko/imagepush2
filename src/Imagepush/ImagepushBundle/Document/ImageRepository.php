@@ -97,7 +97,7 @@ class ImageRepository extends DocumentRepository
     }
 
     /**
-     * Get unprocessed image and change status for it to "in process"
+     * Get oldest unprocessed image and change status for it to "in process"
      * 
      * @return Image|false
      */
@@ -106,7 +106,7 @@ class ImageRepository extends DocumentRepository
         $image = $this->createQueryBuilder()
             ->field('isAvailable')->exists(false)
             ->field('isInProcess')->notEqual(true)
-            ->sort('timestamp', 'DESC')
+            ->sort('timestamp', 'ASC')
             ->limit(1)
             ->requireIndexes(false)
             ->getQuery()
