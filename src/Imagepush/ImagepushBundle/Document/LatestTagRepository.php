@@ -9,7 +9,7 @@ class LatestTagRepository extends DocumentRepository
 
     public function getLatestTrends($max)
     {
-        $latestTrends = apc_fetch('latest_trends', $inCache);
+        $latestTrends = apc_fetch('latest_trends_' . $max, $inCache);
 
         if (false !== $inCache) {
             return unserialize($latestTrends);
@@ -26,7 +26,11 @@ class LatestTagRepository extends DocumentRepository
         }
 
         foreach ($tmpTags as $tmpTag) {
-            $tag = $tmpTag->getTag()->getText();
+            if ($tmpTag->getText()) {
+                $tag = $tmpTag->getText();
+            } else {
+                $tag = $tmpTag->getTag()->getText();
+            }
             $tags[$tag] = (empty($tags[$tag]) ? 1 : $tags[$tag] + 1);
         }
 
@@ -34,7 +38,7 @@ class LatestTagRepository extends DocumentRepository
 
         $tags = array_slice($tags, 0, $max, true);
 
-        apc_store('latest_trends', serialize($tags), 1800);
+        apc_store('latest_trends_' . $max, serialize($tags), 1800);
 
         return $tags;
     }

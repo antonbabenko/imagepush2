@@ -11,7 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @MongoDB\Document(collection="latestTags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
- *   @MongoDB\Index(keys={"tag"="asc"})
+ *   @MongoDB\Index(keys={"tag"="asc"}),
+ *   @MongoDB\Index(keys={"text"="asc"})
  * })
  */
 class LatestTag
@@ -31,6 +32,11 @@ class LatestTag
    * @MongoDB\EmbedOne(targetDocument="Tag")
    */
   protected $tag;
+
+  /**
+   * @MongoDB\String
+   */
+  protected $text;
 
   /**
    * Get id
@@ -67,7 +73,7 @@ class LatestTag
    *
    * @param Imagepush\ImagepushBundle\Document\Tag $tag
    */
-  public function setTag(\Imagepush\ImagepushBundle\Document\Tag $tag)
+  public function setTag($tag)
   {
     $this->tag = $tag;
   }
@@ -80,6 +86,26 @@ class LatestTag
   public function getTag()
   {
     return $this->tag;
+  }
+
+  /**
+   * Set text
+   *
+   * @param string $text
+   */
+  public function setText($text)
+  {
+    $this->text = $text;
+  }
+
+  /**
+   * Get text
+   *
+   * @return string $text
+   */
+  public function getText()
+  {
+    return $this->text;
   }
 
 }

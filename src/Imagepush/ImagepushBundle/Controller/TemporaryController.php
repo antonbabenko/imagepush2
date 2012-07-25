@@ -17,6 +17,56 @@ class TemporaryController extends Controller
 {
 
     /**
+     * @Route("/updateLatestTags", name="updateLatestTags")
+     * @Template("::base.html.twig")
+     */
+    public function updateLatestTagsAction()
+    {
+
+        $i = 0;
+
+        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+
+        $latestTags = $dm->getRepository('ImagepushBundle:LatestTag')
+            ->createQueryBuilder()
+            ->sort('id', 'ASC')
+            ->limit(3333333)
+            ->getQuery()
+            ->execute();
+
+        if (!count($latestTags)) {
+            die("No tags");
+        }
+
+        foreach ($latestTags as $latestTag) {
+            //\D::dump($latestTag->getId());
+
+            if ($latestTag->getTag() && !$latestTag->getText()) {
+                $text = $latestTag->getTag()->getText();
+                //  \D::dump($text);
+                //  \D::dump($latestTag->getText());
+            } else {
+                continue;
+            }
+
+            $latestTag->setText($text);
+            //$latestTag->setTag(null);
+
+            $dm->persist($latestTag);
+
+            if (++$i % 200 == 0) {
+                $dm->flush();
+                $dm->clear();
+            }
+        }
+
+        $dm->flush();
+        $dm->clear();
+
+        return array();
+    }
+
+    /**
      * @Route("/updateContentType", name="updateS3ContentType")
      * @Template("::base.html.twig")
      */
