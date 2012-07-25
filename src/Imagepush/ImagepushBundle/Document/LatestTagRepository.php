@@ -26,11 +26,7 @@ class LatestTagRepository extends DocumentRepository
         }
 
         foreach ($tmpTags as $tmpTag) {
-            if ($tmpTag->getText()) {
-                $tag = $tmpTag->getText();
-            } else {
-                $tag = $tmpTag->getTag()->getText();
-            }
+            $tag = $tmpTag->getText();
             $tags[$tag] = (empty($tags[$tag]) ? 1 : $tags[$tag] + 1);
         }
 
