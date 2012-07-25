@@ -23,7 +23,13 @@ class DiggTag extends Tag implements TagInterface
         $digg = new ImagepushDigg();
         $digg->setVersion('2.0');
 
-        $result = $digg->story->getInfo(array('links' => urlencode($image->getLink())));
+        try {
+            $result = $digg->story->getInfo(array('links' => urlencode($image->getLink())));
+        } catch (\Services_Digg2_Exception $e) {
+            $this->logger->err("[Digg] Error: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
+
+            return array();
+        }
 
         //\D::debug($result);
 
