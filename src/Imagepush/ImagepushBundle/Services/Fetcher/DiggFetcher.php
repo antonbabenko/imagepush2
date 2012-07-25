@@ -72,7 +72,6 @@ class DiggFetcher extends AbstractFetcher implements FetcherInterface
             $digg->setVersion('2.0');
 
             try {
-
                 $response = $digg->search->search(array(
                     'media' => 'images',
                     'domain' => '*',
