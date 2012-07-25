@@ -1,6 +1,6 @@
 <?php
 
-namespace Imagepush\ImagepushBundle\Tests\Services;
+namespace Imagepush\ImagepushBundle\Tests\Services\Processor\Tag;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

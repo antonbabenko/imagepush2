@@ -23,6 +23,8 @@ class TemporaryController extends Controller
     public function updateS3ContentTypeAction()
     {
 
+        die();
+
         // 1) Update filesize in db
         // 2) Change content-type for thumbs
         // 3) Add header - Cache-Control: max-age=31536000, public

@@ -18,8 +18,8 @@ class AbstractFetcher
     /**
      * Counters for fetched, saved items, output array.
      */
-    public $fetchedCounter;
-    public $savedCounter;
+    public $fetchedCounter = 0;
+    public $savedCounter = 0;
     public $output;
 
     /**
@@ -27,7 +27,6 @@ class AbstractFetcher
      */
     public $logger;
     public $dm;
-    public $varnish;
     public $parameters;
 
     /**
@@ -42,9 +41,9 @@ class AbstractFetcher
      */
     public function __construct($container, $fetcherType = null)
     {
+        $this->container = $container;
         $this->logger = $container->get('imagepush.fetcher_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
-        $this->varnish = $container->get('imagepush.varnish');
 
         if (!$this->fetcherType = $fetcherType) {
             throw new \Exception("AbstractFetcher should have fetcherType defined before construct");
@@ -67,6 +66,36 @@ class AbstractFetcher
         } else {
             return $default;
         }
+    }
+
+    /**
+     * Check if API call is allowed now (check delay)
+     */
+    public function isAllowedToPerformAPICall()
+    {
+        /* $lastAPICallTime = (int) apc_fetch($this->fetcherType . "_last_api_call_time");
+          if ($lastAPICallTime + $this->getParameter("min_delay", 60) >= time()) {
+          return false;
+          }
+
+          return true; */
+    }
+
+    /**
+     * Wait some seconds before next call, if necessary.
+     * 
+     */
+    public function delayBeforeNextApiCall()
+    {
+        // APC doesn't work in CLI mode, so do delay manually:
+        sleep($this->getParameter("min_delay", 60));
+
+        /* if (!$this->isAllowedToPerformAPICall()) {
+          sleep($this->getParameter("min_delay", 60));
+          }
+
+          apc_store($this->fetcherType . "_last_api_call_time", time());
+         */
     }
 
     /**
