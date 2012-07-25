@@ -41,15 +41,15 @@ class TemporaryController extends Controller
         foreach ($latestTags as $latestTag) {
             //\D::dump($latestTag->getId());
 
-            if ($latestTag->getTag() && !$latestTag->getText()) {
+            /*if ($latestTag->getTag() && !$latestTag->getText()) {
                 $text = $latestTag->getTag()->getText();
                 //  \D::dump($text);
                 //  \D::dump($latestTag->getText());
             } else {
                 continue;
-            }
+            }*/
 
-            $latestTag->setText($text);
+            $latestTag->setTag(null);
             //$latestTag->setTag(null);
 
             $dm->persist($latestTag);
