@@ -4,6 +4,13 @@ services:
     # Robot services #
     ##################
     
+    # Access control
+    imagepush.access_control.service:
+        class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
+        arguments: [@snc_redis.default, %imagepush.services%]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
     # Fetcher
     imagepush.fetcher.digg:
         class: Imagepush\ImagepushBundle\Services\Fetcher\DiggFetcher
@@ -16,6 +23,37 @@ services:
     imagepush.fetcher.content:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@service_container]
+
+    # RabbitMQ consumers
+    imagepush.consumer_message:
+        class: Imagepush\ImagepushBundle\Consumer\Message
+        arguments: [@service_container, @imagepush.rabbitmq_logger]
+
+
+
+
+    imagepush.consumer.primary:
+        class: Imagepush\ImagepushBundle\Consumer\PrimaryConsumer
+        arguments: [@service_container, @imagepush.rabbitmq_logger]
+
+    imagepush.consumer.twitter:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "twitter"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.reddit:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "reddit"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.delicious:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "delicious"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
 
     # Processor
     imagepush.processor:
@@ -92,6 +130,12 @@ services:
         calls:
             - [pushHandler, [@imagepush.varnish_log_handler]]
 
+    imagepush.rabbitmq_logger:
+        class: Monolog\Logger
+        arguments: [rabbitmq]
+        calls:
+            - [pushHandler, [@imagepush.rabbitmq_log_handler]]
+
     imagepush.processor_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/processor_%kernel.environment%.log, 100]
@@ -103,6 +147,10 @@ services:
     imagepush.varnish_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/varnish_%kernel.environment%.log, 100]
+
+    imagepush.rabbitmq_log_handler:
+        class: Monolog\Handler\StreamHandler
+        arguments: [%kernel.logs_dir%/rabbitmq_%kernel.environment%.log, 100]
     
     # General log processors
     log_web_processor:

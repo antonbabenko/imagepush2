@@ -25,7 +25,7 @@ class DeliciousTag extends Tag implements TagInterface
         if (!$content->isSuccessStatus()) {
             $this->logger->warn(sprintf("Delicious. ID: %d. Link %s returned status code %d", $image->getId(), $image->getLink(), $content->getData()));
 
-            continue;
+            return array();
         }
 
         $response = @json_decode($content->getContent(), true);

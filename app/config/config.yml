@@ -118,6 +118,70 @@ knp_gaufrette:
         images:
             adapter:    %filesystems_images_adapter%
 
+# Redis
+snc_redis:
+    clients:
+        default:
+            type: predis
+            alias: default
+            dsn: redis://localhost/3
+            logging: %kernel.debug%
+            options:
+                profile: 2.4
+                connection_timeout: 10
+                connection_persistent: true
+                read_write_timeout: 30
+                iterable_multibulk: false
+                throw_errors: true
+
+# RabbitMQ
+old_sound_rabbit_mq:
+    debug: %kernel.debug%
+    enable_collector: %kernel.debug%
+    connections:
+        default:
+            host:      %old_sound_rabbit_mq.host%
+            port:      %old_sound_rabbit_mq.port%
+            user:      %old_sound_rabbit_mq.user%
+            password:  %old_sound_rabbit_mq.password%
+            vhost:     %old_sound_rabbit_mq.vhost%
+    producers:
+        # 1) After fetched from varous sources it has to be decided if link is porn or not.
+        # 2) Find tags and mentions
+        primary: # Default one, where initial messages are published
+            connection: default
+            exchange_options: { name: 'primary', type: direct }
+        twitter:
+            connection: default
+            exchange_options: { name: 'twitter', type: direct }
+        reddit:
+            connection: default
+            exchange_options: { name: 'reddit', type: direct }
+        delicious:
+            connection: default
+            exchange_options: { name: 'delicious', type: direct }
+    consumers:
+        primary: # Default consumer, which utilizes initial message
+            connection: default
+            exchange_options: { name: 'primary', type: direct }
+            queue_options:    { name: 'primary' }
+            callback:         imagepush.consumer.primary
+        twitter:
+            connection: default
+            exchange_options: { name: 'twitter', type: direct }
+            queue_options:    { name: 'twitter' }
+            callback:         imagepush.consumer.twitter
+        reddit:
+            connection: default
+            exchange_options: { name: 'reddit', type: direct }
+            queue_options:    { name: 'reddit' }
+            callback:         imagepush.consumer.reddit
+        delicious:
+            connection: default
+            exchange_options: { name: 'delicious', type: direct }
+            queue_options:    { name: 'delicious' }
+            callback:         imagepush.consumer.delicious
+
 # Not in use (19.7.2012), because purge did not work with Symfony 2.0
 #liip_cache_control:
 #    rules:

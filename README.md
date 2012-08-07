@@ -42,9 +42,11 @@ tar -cpz dump/ -f dump.tar.gz
 s3cmd put dump.tar.gz s3://i.imagepush.to/dump/
 
 Import on localhost:
-s3cmd get s3://i.imagepush.to/dump/dump.tar.gz
+cd ~/tmp
+curl -O http://i.imagepush.to/dump/dump.tar.gz
 tar xvfz dump.tar.gz
-mongorestore --db imagepush_dev -u root -p root37 imagepush_prod/
+mongorestore --db imagepush_dev -u root -p root37 dump/imagepush_prod/
+rm -rf ~/tmp/dum*
 
 ---
 0) save largest version of the image as retrieved from original source and remove aWidth-like fields.
@@ -92,3 +94,25 @@ https://www.google.no/searchbyimage?image_url=http://1.bp.blogspot.com/-MhfcaPKv
 2b) Get list of domains in "Pages that include matching images"
 2c) Decide on good/bad domain name ratio.
 3) Twitter hash tags for this link
+4) HTML source page and check stop keywords in it
+
+---
+Add RabbitMQ plugins:
+sudo rabbitmq-plugins enable rabbitmq_management rabbitmq_jsonrpc rabbitmq_jsonrpc_channel rabbitmq_jsonrpc_channel_examples rabbitmq_management_visualiser
+
+Admin: http://localhost:55672/
+
+
+---
+1) Fetch new from reddit
+
+2) Is porn (link1). Queue:
+Find in google?
+Find in twitter?
+Find badwords in html?
+
+3) Queue:
+Find tag (link1) => reddit
+Find tag (link1) => digg
+Find tag (link1) => twitter
+Find mentions (link1) => facebook
