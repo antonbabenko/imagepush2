@@ -33,6 +33,7 @@ class Processor
         $this->logger = $container->get('imagepush.processor_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
         $this->varnish = $container->get('imagepush.varnish');
+        //$this->producer = $container->get('old_sound_rabbit_mq.fetch_producer');
     }
 
     /**
@@ -216,6 +217,11 @@ class Processor
         /**
          * Find tags
          */
+        $this->producer = $this->container->get('old_sound_rabbit_mq.find_tags_and_mentions_producer');
+        $msg = array("image_id" => $image->getId());
+        $this->producer->publish(serialize($msg), "find_tags_and_mentions.ALL");
+
+        // Old way:
         $this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
         $tags = $this->container->get('imagepush.processor.tag')->processTags($image);
         $log = "Best tags: " . implode(", ", $tags) . "\n\n";

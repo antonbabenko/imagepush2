@@ -11,7 +11,15 @@ imagepush:
     
     # Thumbs (Array of thumbnails to generate during processing)
     thumbs: [["in", 463, 1548], ["out", 140, 140], ["in", 625, 2090]]
-        
+    
+    services:
+      twitter:
+        delay: 5
+        max_attempts: 5
+      reddit:
+        delay: 3
+        max_attempts: 5
+          
     fetcher.digg:
       limit: 50 # Max items to fetch every time
       min_diggs: 5 # Minimum diggs score to save. 4-5 is OK.

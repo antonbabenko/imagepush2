@@ -28,6 +28,11 @@
         "symfony/twig-bundle":           "2.0.*",
         "symfony/assetic-bundle":        "2.0.x-dev",
         
+        "oldsound/rabbitmq-bundle":      "dev-master",
+        
+        "snc/redis-bundle":              "2.0.x-dev",
+        "predis/predis":                 "0.7.x-dev",
+        
         "liip/imagine-bundle":           "dev-master",
         
         "amazonwebservices/aws-sdk-for-php": "1.5.10",
