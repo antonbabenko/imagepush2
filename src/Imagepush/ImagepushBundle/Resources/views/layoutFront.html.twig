@@ -8,9 +8,9 @@
 <html lang="en" xmlns="http://www.facebook.com/2008/fbml">
   <head>
     <meta charset=utf-8 />
-    <link rel="icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" /> 
+    <link rel="icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    
+
     {% if block('og_title') %}
       {{ block('og_title') }}
     {% else %} {# if app.request.attributes.get('_route') == 'index' #}
@@ -19,28 +19,28 @@
       <meta name="description" content="Imagepush.to - Best images hourly" />
       <meta property="og:type" content="website" />
     {% endif %}
-    
-    
+
+
     {% if block('og_url') %}
       {{ block('og_url') }}
     {% elseif app.request.attributes.get('_route') == 'index' %}
       <link rel="canonical" href="http://imagepush.to/" />
     {% endif %}
-    
-    
+
+
     {% if block('meta_keywords') %}
     <meta name="keywords" content="{{ block('meta_keywords') }}" />
     {% endif %}
-    
-    
+
+
     {% if block('image_src') %}
     <link rel="image_src" href="{{ block('image_src') }}" />
     <meta name="medium" content="image" />
     {% endif %}
-    
+
     {% block og_image %}{% endblock %}
-    
-    
+
+
     {# <meta name="viewport" content="initial-scale=1.0, width=device-width"> #}
 
     <link rel="alternate" type="application/rss+xml" title="Imagepush.to feed" href="http://imagepush.to/rss" />
@@ -50,7 +50,7 @@
     <meta property="fb:app_id" content="118412418235312" />
 
     <link rel="stylesheet" href="{{ asset('css/base.css') }}" type="text/css" media="all" />
-    
+
     <!--[if lt IE 8]>
 		<link rel="stylesheet" href="{{ asset('css/ie67.css') }}" />
 	<![endif]-->
@@ -78,9 +78,9 @@
         <div class="search_box">
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>
-        
+
         {% render "ImagepushBundle:Front:_trendingNow" with {'max': 20}, {'standalone': true} %}
-        
+
       </header>
 
       {#

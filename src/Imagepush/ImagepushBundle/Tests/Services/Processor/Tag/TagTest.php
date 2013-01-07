@@ -68,8 +68,6 @@ class TagTest extends WebTestCase
 
         $this->assertEquals(array("fun" => 16, "sport" => 5, "politic" => 2), $tags);
 
-
-
         $sourceTags = array();
         $tags = $service->calculateTagsScore($sourceTags);
 

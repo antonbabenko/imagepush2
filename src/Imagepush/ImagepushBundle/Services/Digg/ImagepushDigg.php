@@ -15,4 +15,3 @@ class ImagepushDigg extends \Services_Digg2
     }
 
 }
-

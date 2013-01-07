@@ -7,21 +7,21 @@ use OldSound\RabbitMqBundle\RabbitMq\Producer;
 
 /**
  * Useful functions to be used inside Consumers classes
- * 
+ *
  */
 class Message
 {
 
     /**
      * Message body
-     * 
+     *
      * @var array
      */
     public $body;
 
     /**
      * Desired action task
-     * 
+     *
      * @var string
      */
     public $task;
@@ -40,14 +40,13 @@ class Message
     {
         $this->container = $container;
         $this->logger = $logger;
-        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
     }
 
     /**
      * Returns decoded message body
-     * 
+     *
      * @param \PhpAmqpLib\Message\AMQPMessage $msg
-     * 
+     *
      * @return array
      */
     public function setAMQPMessage(AMQPMessage $msg)
@@ -60,27 +59,6 @@ class Message
         $this->attempts = $this->body["attempts"] = (empty($this->body["attempts"]) ? 0 : $this->body["attempts"]);
 
         return $this;
-    }
-
-    /**
-     * Get from body
-     * 
-     * @return boolean
-     */
-    public function getImageId()
-    {
-
-        $image = $this->dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findOneBy(array("id" => $this->body['image_id']));
-
-        if (!$image) {
-            $this->logger->err('Image id ' . $this->body['image_id'] . ' does not exist.');
-
-            return true;
-        }
-
-        return $this->body['image_id'];
     }
 
     /**

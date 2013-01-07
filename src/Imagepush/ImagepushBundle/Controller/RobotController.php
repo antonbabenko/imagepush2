@@ -3,7 +3,6 @@
 namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -20,10 +19,23 @@ class RobotController extends Controller
 
         $time = microtime(true);
 
-        $producer = $this->get('old_sound_rabbit_mq.primary_producer');
         $msg = array("image_id" => 43516, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
-        $producer->publish(json_encode($msg));
-        $producer->publish(json_encode($msg));
+        //$this->get('old_sound_rabbit_mq.reddit_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        //sleep(2);
+        //$msg = array("image_id" => 43517, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        /*$this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+         *
+         */
+        //$msg = array("image_id" => 43518, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        //$producer->publish(json_encode($msg));
 
         /* $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
           $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
@@ -40,9 +52,7 @@ class RobotController extends Controller
 
         echo sprintf("%f", microtime(true) - $time);
 
-
         //\D::dump($replies);
-
         return new Response();
     }
 

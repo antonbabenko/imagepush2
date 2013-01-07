@@ -34,7 +34,7 @@ class ImagineController
     protected $cacheManager;
 
     /**
-     * @var DocumentManager 
+     * @var DocumentManager
      */
     protected $dm;
 
@@ -45,8 +45,8 @@ class ImagineController
 
     /**
      * Allow to generate images without hash verification in debug mode
-     * 
-     * @var boolean 
+     *
+     * @var boolean
      */
     protected $debug;
 

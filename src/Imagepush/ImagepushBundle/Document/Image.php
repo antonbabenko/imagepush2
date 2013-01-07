@@ -8,7 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Image
- * 
+ *
  * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
@@ -430,7 +430,7 @@ class Image
      * Set thumbs
      *
      * @param hash $thumbs
-     * 
+     *
      * @return Image
      */
     public function setThumbs($thumbs)
@@ -496,7 +496,7 @@ class Image
      * @param integer $width    Width
      * @param integer $height   Height
      * @param string  $property Property name (height => "h", width => "w", filesize => "s")
-     * 
+     *
      * @return integer|false
      */
     public function getThumbProperty($filter, $width, $height, $property)

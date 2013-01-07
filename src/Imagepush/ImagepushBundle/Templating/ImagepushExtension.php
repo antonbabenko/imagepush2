@@ -37,11 +37,11 @@ class ImagepushExtension extends \Twig_Extension
     /**
      * Gets cache path of an image to be filtered
      *
-     * @param string $file
-     * @param string $filter
+     * @param string  $file
+     * @param string  $filter
      * @param integer $width
      * @param integer $height
-     * @param integer $imageId  Optional image id (if object is Image)
+     * @param integer $imageId Optional image id (if object is Image)
      *
      * @return string
      */
@@ -63,8 +63,8 @@ class ImagepushExtension extends \Twig_Extension
     /**
      * Gets CDN url of an image which is already saved there
      *
-     * @param string $file
-     * @param string $filter
+     * @param string  $file
+     * @param string  $filter
      * @param integer $width
      * @param integer $height
      *

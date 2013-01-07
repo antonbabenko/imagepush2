@@ -21,12 +21,12 @@ framework:
     session:
         default_locale: %locale%
         auto_start:     true
-        
+
 # Twig Configuration
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    
+
     # Settings to use in templates
     globals:
       site_url: %site_url%
@@ -146,11 +146,15 @@ old_sound_rabbit_mq:
             password:  %old_sound_rabbit_mq.password%
             vhost:     %old_sound_rabbit_mq.vhost%
     producers:
-        # 1) After fetched from varous sources it has to be decided if link is porn or not.
+        # 1) After fetched from various sources it has to be decided if link is porn or not.
         # 2) Find tags and mentions
-        primary: # Default one, where initial messages are published
+
+        # Primary one, where initial messages are published
+        primary:
             connection: default
             exchange_options: { name: 'primary', type: direct }
+
+        # Services-related
         twitter:
             connection: default
             exchange_options: { name: 'twitter', type: direct }
@@ -160,12 +164,21 @@ old_sound_rabbit_mq:
         delicious:
             connection: default
             exchange_options: { name: 'delicious', type: direct }
+        stumble_upon:
+            connection: default
+            exchange_options: { name: 'stumble_upon', type: direct }
+        source: # HTML-source of the link itself (to browse DOM and find tags there)
+            connection: default
+            exchange_options: { name: 'source', type: direct }
     consumers:
-        primary: # Default consumer, which utilizes initial message
+        # Primary consumer, which utilizes initial message
+        primary:
             connection: default
             exchange_options: { name: 'primary', type: direct }
             queue_options:    { name: 'primary' }
             callback:         imagepush.consumer.primary
+
+        # Services-related
         twitter:
             connection: default
             exchange_options: { name: 'twitter', type: direct }
@@ -181,6 +194,16 @@ old_sound_rabbit_mq:
             exchange_options: { name: 'delicious', type: direct }
             queue_options:    { name: 'delicious' }
             callback:         imagepush.consumer.delicious
+        stumble_upon:
+            connection: default
+            exchange_options: { name: 'stumble_upon', type: direct }
+            queue_options:    { name: 'stumble_upon' }
+            callback:         imagepush.consumer.stumble_upon
+        source:
+            connection: default
+            exchange_options: { name: 'source', type: direct }
+            queue_options:    { name: 'source' }
+            callback:         imagepush.consumer.source
 
 # Not in use (19.7.2012), because purge did not work with Symfony 2.0
 #liip_cache_control:

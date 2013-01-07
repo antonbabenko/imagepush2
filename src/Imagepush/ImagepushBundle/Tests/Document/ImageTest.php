@@ -9,7 +9,7 @@ class ImageTest extends WebTestCase
 
     /**
      * Part of Document\Image::updateFilename(), which generates filename based on id
-     * 
+     *
      * @param integer $id
      */
     private function generateFilename($id, $fileExt = "jpg")

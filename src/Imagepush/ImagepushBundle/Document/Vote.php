@@ -3,15 +3,14 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Users votes
- * 
+ *
  * ---------------------
  * 9 July 2012: This is not completed yet, because it is not in much use! Use redis to count votes.
  * ---------------------
- * 
+ *
  * @MongoDB\Document(collection="vote", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\VoteRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"imageId"="asc"}),
@@ -66,7 +65,7 @@ class Vote
      * Set imageId
      *
      * @param int $imageId
-     * 
+     *
      * @return Vote
      */
     public function setImageId($imageId)
@@ -90,7 +89,7 @@ class Vote
      * Set userIp
      *
      * @param string $userIp
-     * 
+     *
      * @return Vote
      */
     public function setUserIp($userIp)
@@ -114,7 +113,7 @@ class Vote
      * Set score
      *
      * @param int $score
-     * 
+     *
      * @return Vote
      */
     public function setScore($score)
@@ -138,7 +137,7 @@ class Vote
      * Set timestamp
      *
      * @param timestamp $timestamp
-     * 
+     *
      * @return Vote
      */
     public function setTimestamp($timestamp)
