@@ -9,7 +9,7 @@ class D
    *  Usage: D::debug($var) => echo("<pre>"); print_r($var); echo ("</pre>");
    */
 
-  static function debug($var)
+  public static function debug($var)
   {
     echo("<pre>");
     print_r($var);
@@ -21,7 +21,7 @@ class D
   // Inspired from:     PHP.net Contributions
   // Description: Helps with php debugging
 
-  static public function dump($var, $info = FALSE)
+  public static function dump($var, $info = FALSE)
   {
     $scope = false;
     $prefix = 'unique';
@@ -41,11 +41,9 @@ class D
     $var = $old;
 
     echo "<pre style='margin: 0px 0px 10px 0px; display: block; background: white; color: black; font-family: Verdana; border: 1px solid #cccccc; padding: 5px; font-size: 10px; line-height: 13px;'>";
-    if ($info != FALSE)
-    {
+    if ($info != FALSE) {
       echo "<b style='color: red;'>$info:</b><br>";
-    } else
-    {
+    } else {
       $stack = debug_backtrace();
       $caller = $stack[1];
       $fileinfo = $stack[0];
@@ -62,21 +60,19 @@ class D
   // Inspired from:     PHP.net Contributions
   // Description: Better GI than print_r or var_dump
 
-  static private function do_dump(&$var, $var_name = NULL, $indent = NULL, $reference = NULL)
+  private static function do_dump(&$var, $var_name = NULL, $indent = NULL, $reference = NULL)
   {
     $do_dump_indent = "<span style='color:#eeeeee;'>|</span> &nbsp;&nbsp; ";
     $reference = $reference . $var_name;
     $keyvar = 'the_do_dump_recursion_protection_scheme';
     $keyname = 'referenced_object_name';
 
-    if (is_array($var) && isset($var[$keyvar]))
-    {
+    if (is_array($var) && isset($var[$keyvar])) {
       $real_var = &$var[$keyvar];
       $real_name = &$var[$keyname];
       $type = ucfirst(gettype($real_var));
       echo "$indent$var_name <span style='color:#a2a2a2'>$type</span> = <span style='color:#e87800;'>&amp;$real_name</span><br>";
-    } else
-    {
+    } else {
       $var = array($keyvar => $var, $keyname => $reference);
       $avar = &$var[$keyvar];
 
@@ -85,8 +81,7 @@ class D
         $type_color = "<span style='color:green'>";
       elseif ($type == "integer")
         $type_color = "<span style='color:red'>";
-      elseif ($type == "double")
-      {
+      elseif ($type == "double") {
         $type_color = "<span style='color:#0099c5'>";
         $type = "float";
       } elseif ($type == "boolean")
@@ -94,12 +89,10 @@ class D
       elseif ($type == "null")
         $type_color = "<span style='color:black'>";
 
-      if (is_array($avar))
-      {
+      if (is_array($avar)) {
         $count = count($avar);
         echo "$indent" . ($var_name ? "$var_name => " : "") . "<span style='color:#a2a2a2'>$type ($count)</span><br>";
-        if ($count > 0)
-        {
+        if ($count > 0) {
           echo "$indent(<br>";
           $keys = array_keys($avar);
           foreach ($keys as $name) {
@@ -108,8 +101,7 @@ class D
           }
           echo "$indent)<br>";
         }
-      } elseif (is_object($avar))
-      {
+      } elseif (is_object($avar)) {
         echo "$indent$var_name <span style='color:#a2a2a2'>is a</span> <b>" . get_class($avar) . "</b> (";
         $newLine = false;
         foreach ($avar as $name => $value) {
@@ -119,8 +111,7 @@ class D
           self::do_dump($value, "$name", $indent . $do_dump_indent, $reference);
         }
         echo ($newLine ? $indent : "") . ")<br>";
-      }
-      elseif (is_int($avar))
+      } elseif (is_int($avar))
         echo "$indent$var_name = <span style='color:#a2a2a2'>$type</span> $type_color$avar</span><br>";
       elseif (is_string($avar))
         echo "$indent$var_name = <span style='color:#a2a2a2'>$type(" . strlen($avar) . ")</span> $type_color\"$avar\"</span><br>";

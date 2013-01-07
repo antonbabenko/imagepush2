@@ -9,12 +9,12 @@ class StumbleUponTag extends Tag implements TagInterface
 
     /**
      * StumbleUpon
-     * 
+     *
      * @param Image $image
-     * 
+     *
      * @link http://www.stumbleupon.com/services/1.01/badge.getinfo?url=http://www.treehugger.com/
      * @link YQL sample URL: SELECT content FROM html WHERE url="http://www.stumbleupon.com/url/www.flickr.com/photos/passiveaggressive/3642661392/sizes/o/" and xpath='//ul[@class="listTopics"]/li/a'
-     * 
+     *
      * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
      */
     public function find(Image $image)

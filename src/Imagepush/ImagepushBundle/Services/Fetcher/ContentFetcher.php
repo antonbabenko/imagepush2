@@ -29,7 +29,7 @@ class ContentFetcher
 
     /**
      * Send GET request
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     public function getRequest($uri)
@@ -41,7 +41,7 @@ class ContentFetcher
 
     /**
      * Send HEAD request
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     public function headRequest($uri)
@@ -53,7 +53,7 @@ class ContentFetcher
 
     /**
      * Make HTTP request to url
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     protected function makeRequest($uri)

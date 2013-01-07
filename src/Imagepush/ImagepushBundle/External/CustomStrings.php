@@ -102,7 +102,7 @@ class CustomStrings
     /**
      * Modifies a string to remove all non ASCII characters and spaces.
      */
-    static public function slugify($text)
+    public static function slugify($text)
     {
         // replace non letter or digits by -
         $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
@@ -158,7 +158,7 @@ class CustomStrings
     /**
      * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
      */
-    static public function cleanTitle($text)
+    public static function cleanTitle($text)
     {
 
         $startsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeStart))));

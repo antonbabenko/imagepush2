@@ -3,7 +3,7 @@ services:
     ##################
     # Robot services #
     ##################
-    
+
     # Access control
     imagepush.access_control.service:
         class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
@@ -51,6 +51,18 @@ services:
     imagepush.consumer.delicious:
         class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
         arguments: [@service_container, "delicious"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.stumble_upon:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "stumble_upon"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.source:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "source"]
         calls:
             - [ setLogger, [@imagepush.rabbitmq_logger]]
 
@@ -116,7 +128,7 @@ services:
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-        
+
     imagepush.fetcher_logger:
         class: Monolog\Logger
         arguments: [fetcher]
@@ -151,17 +163,17 @@ services:
     imagepush.rabbitmq_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/rabbitmq_%kernel.environment%.log, 100]
-    
+
     # General log processors
     log_web_processor:
         class: Monolog\Processor\WebProcessor
-        
+
     log_introspection_processor:
         class: Monolog\Processor\IntrospectionProcessor
-        
+
     log_memory_usage_processor:
         class: Monolog\Processor\MemoryUsageProcessor
-        
+
     log_memory_peak_usage_processor:
         class: Monolog\Processor\MemoryPeakUsageProcessor
 
@@ -173,14 +185,14 @@ services:
     imagepush.imagine.controller:
       class: Imagepush\ImagepushBundle\Controller\ImagineController
       arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, @doctrine.odm.mongodb.document_manager, @liip_imagine, @logger, %kernel.debug%]
-      
+
     # Imagine data loader (via Gaufrette with name "images")
     imagepush.imagine.files.data.loader:
         class: Imagepush\ImagepushBundle\Imagine\CustomDataLoader
         arguments: [@liip_imagine, %liip_imagine.formats%, @gaufrette.images_filesystem]
         tags:
             - { name: liip_imagine.data.loader, loader: custom_data_loader }
- 
+
     # Imagine cache resolver (via Gaufrette with name "images")
     imagepush.imagine.files.cache.resolver:
         class: Imagepush\ImagepushBundle\Imagine\CustomCacheResolver

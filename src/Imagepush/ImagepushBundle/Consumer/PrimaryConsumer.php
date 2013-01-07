@@ -16,10 +16,14 @@ class PrimaryConsumer implements ConsumerInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Consume message and republish it to other service-related queues depending on task in message.
+     *
+     * @param  \PhpAmqpLib\Message\AMQPMessage $msg
+     * @return boolean
+     */
     public function execute(AMQPMessage $msg)
     {
-        $this->logger->crit("!!!!!!!!!!!! ===> " . $msg->body);
-
         $message = $this->container->get('imagepush.consumer_message')->setAMQPMessage($msg);
 
         if (!$message->task) {
@@ -37,9 +41,10 @@ class PrimaryConsumer implements ConsumerInterface
             return true;
         }
 
+        // Validate parameters
         if ($message->task == MessageTask::FIND_TAGS_AND_MENTIONS) {
             if (empty($message->body['image_id'])) {
-                $this->logger->err('Image id is missing. Skip message.');
+                $this->logger->crit('Image id is missing. Skip message.');
 
                 return true;
             }
@@ -47,22 +52,10 @@ class PrimaryConsumer implements ConsumerInterface
 
         $this->logger->info(sprintf('Publish message %s to producers (%s)', $msg->body, implode(", ", $producers)));
 
-        $msgCopy = clone $msg;
-
         foreach ($producers as $name) {
-            $this->logger->crit($name . "0 ===> " . $msg->body);
 
-            $this->logger->crit('old_sound_rabbit_mq.' . $name . '_producer');
-
-            $producer = $this->container->get('old_sound_rabbit_mq.' . $name . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-
-            $this->logger->crit(get_class($producer));
-
-            if (null !== $producer) {
-                $this->logger->crit($name . "1 ===> " . $msg->body);
-
-                $producer->publish($msgCopy->body);
-                $this->logger->crit($name . "2 ===> " . $msg->body);
+            if ($producer = $this->container->get('old_sound_rabbit_mq.' . $name . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+                $producer->publish($msg->body);
             } else {
                 $this->logger->crit(sprintf('Producer %s does not exist. Skip message.', $name));
 
@@ -70,9 +63,7 @@ class PrimaryConsumer implements ConsumerInterface
             }
         }
 
-        return "DONE";
-
-        //return true;
+        return true;
     }
 
 }

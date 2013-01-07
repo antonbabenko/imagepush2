@@ -14,7 +14,7 @@ class MessageTask
      * Array of associated producers, where task will be published
      */
     public static $producers = array(
-        self::FIND_TAGS_AND_MENTIONS => array("twitter", "delicious", "reddit"),
+        self::FIND_TAGS_AND_MENTIONS => array("twitter", "delicious", "reddit", "stumble_upon", "source"),
     );
 
 }

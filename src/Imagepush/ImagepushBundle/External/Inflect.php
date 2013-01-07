@@ -35,7 +35,7 @@ class Inflect
     /**
      * @var array $plural
      */
-    static public $plural = array(
+    public static $plural = array(
         '/(quiz)$/i' => "$1zes",
         '/^(ox)$/i' => "$1en",
         '/([m|l])ouse$/i' => "$1ice",
@@ -60,7 +60,7 @@ class Inflect
     /**
      * @var array $singular
      */
-    static public $singular = array(
+    public static $singular = array(
         '/(quiz)zes$/i' => "$1",
         '/(matr)ices$/i' => "$1ix",
         '/(vert|ind)ices$/i' => "$1ex",
@@ -94,7 +94,7 @@ class Inflect
     /**
      * @var array $irregular
      */
-    static public $irregular = array(
+    public static $irregular = array(
         'move' => 'moves',
         'foot' => 'feet',
         'goose' => 'geese',
@@ -108,7 +108,7 @@ class Inflect
     /**
      * @var array $uncountable
      */
-    static public $uncountable = array(
+    public static $uncountable = array(
         'sheep',
         'fish',
         'deer',
@@ -122,7 +122,7 @@ class Inflect
 
     /**
      * @param string $string
-     * 
+     *
      * @return string
      */
     public static function pluralize($string)
@@ -153,7 +153,7 @@ class Inflect
 
     /**
      * @param string $string
-     * 
+     *
      * @return string
      */
     public static function singularize($string)
@@ -185,7 +185,7 @@ class Inflect
     /**
      * @param integer $count
      * @param string  $string
-     * 
+     *
      * @return string
      */
     public static function pluralize_if($count, $string)

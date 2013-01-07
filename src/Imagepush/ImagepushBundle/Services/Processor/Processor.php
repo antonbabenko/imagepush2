@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Processor
- * 
+ *
  * @todo: Other classes are:
  *   Processor\Processor - super-class which handles all other processors relations and contains business logic
  *   Processor\Html - handle html content (and get the most suitable image inside html content)
@@ -69,9 +69,9 @@ class Processor
         }
 
         /*
-          if ($image->sourceDomainIsBlocked())
-          {
+          if ($image->sourceDomainIsBlocked()) {
           $this->logger->warn(sprintf("ID: %d. %s is blacklisted domain (porn, spam, etc)", $image->id, $image->link));
+
           return false;
           }
          */
@@ -237,10 +237,10 @@ class Processor
     /**
      * Process content of found image
      * (verify image size, save original image, generate required thumbnails)
-     * 
+     *
      * @param Image   $image   Image
      * @param Content $content Content
-     * 
+     *
      * @return boolean True if image has been successfully saved
      */
     private function processFoundImage(Image $image, $content)

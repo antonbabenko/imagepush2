@@ -7,27 +7,26 @@ namespace Imagepush\ImagepushBundle\Services\AccessControl;
  */
 class ServiceAccess
 {
-
-    /**
-     * Service key
-     * 
-     * @var string
-     */
-    public $key;
-
-    /**
-     * Service access settings
-     * 
-     * @var array
-     */
-    public $settings;
-
     /**
      * Server status messages
      */
 
     const STATUS_OK = "OK";
     const STATUS_FAIL = "FAIL";
+
+    /**
+     * Service key
+     *
+     * @var string
+     */
+    public $key;
+
+    /**
+     * Service access settings
+     *
+     * @var array
+     */
+    public $settings;
 
     /**
      * @param Predis\Client $redis
@@ -49,9 +48,9 @@ class ServiceAccess
 
     /**
      * Set service key
-     * 
+     *
      * @param string $key
-     * 
+     *
      * @return $this
      */
     public function setKey($key)
@@ -79,13 +78,13 @@ class ServiceAccess
 
     /**
      * Get minimum allowed exponential delay before next attempt to access web-service.
-     * 
+     *
      * @return int
      */
     public function getDelay()
     {
 
-        $lastAccess = (int) $this->redis->get('service_access_' . $this->key);
+        $lastAccess = (float) $this->redis->get('service_access_' . $this->key);
 
         if ($this->serviceIsOK()) {
             $expDelay = $this->delay;
@@ -93,7 +92,7 @@ class ServiceAccess
             $expDelay = $this->getExpDelay();
         }
 
-        $delay = $lastAccess + $expDelay - time();
+        $delay = $lastAccess + $expDelay - microtime(true) + 1;
 
         // Last access was long time ago = no delay
         if ($delay < 0) {
@@ -118,7 +117,7 @@ class ServiceAccess
      */
     public function updateLastAccess()
     {
-        $this->redis->set('service_access_' . $this->key, time());
+        $this->redis->set('service_access_' . $this->key, microtime(true));
     }
 
     /**
@@ -146,7 +145,7 @@ class ServiceAccess
 
     /**
      * Returns exponential delay for this service.
-     * 
+     *
      * @return int
      */
     public function getExpDelay()

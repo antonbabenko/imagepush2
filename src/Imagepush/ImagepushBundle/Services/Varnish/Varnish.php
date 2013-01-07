@@ -54,7 +54,7 @@ class Varnish
 
     /**
      * When new image is published on homepage
-     * 
+     *
      * @param Image $image
      */
     public function purgeWhenNewImageIsPublished($image = null)
@@ -82,7 +82,7 @@ class Varnish
 
     /**
      * When new image is saved as upcoming
-     * 
+     *
      * @todo: update tag pages for added images
      */
     public function purgeWhenNewImagesSavedAsUpcoming()

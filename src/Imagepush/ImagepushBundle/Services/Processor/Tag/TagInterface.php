@@ -9,10 +9,10 @@ interface TagInterface
 
     /**
      * Find tags for the Image
-     * 
+     *
      * @param Imagepush\ImagepushBundle\Document\Image $image
-     * 
+     *
      * @return array Array of tags with weight
      */
-    function find(Image $image);
+    public function find(Image $image);
 }

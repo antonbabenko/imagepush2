@@ -23,6 +23,10 @@ class WebServiceConsumer implements ConsumerInterface
         $this->producer = $container->get('old_sound_rabbit_mq.' . $serviceKey . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
         $this->service = $container->get('imagepush.access_control.service')->setKey($serviceKey);
+
+        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+
+        $this->serviceKey = $serviceKey;
     }
 
     public function setLogger($logger = null)
@@ -40,6 +44,8 @@ class WebServiceConsumer implements ConsumerInterface
     public function execute(AMQPMessage $msg)
     {
 
+        $statusCode = ProcessorStatusCode::OK;
+
         $message = $this->container->get('imagepush.consumer_message')->setAMQPMessage($msg);
 
         if ($message->attempts >= $this->service->maxAttempts) {
@@ -48,11 +54,20 @@ class WebServiceConsumer implements ConsumerInterface
             return true;
         }
 
-        // Extract required parameters
+        // Validate parameters
         if ($message->task == MessageTask::FIND_TAGS_AND_MENTIONS) {
-            if (true === $imageId = $message->getImageId()) {
+
+            $image = $this->dm
+                ->getRepository('ImagepushBundle:Image')
+                ->findOneBy(array("id" => $msg->body['image_id']));
+
+            if (!$image) {
+                $this->log(Logger::INFO, sprintf("Image id %d does not exist.", $msg->body['image_id']));
+
                 return true;
             }
+
+            $imageId = $msg->body['image_id'];
         }
 
         // Should service be accessed now or sleep?
@@ -68,21 +83,35 @@ class WebServiceConsumer implements ConsumerInterface
 
         // Get result from task specific action
         if ($message->task == MessageTask::FIND_TAGS_AND_MENTIONS) {
-            //$result = $this->container->get("imagepush.processor.tag." . $this->key)->find($imageId);
-            $result = array("tag_1", rand());
+
+            $processor = $this->container->get("imagepush.processor.tag." . $this->serviceKey, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+
+            if (null === $processor) {
+                $this->log(Logger::CRITICAL, sprintf("Unknown processor tag service: %s", "imagepush.processor.tag." . $this->serviceKey));
+
+                return true;
+            } else {
+
+                try {
+
+//                $result = $processor->find($imageId);
+                    $result = array("tag_1", rand());
+
+                    if (is_array($result)) {
+                        $statusCode = ProcessorStatusCode::OK;
+
+                        $this->service->saveTags($imageId, $this->serviceKey, $result);
+                    } else {
+                        $statusCode = $result;
+                    }
+                } catch (\Exception $e) {
+                    $this->log(Logger::CRITICAL, sprintf("Exception caught. Code %s. Message: %s", $e->getMessage(), $e->getCode()));
+                }
+            }
         } else {
             $this->log(Logger::CRITICAL, sprintf("Unknown message task: %s", $message->task));
 
             return true;
-        }
-
-        // OK
-        if (is_array($result)) {
-            $statusCode = 0;
-
-            //$this->service->saveTags($result);
-        } else {
-            $statusCode = $result;
         }
 
         /**
@@ -92,39 +121,33 @@ class WebServiceConsumer implements ConsumerInterface
          * 2 - Don't retry the same request. It was an error. Skip it.
          * 3 - Don't retry this service at all now. Service is down. Retry when service is back.
          */
-        switch ($statusCode):
-            case ProcessorStatusCode::OK:
-                $this->log(Logger::DEBUG, 'Status=0 -- OK! There were tags found! ' . print_r(json_encode($result), true));
-                break;
+        if (ProcessorStatusCode::OK == $statusCode) {
+            $serviceOk = true;
+            $this->log(Logger::DEBUG, 'Status=0 -- OK! There were tags found! ' . print_r(json_encode($result), true));
+        } elseif (ProcessorStatusCode::RETRY_REQUEST_AGAIN == $statusCode) {
+            $serviceOk = true;
+            if ($this->producer) {
+                $message->publishToRetry($this->producer);
+                $this->log(Logger::DEBUG, 'Status=1 -- Republish: ' . print_r(json_encode($message->body), true));
+            } else {
+                $this->log(Logger::CRITICAL, 'Status=1 -- No service defined');
+            }
+        } elseif (ProcessorStatusCode::WRONG_REQUEST == $statusCode) {
+            $serviceOk = true;
+            $this->log(Logger::DEBUG, 'Status=2 -- Don\'t retry the same request. Skip it.');
+        } elseif (ProcessorStatusCode::SERVICE_IS_DOWN == $statusCode) {
+            $serviceOk = false;
+            $this->log(Logger::DEBUG, 'Status=3 -- Service is currently down. Try later. Body: ' . print_r(json_encode($message->body), true));
 
-            case ProcessorStatusCode::RETRY_REQUEST_AGAIN:
-                if ($this->producer) {
-                    $message->publishToRetry($this->producer);
-                    $this->log(Logger::DEBUG, 'Status=1 -- Republish: ' . print_r(json_encode($message->body), true));
-                } else {
-                    $this->log(Logger::CRITICAL, 'Status=1 -- No service defined');
-                }
-                break;
+            // And requeue the message to process when service is back.
+            //return false;
+        } else {
+            $serviceOk = true;
+            $this->log(Logger::ERROR, "UNKNOWN STATUS CODE " . print_r($statusCode, true) . ". Message skiped");
+        }
 
-            case ProcessorStatusCode::WRONG_REQUEST:
-                $this->log(Logger::DEBUG, 'Status=2 -- Don\'t retry the same request. Skip it.');
-                break;
-
-            case ProcessorStatusCode::SERVICE_IS_DOWN:
-                $this->service->updateServiceStatus(ServiceAccess::STATUS_FAIL);
-                $this->log(Logger::DEBUG, 'Status=3 -- Service is currently down. Try later. Body: ' . print_r(json_encode($message->body), true));
-
-                // And requeue the message to process when service is back.
-                return false;
-
-            default:
-                $this->log(Logger::ERROR, "UNKNOWN STATUS CODE " . print_r($statusCode, true) . ". Message skiped");
-                break;
-
-        endswitch;
-
-        // Set service status to "Available"
-        $this->service->updateServiceStatus(ServiceAccess::STATUS_OK);
+        // Update service status
+        $this->service->updateServiceStatus($serviceOk ? ServiceAccess::STATUS_OK : ServiceAccess::STATUS_FAIL);
 
         return true;
     }

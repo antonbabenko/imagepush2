@@ -10,9 +10,9 @@ class LinkRepository extends DocumentRepository
 
     /**
      * Whether link is empty or already indexed/failed.
-     * 
+     *
      * @param string $link
-     * 
+     *
      * @return boolean
      */
     public function isIndexedOrFailed($link = "")

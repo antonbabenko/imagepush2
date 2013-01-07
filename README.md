@@ -14,12 +14,11 @@ pear channel-discover pear.symfony-project.com
 pear install phpunit/PHPUnit
 ---
 ImageMagick:
-1) Install ImageMagick via MacPorts (don't use Mac OS X Binary Release from official ImageMagick)
-2) download stable imagick pecl sources (like 3.0.1)
-3) ./configure --with-imagick=/opt/local
-4) make
-5) make install
-6) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://mikepuchol.com/2010/08/26/getting-mamp-1-9-to-work-with-image-magick-imagick-so-and-other-flora/
+1) Install ImageMagick via MacPorts (don't use Mac OS X Binary Release from official ImageMagick):
+sudo port install ImageMagick
+2) Install pecl module with location /opt/local
+pecl install imagick
+3) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://thoomtech.com/post/8832473042/mamp-imagemagick-lion
 
 ---
 Helpful about DI:
@@ -102,6 +101,15 @@ sudo rabbitmq-plugins enable rabbitmq_management rabbitmq_jsonrpc rabbitmq_jsonr
 
 Admin: http://localhost:55672/
 
+---
+
+Note (6.10.2012):
+Using https://github.com/StartupLabs/php-amqplib instead of https://github.com/videlalvaro/php-amqplib in composer.json,
+because this fix has not been merged to main master yet (https://github.com/videlalvaro/php-amqplib/issues/25).
+Use original master when it will include this fix!
+
+Use supervisord to restart rabbitmq consumers:
+http://sonata-project.org/bundles/notification/master/doc/reference/command_line.html
 
 ---
 1) Fetch new from reddit

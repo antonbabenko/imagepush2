@@ -10,11 +10,11 @@ class DiggTag extends Tag implements TagInterface
 
     /**
      * Digg topics/tags (it is useless when data is fetched from digg only, because tags are already saved)
-     * 
+     *
      * @param Image $image
-     * 
+     *
      * @link http://developers.digg.com/version2/story-getinfo
-     * 
+     *
      * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
      */
     public function find(Image $image)

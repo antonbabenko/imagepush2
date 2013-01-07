@@ -9,9 +9,9 @@ class DeliciousTag extends Tag implements TagInterface
 
     /**
      * Delicious tags
-     * 
+     *
      * Get tags for URL - http://feeds.delicious.com/v2/json/urlinfo/data?hash=md5(http://...)
-     * 
+     *
      * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
      */
     public function find(Image $image)

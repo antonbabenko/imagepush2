@@ -113,12 +113,11 @@ class Content
 
     /**
      * @param string $link
-     * 
+     *
      * @return array|false
      */
     public function head($link)
     {
-
         return $this->fetcher->headRequest($link);
     }
 

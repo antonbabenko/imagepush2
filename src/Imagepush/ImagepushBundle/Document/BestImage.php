@@ -3,12 +3,11 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Best images (defined by admin).
  * Admin add best images from "vote up" email. This is temporary solution to increase quality of images (13.7.2012).
- * 
+ *
  * @MongoDB\Document(collection="bestImage")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"imageId"="asc"}, dropDups=true, safe=false)
@@ -46,7 +45,7 @@ class BestImage
      * Set imageId
      *
      * @param int $imageId
-     * 
+     *
      * @return BestImage
      */
     public function setImageId($imageId)
@@ -70,7 +69,7 @@ class BestImage
      * Set timestamp
      *
      * @param timestamp $timestamp
-     * 
+     *
      * @return BestImage
      */
     public function setTimestamp($timestamp)

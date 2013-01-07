@@ -3,15 +3,10 @@
 namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Imagepush\ImagepushBundle\Document\Image;
-use Imagepush\ImagepushBundle\Document\Tag;
 use Imagepush\ImagepushBundle\Document\LatestTag;
-use Imagepush\ImagepushBundle\Document\Link;
-use Imagepush\ImagepushBundle\Document\ProcessedHash;
 
 class TemporaryController extends Controller
 {
@@ -183,9 +178,7 @@ class TemporaryController extends Controller
         echo "</pre>";
 
         //\D::dump($results);
-
         return array();
     }
 
 }
-

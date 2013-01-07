@@ -98,7 +98,7 @@ class ImageRepository extends DocumentRepository
 
     /**
      * Get oldest unprocessed image and change status for it to "in process"
-     * 
+     *
      * @return Image|false
      */
     public function initUnprocessedSource()
