@@ -79,7 +79,7 @@
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>
 
-        {% render "ImagepushBundle:Front:_trendingNow" with {'max': 20}, {'standalone': true} %}
+        {{ render_esi(controller('ImagepushBundle:Front:_trendingNow', { 'max': 20 })) }}
 
       </header>
 
@@ -97,14 +97,14 @@
       <div id="content">{% block content %}{% endblock %}</div>
 
       <aside id="asideInfo">
-        {% render "ImagepushBundle:Front:_sidebar" with {}, {'standalone': true} %}
+        {{ render_esi(controller('ImagepushBundle:Front:_sidebar')) }}
       </aside>
       <div class="footerFix"></div>
       {# <?php include_slot("verticalShare"); ?> #}
 
     </div>
 
-   {% render "ImagepushBundle:Front:_footer" with {}, {'standalone': true} %}
+   {{ render_esi(controller('ImagepushBundle:Front:_footer')) }}
 
   </body>
 </html>

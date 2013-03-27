@@ -6,10 +6,12 @@ imports:
 
 framework:
     esi:             { enabled: true }
-    #translator:      { fallback: %locale% }
+    translator:      { fallback: %locale% }
     secret:          %secret%
-    charset:         UTF-8
-    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    router:
+        strict_requirements: %kernel.debug%
+        resource: "%kernel.root_dir%/config/routing.yml"
+    default_locale:  %locale%
     form:            true
     csrf_protection: true
     validation:      { enable_annotations: true }
@@ -19,8 +21,9 @@ framework:
       #  http: [http://cdn.imagepush.to]
       #assets_version: SomeVersionScheme
     session:
-        default_locale: %locale%
-        auto_start:     true
+        save_path: ~
+    trust_proxy_headers: true
+    trusted_proxies: ['127.0.0.1']
 
 # Twig Configuration
 twig:
@@ -72,10 +75,6 @@ swiftmailer:
     host:      %mailer_host%
     username:  %mailer_user%
     password:  %mailer_password%
-
-jms_security_extra:
-    secure_controllers:  true
-    secure_all_services: false
 
 stof_doctrine_extensions:
     default_locale: en_US
