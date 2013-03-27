@@ -33,15 +33,12 @@ AnnotationRegistry::registerFile(__DIR__ . '/../vendor/doctrine/mongodb-odm/lib/
 
 // Swiftmailer needs a special autoloader to allow
 // the lazy loading of the init file (which is expensive)
-require_once __DIR__ . '/../vendor/swiftmailer/swiftmailer/lib/classes/Swift.php';
-Swift::registerAutoload(__DIR__ . '/../vendor/swiftmailer/swiftmailer/lib/swift_init.php');
+//require_once __DIR__ . '/../vendor/swiftmailer/swiftmailer/lib/classes/Swift.php';
+//Swift::registerAutoload(__DIR__ . '/../vendor/swiftmailer/swiftmailer/lib/swift_init.php');
 
 // AWS SDK needs a special autoloader
 //require_once __DIR__.'/../vendor/amazonwebservices/aws-sdk-for-php/sdk.class.php';
 // Load Amazon credentials config
 include_once __DIR__ . '/config/amazon_config.inc.php';
-
-// Load Services_Digg
-require_once __DIR__ . '/../vendor/digg/Services_Digg2/Services/Digg2.php';
 
 return $loader;

@@ -5,9 +5,11 @@
     {# <li><a href="<?php echo url_for("@homepage"); ?>" title="Home" class="active">Home</a></li> #}
     {% for tag, count in tags %}
     {% set tag = tag|replace({"\n": " "})|lower %}
+    {% if tag is not empty %}
     <li>
       <a href="{{ path('viewUpcomingByTag', {'tag': tag|url_encode}) }}" {{ app.request.get('tag') == tag ? 'class="active"' : '' }}>{{ tag }}</a>
     </li>
+    {% endif %}
     {% endfor %}
   </ul>
 </nav>

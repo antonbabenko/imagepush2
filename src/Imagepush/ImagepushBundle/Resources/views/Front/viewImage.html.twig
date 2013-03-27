@@ -74,7 +74,7 @@
           <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 625, 2090, "w") }}" height="{{ image.thumbProperty("in", 625, 2090, "h") }}" />
         </figure>
 
-        {% render "ImagepushBundle:Front:_comments" with {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) } %}
+        {{ render (controller('ImagepushBundle:Front:_comments', {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) })) }}
 
       </div>
 
@@ -93,6 +93,6 @@
   </div>
 </section>
 
-{% render "ImagepushBundle:Front:_thumbBox" with {'initialTags': image.tags, 'skipImageId': image.id} %}
+{{ render (controller('ImagepushBundle:Front:_thumbBox', {'initialTags': image.tags, 'skipImageId': image.id})) }}
 
 {% endblock %}
