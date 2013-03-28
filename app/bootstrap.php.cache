@@ -1,6 +1,6 @@
 <?php
 
-namespace { require_once __DIR__.'/autoload.php'; }
+namespace { $loader = require_once __DIR__.'/autoload.php'; }
 
  
 namespace Symfony\Component\DependencyInjection
@@ -720,76 +720,28 @@ $this->__construct($environment, $debug);
 }
 namespace Symfony\Component\ClassLoader
 {
-class UniversalClassLoader
+class ApcClassLoader
 {
-private $namespaces = array();
-private $prefixes = array();
-private $namespaceFallbacks = array();
-private $prefixFallbacks = array();
-private $useIncludePath = false;
-public function useIncludePath($useIncludePath)
+private $prefix;
+protected $decorated;
+public function __construct($prefix, $decorated)
 {
-$this->useIncludePath = $useIncludePath;
+if (!extension_loaded('apc')) {
+throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
 }
-public function getUseIncludePath()
-{
-return $this->useIncludePath;
+if (!method_exists($decorated,'findFile')) {
+throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');
 }
-public function getNamespaces()
-{
-return $this->namespaces;
-}
-public function getPrefixes()
-{
-return $this->prefixes;
-}
-public function getNamespaceFallbacks()
-{
-return $this->namespaceFallbacks;
-}
-public function getPrefixFallbacks()
-{
-return $this->prefixFallbacks;
-}
-public function registerNamespaceFallbacks(array $dirs)
-{
-$this->namespaceFallbacks = $dirs;
-}
-public function registerNamespaceFallback($dir)
-{
-$this->namespaceFallbacks[] = $dir;
-}
-public function registerPrefixFallbacks(array $dirs)
-{
-$this->prefixFallbacks = $dirs;
-}
-public function registerPrefixFallback($dir)
-{
-$this->prefixFallbacks[] = $dir;
-}
-public function registerNamespaces(array $namespaces)
-{
-foreach ($namespaces as $namespace => $locations) {
-$this->namespaces[$namespace] = (array) $locations;
-}
-}
-public function registerNamespace($namespace, $paths)
-{
-$this->namespaces[$namespace] = (array) $paths;
-}
-public function registerPrefixes(array $classes)
-{
-foreach ($classes as $prefix => $locations) {
-$this->prefixes[$prefix] = (array) $locations;
-}
-}
-public function registerPrefix($prefix, $paths)
-{
-$this->prefixes[$prefix] = (array) $paths;
+$this->prefix = $prefix;
+$this->decorated = $decorated;
 }
 public function register($prepend = false)
 {
 spl_autoload_register(array($this,'loadClass'), true, $prepend);
+}
+public function unregister()
+{
+spl_autoload_unregister(array($this,'loadClass'));
 }
 public function loadClass($class)
 {
@@ -800,53 +752,14 @@ return true;
 }
 public function findFile($class)
 {
-if ('\\'== $class[0]) {
-$class = substr($class, 1);
+if (false === $file = apc_fetch($this->prefix.$class)) {
+apc_store($this->prefix.$class, $file = $this->decorated->findFile($class));
 }
-if (false !== $pos = strrpos($class,'\\')) {
-$namespace = substr($class, 0, $pos);
-$className = substr($class, $pos + 1);
-$normalizedClass = str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-foreach ($this->namespaces as $ns => $dirs) {
-if (0 !== strpos($namespace, $ns)) {
-continue;
-}
-foreach ($dirs as $dir) {
-$file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-if (is_file($file)) {
 return $file;
 }
-}
-}
-foreach ($this->namespaceFallbacks as $dir) {
-$file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-if (is_file($file)) {
-return $file;
-}
-}
-} else {
-$normalizedClass = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-foreach ($this->prefixes as $prefix => $dirs) {
-if (0 !== strpos($class, $prefix)) {
-continue;
-}
-foreach ($dirs as $dir) {
-$file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-if (is_file($file)) {
-return $file;
-}
-}
-}
-foreach ($this->prefixFallbacks as $dir) {
-$file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-if (is_file($file)) {
-return $file;
-}
-}
-}
-if ($this->useIncludePath && $file = stream_resolve_include_path($normalizedClass)) {
-return $file;
-}
+public function __call($method, $args)
+{
+return call_user_func_array(array($this->decorated, $method), $args);
 }
 }
 }
@@ -1033,3 +946,192 @@ if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmp
 }
 }
 }
+namespace Symfony\Component\HttpKernel
+{
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+class HttpKernel implements HttpKernelInterface, TerminableInterface
+{
+protected $dispatcher;
+protected $resolver;
+public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
+{
+$this->dispatcher = $dispatcher;
+$this->resolver = $resolver;
+}
+public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+{
+try {
+return $this->handleRaw($request, $type);
+} catch (\Exception $e) {
+if (false === $catch) {
+throw $e;
+}
+return $this->handleException($e, $request, $type);
+}
+}
+public function terminate(Request $request, Response $response)
+{
+$this->dispatcher->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this, $request, $response));
+}
+private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
+{
+$event = new GetResponseEvent($this, $request, $type);
+$this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
+if ($event->hasResponse()) {
+return $this->filterResponse($event->getResponse(), $request, $type);
+}
+if (false === $controller = $this->resolver->getController($request)) {
+throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
+}
+$event = new FilterControllerEvent($this, $controller, $request, $type);
+$this->dispatcher->dispatch(KernelEvents::CONTROLLER, $event);
+$controller = $event->getController();
+$arguments = $this->resolver->getArguments($request, $controller);
+$response = call_user_func_array($controller, $arguments);
+if (!$response instanceof Response) {
+$event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
+$this->dispatcher->dispatch(KernelEvents::VIEW, $event);
+if ($event->hasResponse()) {
+$response = $event->getResponse();
+}
+if (!$response instanceof Response) {
+$msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+if (null === $response) {
+$msg .=' Did you forget to add a return statement somewhere in your controller?';
+}
+throw new \LogicException($msg);
+}
+}
+return $this->filterResponse($response, $request, $type);
+}
+private function filterResponse(Response $response, Request $request, $type)
+{
+$event = new FilterResponseEvent($this, $request, $type, $response);
+$this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+return $event->getResponse();
+}
+private function handleException(\Exception $e, $request, $type)
+{
+$event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+$this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+$e = $event->getException();
+if (!$event->hasResponse()) {
+throw $e;
+}
+$response = $event->getResponse();
+if ($response->headers->has('X-Status-Code')) {
+$response->setStatusCode($response->headers->get('X-Status-Code'));
+$response->headers->remove('X-Status-Code');
+} elseif (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+if ($e instanceof HttpExceptionInterface) {
+$response->setStatusCode($e->getStatusCode());
+$response->headers->add($e->getHeaders());
+} else {
+$response->setStatusCode(500);
+}
+}
+try {
+return $this->filterResponse($response, $request, $type);
+} catch (\Exception $e) {
+return $response;
+}
+}
+private function varToString($var)
+{
+if (is_object($var)) {
+return sprintf('Object(%s)', get_class($var));
+}
+if (is_array($var)) {
+$a = array();
+foreach ($var as $k => $v) {
+$a[] = sprintf('%s => %s', $k, $this->varToString($v));
+}
+return sprintf("Array(%s)", implode(', ', $a));
+}
+if (is_resource($var)) {
+return sprintf('Resource(%s)', get_resource_type($var));
+}
+if (null === $var) {
+return'null';
+}
+if (false === $var) {
+return'false';
+}
+if (true === $var) {
+return'true';
+}
+return (string) $var;
+}
+}
+}
+namespace Symfony\Component\HttpKernel\DependencyInjection
+{
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+class ContainerAwareHttpKernel extends HttpKernel
+{
+protected $container;
+public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+{
+parent::__construct($dispatcher, $controllerResolver);
+$this->container = $container;
+}
+public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+{
+$request->headers->set('X-Php-Ob-Level', ob_get_level());
+$this->container->enterScope('request');
+$this->container->set('request', $request,'request');
+try {
+$response = parent::handle($request, $type, $catch);
+} catch (\Exception $e) {
+$this->container->leaveScope('request');
+throw $e;
+}
+$this->container->leaveScope('request');
+return $response;
+}
+}
+}
+namespace Symfony\Bundle\FrameworkBundle
+{
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
+class HttpKernel extends ContainerAwareHttpKernel
+{
+public function forward($controller, array $attributes = array(), array $query = array())
+{
+trigger_error('forward() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+$attributes['_controller'] = $controller;
+$subRequest = $this->container->get('request')->duplicate($query, null, $attributes);
+return $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+}
+public function render($uri, array $options = array())
+{
+trigger_error('render() is deprecated since version 2.2 and will be removed in 2.3. Use Symfony\Component\HttpKernel\Fragment\FragmentHandler::render() instead.', E_USER_DEPRECATED);
+$options = $this->renderer->fixOptions($options);
+$strategy = isset($options['strategy']) ? $options['strategy'] :'default';
+unset($options['strategy']);
+$this->container->get('fragment.handler')->render($uri, $strategy, $options);
+}
+}
+}
+
+namespace { return $loader; }
+            

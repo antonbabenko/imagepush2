@@ -34,8 +34,7 @@
         "liip/imagine-bundle":           "dev-master",
         "amazonwebservices/aws-sdk-for-php": "1.5.10",
         "knplabs/knp-gaufrette-bundle":  "0.1.4",
-        "fabpot/Goutte":                 "*",
-        "guzzle/guzzle":                 "2.6.*"
+        "guzzle/guzzle":                 "dev-master"
     },
     
     "require-dev": {
@@ -48,26 +47,6 @@
         "behat/common-contexts": "*",
         "kriswallsmith/buzz": ">=0.5.0"
     },
-    
-    "repositories": [
-    {
-        "type": "package",
-        "package": {
-            "version": "dev-master",
-            "name": "fabpot/Goutte",
-            "source": {
-                "url": "https://github.com/fabpot/Goutte.git",
-                "type": "git",
-                "reference": "master"
-            },
-            "dist":{
-                "url":"https://github.com/fabpot/Goutte/zipball/master",
-                "type":"zip"
-            }
-        }
-    }
-
-    ],
     
     "scripts": {
         "post-install-cmd": [
@@ -90,8 +69,7 @@
 
     "autoload": {
         "psr-0": {
-            "": "src/",
-            "Goutte": "vendor/fabpot/Goutte/"
+            "": "src/"
         }
     },
 

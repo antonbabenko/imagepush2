@@ -12,10 +12,6 @@ services:
             - [ setLogger, [@imagepush.rabbitmq_logger]]
 
     # Fetcher
-    imagepush.fetcher.digg:
-        class: Imagepush\ImagepushBundle\Services\Fetcher\DiggFetcher
-        arguments: [@service_container]
-
     imagepush.fetcher.reddit:
         class: Imagepush\ImagepushBundle\Services\Fetcher\RedditFetcher
         arguments: [@service_container]
@@ -89,10 +85,6 @@ services:
 
     imagepush.processor.tag.source:
         class: Imagepush\ImagepushBundle\Services\Processor\Tag\SourceTag
-        arguments: [@service_container]
-
-    imagepush.processor.tag.digg:
-        class: Imagepush\ImagepushBundle\Services\Processor\Tag\DiggTag
         arguments: [@service_container]
 
     imagepush.processor.tag.stumbleupon:

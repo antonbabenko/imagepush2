@@ -61,8 +61,7 @@ imagepush:
     tag_group_value:
       # Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
       source: 3
-      digg: 2
       delicious: 2
       stumbleupon: 2.5
       reddit: 1.5
-      twitter: 3
+      twitter: 2

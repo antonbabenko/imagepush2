@@ -21,8 +21,7 @@ class StumbleUponTag extends Tag implements TagInterface
     {
 
         $url = "http://www.stumbleupon.com/services/1.01/badge.getinfo?url=" . $image->getLink();
-        $xpathQueries[] = '//section[@class="discovery-data"]/h5/a';
-        $xpathQueries[] = '//ul[@class="suggested-list"]/li/div/p[1]/a/@title';
+        $xpathQueries[] = '//div[@class="subject-dna"]/div[@class="topic-bar"]';
 
         $content = $this->container->get('imagepush.processor.content');
         $content->get($url);
@@ -37,17 +36,19 @@ class StumbleUponTag extends Tag implements TagInterface
 
         //\D::debug($response);
 
-        if (true !== $response["result"]["in_index"]) {
+        if (empty($response["result"]["in_index"])) {
             return array();
         }
 
-        if (empty($response["result"]["info_link"])) {
-            $this->logger->warn(sprintf("StumbleUpon. URL %s doesn't have info_link property", $url));
+        if (empty($response["result"]["publicid"])) {
+            $this->logger->error(sprintf("StumbleUpon. URL %s doesn't have publicid property", $url));
 
             return array();
         }
 
-        $content->get($response["result"]["info_link"]);
+        $link = "http://www.stumbleupon.com/content/".$response["result"]["publicid"];
+
+        $content->get($link);
 
         $contentHtml = $this->container->get('imagepush.processor.content.html');
         $contentHtml->setContent($content);

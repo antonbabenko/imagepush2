@@ -49,7 +49,7 @@ class Tag
         /**
          * hash:
          * image_id =>
-         *   digg = [tag1 => 3, tag2 => 1]
+         *   reddit = [tag1 => 3, tag2 => 1]
          *   twitter = [tag1 => 3, tag2 => 1]
          *   mentions = [50]
          */
