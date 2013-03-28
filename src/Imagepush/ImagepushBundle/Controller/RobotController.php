@@ -62,7 +62,7 @@ class RobotController extends Controller
      */
     public function indexAction($action)
     {
-        die();
+//        die();
 
         //return new Response("Use CLI commands instead of this");
 
@@ -86,8 +86,9 @@ class RobotController extends Controller
 
                 $image = $dm
                     ->getRepository('ImagepushBundle:Image')
-                    ->findOneBy(array("id" => 100015));
-                $content = $this->get('imagepush.processor.tag')->processTags($image);
+                    ->findOneBy(array("link" => "http://www.google.com/"));
+                //$content = $this->get('imagepush.processor.tag')->processTags($image);
+                $content = $this->get('imagepush.processor.tag.stumbleupon')->find($image);
                 break;
 
             /**

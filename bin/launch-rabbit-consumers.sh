@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NB_TASKSc  c = 2
-SYMFONY_ENV = "dev"
+NB_TASKS=2
+SYMFONY_ENV="dev"
 
 TEXT[0]="app/console rabbitmq:consumer primary"
 TEXT[1]="app/console rabbitmq:consumer twitter"
@@ -16,6 +16,7 @@ do
 
 NB_LAUNCHED=$(ps x | grep "$text" | grep -v grep | wc -l)
 
+# Running without --messages parameter means that it will work forever, which is good
 TASK="/usr/bin/env php ${text} --env=${SYMFONY_ENV} --messages=5"
 
 for (( i=${NB_LAUNCHED}; i<${NB_TASKS}; i++ ))
@@ -31,7 +32,7 @@ done
 # All consumers:
 
 # Dispatcher
-#./app/console rabbitmq:consumer -m 10 find_tags_and_mentions
+#./app/console rabbitmq:consumer primary
 
 # Service consumers
 #./app/console rabbitmq:consumer -m 10 twitter
