@@ -11,7 +11,7 @@ app/cache/*
 app/logs/*
 build/
 vendor/
-app/config/parameters.ini
+app/config/parameters.yml
 .buildpath
 .project
 .settings/
