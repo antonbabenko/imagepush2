@@ -1,17 +1,17 @@
 imports:
-    - { resource: parameters.ini }
+    - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: imagepush.yml }
     - { resource: services.yml }
 
 framework:
     esi:             { enabled: true }
-    translator:      { fallback: %locale% }
+    translator:      { fallback: en }
     secret:          %secret%
     router:
         strict_requirements: %kernel.debug%
         resource: "%kernel.root_dir%/config/routing.yml"
-    default_locale:  %locale%
+    default_locale:  en
     form:            true
     csrf_protection: true
     validation:      { enable_annotations: true }

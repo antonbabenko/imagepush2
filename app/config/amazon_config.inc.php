@@ -3,16 +3,20 @@
 /**
  * Load config settings (key and secret_key) from parameters.ini
  */
-if (!file_exists(__DIR__.'/parameters.ini')) {
-  error_log('No parameters.ini available');
-  die("Hmm. Missing parameters.ini");
+if (!file_exists(__DIR__.'/parameters.yml')) {
+  error_log('No parameters.yml available');
+  die("Hmm. #1");
+}
+try {
+    $yml = Symfony\Component\Yaml\Yaml::parse(__DIR__.'/parameters.yml');
+} catch (Symfony\Component\Yaml\Exception\ParseException $e) {
+    error_log('Not yaml format.');
+    die("Hmm. #2");
 }
 
-$ini = @parse_ini_file('parameters.ini');
-
-if (empty($ini["aws_key"]) || empty($ini["aws_secret_key"])) {
-  error_log("No Amazon keys specified");
-  die("Hmm. Missing keys");
+if (empty($yml["parameters"]["aws_key"]) || empty($yml["parameters"]["aws_secret_key"])) {
+    error_log("No Amazon keys specified");
+    die("Hmm. #3");
 }
 
 /**
@@ -70,18 +74,18 @@ CFCredentials::set(array(
 
         // Amazon Web Services Key. Found in the AWS Security Credentials. You can also pass
         // this value as the first parameter to a service constructor.
-        'key' => $ini["aws_key"],
+        'key' => $yml["parameters"]["aws_key"],
 
         // Amazon Web Services Secret Key. Found in the AWS Security Credentials. You can also
         // pass this value as the second parameter to a service constructor.
-        'secret' => $ini["aws_secret_key"],
+        'secret' => $yml["parameters"]["aws_secret_key"],
 
         // This option allows you to configure a preferred storage type to use for caching by
         // default. This can be changed later using the set_cache_config() method.
         //
         // Valid values are: `apc`, `xcache`, or a file system path such as `./cache` or
         // `/tmp/cache/`.
-        'default_cache_config' => (!empty($ini["amazon_default_cache_config"]) ? $ini["amazon_default_cache_config"] : ''),
+        'default_cache_config' => (!empty($yml["parameters"]["amazon_default_cache_config"]) ? $yml["parameters"]["amazon_default_cache_config"] : ''),
 
         // Determines which Cerificate Authority file to use.
         //
