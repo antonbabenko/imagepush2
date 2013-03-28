@@ -61,24 +61,19 @@ class ContentFetcher
     {
 
         $client = new Client($uri);
-
-        //$client->setServerParameters(array('HTTP_USER_AGENT' => $this->userAgent));
+        $client->setUserAgent($this->userAgent);
 
         // Increase curl timeout
-        //$guzzleClient = $client->getClient();
         $client->getConfig()->set('curl.CURLOPT_TIMEOUT', 337);
 
-        //$client->setClient($guzzleClient);
-
-        //\D::debug($client->getClient()->getConfig()->getAll());
-
-        try {
         if ($this->requestType == "HEAD") {
-            $response = $client->head()->send();
+            $request = $client->head();
         } else {
-            $response = $client->get()->send();
+            $request = $client->get();
         }
 
+        try {
+            $response = $request->send();
         } catch (CurlException $e) {
             // @todo: catch errors and log them
             return 500;
