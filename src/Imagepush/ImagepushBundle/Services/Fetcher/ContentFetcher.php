@@ -61,11 +61,16 @@ class ContentFetcher
     protected function makeRequest($uri)
     {
 
-        $client = new Client($uri);
+        $client = new Client($uri, array(
+            'curl.options' => array(
+                CURLOPT_SSL_VERIFYHOST => false,
+                'CURLOPT_SSL_VERIFYPEER' => false,
+                CURLOPT_TIMEOUT => 337,
+                'CURLOPT_TIMEOUT' => 337
+            ),
+            'ssl.certificate_authority' => false,
+        ));
         $client->setUserAgent($this->userAgent);
-
-        // Increase curl timeout
-        $client->getConfig()->set('curl.CURLOPT_TIMEOUT', 337);
 
         if ($this->requestType == "HEAD") {
             $request = $client->head();

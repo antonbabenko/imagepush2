@@ -1,10 +1,10 @@
 MAILTO="anton@imagepush.to"
 
-# 0 */4 * * * /mnt/www/imagepush/current/app/console imagepush:fetch-from-digg --env=prod
-
 */30 * * * * /mnt/www/imagepush/current/app/console imagepush:fetch-from-reddit --env=prod
 
 */5 * * * * /mnt/www/imagepush/current/app/console imagepush:process-source --env=prod
+
+*/6 * * * * /mnt/www/imagepush/current/app/console imagepush:update-tags --env=prod
 
 0 */4 * * * /mnt/www/imagepush/current/app/console imagepush:publish-image --env=prod
 

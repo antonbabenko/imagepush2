@@ -1,12 +1,12 @@
 #!/bin/bash
 
 NB_TASKS=1
-SYMFONY_ENV="dev"
+SYMFONY_ENV="prod"
 
 TEXT[0]="app/console rabbitmq:consumer primary"
 TEXT[1]="app/console rabbitmq:consumer reddit"
 TEXT[2]="app/console rabbitmq:consumer twitter"
-# TEXT[3]="app/console rabbitmq:consumer stumble_upon"
+TEXT[3]="app/console rabbitmq:consumer stumble_upon"
 TEXT[4]="app/console rabbitmq:consumer delicious"
 TEXT[5]="app/console rabbitmq:consumer source"
 
