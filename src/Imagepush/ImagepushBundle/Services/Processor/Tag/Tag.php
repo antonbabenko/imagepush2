@@ -10,18 +10,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Tag
 {
-
     /**
      * All tags, which should be saved for image, but not all has a high score.
      * @var array
      */
-    public $allTags;
+    //public $allTags;
 
     /**
      * Best tags with highest score. Use this to save in image entity.
      * @var array
      */
-    public $bestTags;
+    //public $bestTags;
 
     /**
      * @services
@@ -32,28 +31,160 @@ class Tag
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->redis = $container->get('snc_redis.default');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
         $this->logger = $container->get('logger');
     }
 
     /**
-     * Save tags and mentions into temporary storage (on Redis) to be calculated,
-     * filtered, ordered during calculate score
+     * Save all tags into MongoDB, but not passed through filterTagsByScore()
      *
-     * @param type $imageId
-     * @param type $serviceName
-     * @param type $tags
+     * @param integer $imageId
+     * @param string  $serviceName
+     * @param array   $foundTags
      */
-    public function saveTags($imageId, $serviceName, $tags)
+    public function saveTagsFound($imageId, $serviceName, $foundTags)
     {
-        /**
-         * hash:
-         * image_id =>
-         *   reddit = [tag1 => 3, tag2 => 1]
-         *   twitter = [tag1 => 3, tag2 => 1]
-         *   mentions = [50]
-         */
-        $this->logger->err($imageId . $serviceName . "==" . json_encode($tags));
+        $message = "Found tags: " . implode(", ", $foundTags);
+        $this->logger->info($message);
+
+        if (count($foundTags)) {
+            $redisLockKey = "image_is_locked_for_updates_" . $imageId;
+
+            while ($this->redis->get($redisLockKey)) {
+                usleep(mt_rand(100, 1000));
+            }
+
+            // Lock for max 30 seconds
+            $this->redis->setex($redisLockKey, 30, $serviceName);
+
+            $image = $this->dm->getRepository("ImagepushBundle:Image")->findOneBy(array("id" => $imageId));
+
+            if (null === $image) {
+                $this->logger->crit("Image {$imageId} doesn't exist");
+
+                return false;
+            }
+
+            // Add tags found
+            $existingTags = $image->getTagsFound();
+            if (isset($existingTags[$serviceName]) && is_array($existingTags[$serviceName])) {
+                $existingTags[$serviceName] = array_merge($existingTags[$serviceName], (array) $foundTags);
+            } else {
+                $existingTags[$serviceName] = (array) $foundTags;
+            }
+            $image->setTagsFound($existingTags);
+
+            $this->dm->persist($image);
+            $this->dm->flush();
+
+            // Keep tags counter (score) updated for image
+            $this->redis->zincrby("found_tags_counter", count($foundTags), $imageId);
+
+            // Keep images where new tags were found
+            $this->redis->sadd("images_with_new_found_tags", $imageId);
+
+            // Unlock
+            $this->redis->del($redisLockKey);
+        }
+
+        $this->logger->err("!!!!!!" . $imageId . $serviceName . "==" . json_encode($foundTags));
+    }
+
+    /**
+     * Update all images tags where new tags were found
+     *
+     * @return int Number of updated images
+     */
+    public function updateTagsFromFoundTagsForAllImages()
+    {
+        $imageIds = $this->redis->smembers("images_with_new_found_tags");
+        if (empty($imageIds)) {
+            return 0;
+        }
+
+        $counter = 0;
+
+        $images = $this->dm
+            ->createQueryBuilder('ImagepushBundle:Image')
+            ->field('id')->in($imageIds)
+            ->getQuery()
+            ->toArray();
+
+        $images = array_values($images);
+
+        foreach ($images as $image) {
+            $this->updateTagsFromFoundTags($image);
+            $this->redis->srem("images_with_new_found_tags", $image->getId());
+
+            $counter++;
+        }
+
+        return $counter;
+    }
+
+    /**
+     * Merge tags with summarized found tags (remove bad and filter by score)
+     */
+    public function updateTagsFromFoundTags(Image $image)
+    {
+
+        $foundTags = $image->getTagsFound();
+
+        if (empty($foundTags)) {
+            return 0;
+        }
+
+        foreach ($foundTags as $service => $tags) {
+            $foundTags[$service] = array_count_values($foundTags[$service]);
+        }
+        $foundTags = $this->calculateTagsScore($foundTags);
+
+        $goodTags = $this->filterTagsByScore($foundTags, 20);
+
+        $goodTags = array_keys($goodTags);
+
+        $this->logger->info("Good found tags: " . implode(", ", $goodTags));
+
+        if (count($goodTags)) {
+            $goodTags = array_unique(array_merge((array) $image->getTags(), $goodTags));
+            $this->saveTagsForImage($image, $goodTags);
+        }
+
+        return count($goodTags);
+    }
+
+    public function saveTagsForImage(Image $image, array $goodTags)
+    {
+
+        $image->getTagsRef()->clear();
+
+        foreach ($goodTags as $goodTag) {
+            $tag = $this->dm->getRepository("ImagepushBundle:Tag")->findOneBy(array("text" => $goodTag));
+
+            if (null === $tag) {
+                $tag = new DocumentTag();
+                $tag->setText($goodTag);
+            }
+
+            $image->addTagsRef($tag);
+
+            $latestTag = new LatestTag();
+            $latestTag->setTimestamp(time());
+            $latestTag->setText($goodTag);
+            //\D::dump($latestTag);
+
+            $tag->addImagesRef($image);
+            $tag->incUsedInUpcoming(1);
+
+            $this->dm->persist($latestTag);
+            $this->dm->persist($tag);
+        }
+
+        $image->setTags($goodTags);
+        $this->dm->persist($image);
+
+        $this->dm->flush();
     }
 
     /**

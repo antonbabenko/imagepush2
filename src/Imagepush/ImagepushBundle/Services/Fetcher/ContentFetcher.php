@@ -4,6 +4,7 @@ namespace Imagepush\ImagepushBundle\Services\Fetcher;
 
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\CurlException;
+use Guzzle\Http\Exception\ClientErrorResponseException;
 
 /**
  * Class which get link content and format response as array
@@ -74,6 +75,8 @@ class ContentFetcher
 
         try {
             $response = $request->send();
+        } catch (ClientErrorResponseException $e) {
+            return 404;
         } catch (CurlException $e) {
             // @todo: catch errors and log them
             return 500;

@@ -22,6 +22,90 @@ class Publisher
         $this->logger = $container->get('logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
         $this->varnish = $container->get('imagepush.varnish');
+        $this->redis = $container->get('snc_redis.default');
+    }
+
+    public function publishImageWithMostTagsFound()
+    {
+
+        $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTags();
+
+        // get images with most tags found
+        $imagesWithFoundTags = $this->redis->zrevrangebyscore("found_tags_counter", "+inf", "-inf", array("withscores" => true, "limit" => array(0, 1000)));
+
+        //\D::debug($imagesWithFoundTags);
+
+        foreach ($imagesWithFoundTags as $imageWithFoundTags => $foundTagsCounter) {
+            $image = $this->dm
+                ->createQueryBuilder('ImagepushBundle:Image')
+                ->field('id')->equals($imageWithFoundTags)
+                ->field('isAvailable')->equals(false)
+                ->getQuery()
+                ->getSingleResult();
+
+            // Image has been already published, then reset found tags counter
+            if (null === $image) {
+                $this->redis->zrem("found_tags_counter", $imageWithFoundTags);
+                continue;
+            }
+
+            // Filter found tags (bad, duplicates) and merge with already saved tags
+            $count = $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTags($image);
+
+            //\D::debug($count);
+
+            if ($count > 0) {
+                $this->publishImage($image);
+
+                $this->redis->zrem("found_tags_counter", $imageWithFoundTags);
+
+                $log = sprintf("Image with most tags has been published! Tags: %d, Tags values: %s, Image id: %d", $count, json_encode($image->getTags()), $image->getId());
+                $this->logger->info($log);
+
+                // Publish only one image at the time, so break this loop
+                return $log;
+            }
+        }
+
+        // Fallback
+        $log = sprintf("There is no images with most tags, which can be published! Continue to publishLatestUpcomingImage()");
+        $this->logger->err($log);
+
+        return $this->publishLatestUpcomingImage();
+
+        /////////
+        // If needed keep only images added during last hour.
+        // 30.03.2013 - will see if it is needed!
+        /////////
+    }
+
+    protected function publishImage(Image $image)
+    {
+
+        //\D::debug($image->getId());
+        //die();
+        //\D::dump($image->getMongoId());
+        // update timestamp to now
+        $image->setTimestamp(time());
+
+        $image->setIsAvailable(true);
+        $image->setIsInProcess(false);
+
+        $tags = $image->getTags();
+        foreach ($tags as $tag) {
+            $oneTag = $this->dm->getRepository("ImagepushBundle:Tag")->findOneBy(array("text" => $goodTag));
+            if ($oneTag) {
+                $oneTag->incUsedInAvailable();
+                $this->dm->persist($oneTag);
+            }
+        }
+
+        $this->dm->persist($image);
+        $this->dm->flush();
+        $this->dm->refresh($image);
+
+        // Purge cached pages
+        $this->varnish->purgeWhenNewImageIsPublished($image);
     }
 
     public function publishLatestUpcomingImage()
@@ -74,18 +158,7 @@ class Publisher
             }
         }
 
-        //\D::debug($image->getId());
-        //die();
-        //\D::dump($image->getMongoId());
-        // update timestamp to now
-        $image->setTimestamp(time());
-
-        $image->setIsAvailable(true);
-        $image->setIsInProcess(false);
-
-        $this->dm->persist($image);
-        $this->dm->flush();
-        $this->dm->refresh($image);
+        $this->publishImage($image);
 
         if ($useBestImageId) {
             // remove from BestImage
@@ -101,9 +174,6 @@ class Publisher
         }
 
         $this->logger->info($log);
-
-        // Purge cached pages
-        $this->varnish->purgeWhenNewImageIsPublished($image);
 
         return $log;
     }

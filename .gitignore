@@ -4,6 +4,7 @@ web/js/combined/*
 web/sitemap.xml
 web/sitemap.xml.gz
 web/bundles/
+web/new_uploads/
 web/uploads
 web/i/*
 app/bootstrap.php.cache
@@ -20,6 +21,6 @@ nbproject
 .DS_Store
 .tmp_staging/
 composer.phar
-composer.lock
+#composer.lock
 nohup.out
 *~

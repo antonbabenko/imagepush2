@@ -8,11 +8,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Image
- * 
+ *
  * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"link"="asc"}),
+ *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true),
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"}),
@@ -78,6 +78,12 @@ class Image
      * @MongoDB\Collection
      */
     protected $tags;
+
+    /**
+     * Hash of found tags (not finalized)
+     * @MongoDB\Collection
+     */
+    protected $tagsFound;
 
     /**
      * @MongoDB\Collection
@@ -427,6 +433,20 @@ class Image
     }
 
     /**
+     * Set thumbs
+     *
+     * @param hash $thumbs
+     *
+     * @return Image
+     */
+    public function setThumbs($thumbs)
+    {
+        $this->thumbs = $thumbs;
+
+        return $this;
+    }
+
+    /**
      * Get array of created thumbs.
      *
      * @return array $thumbs
@@ -482,7 +502,7 @@ class Image
      * @param integer $width    Width
      * @param integer $height   Height
      * @param string  $property Property name (height => "h", width => "w", filesize => "s")
-     * 
+     *
      * @return integer|false
      */
     public function getThumbProperty($filter, $width, $height, $property)

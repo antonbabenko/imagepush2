@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PublishImageCommand extends ContainerAwareCommand
+class UpdateTagsCommand extends ContainerAwareCommand
 {
 
     protected function configure()
@@ -14,8 +14,9 @@ class PublishImageCommand extends ContainerAwareCommand
         parent::configure();
 
         $this
-            ->setName('imagepush:publish-image')
-            ->setDescription('Publish latest upcoming image as available');
+            ->setName('imagepush:update-tags')
+            ->setDescription('Update found tags for images, where new tags were found, so that they are visible on upcoming pages')
+            ->setHelp('This is safe to run as often as you want');
     }
 
     /**
@@ -24,10 +25,7 @@ class PublishImageCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->getContainer()->get('imagepush.publisher')->publishImageWithMostTagsFound();
-
-        // This was used before 30.03.2013:
-        // $content = $this->getContainer()->get('imagepush.publisher')->publishLatestUpcomingImage();
+        $content = $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTagsForAllImages();
 
         $output->writeLn($content, true);
     }

@@ -59,13 +59,12 @@ doctrine_mongodb:
             server: mongodb://%database_user%:%database_password%@%database_host%:%database_port%
             options:
                 connect: true
-                persist: true
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
     hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
     default_database: imagepush_%kernel.environment%
     document_managers:
         default:
-            metadata_cache_driver: apc
+            metadata_cache_driver: array # apc
             auto_mapping: true
             mappings:
                 StofDoctrineExtensionsBundle: false
@@ -122,9 +121,10 @@ knp_gaufrette:
 snc_redis:
     clients:
         default:
-            type: predis
+            #type: predis
+            type: phpredis
             alias: default
-            dsn: redis://localhost/3
+            dsn: redis://%redis_host%:%redis_port%/%redis_db%
             logging: %kernel.debug%
             options:
                 profile: 2.4

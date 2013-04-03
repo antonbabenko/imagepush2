@@ -6,6 +6,7 @@ use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Monolog\Logger;
+use LogicException;
 use Imagepush\ImagepushBundle\Consumer\MessageTask;
 use Imagepush\ImagepushBundle\Services\Processor\ProcessorStatusCode;
 use Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess;
@@ -15,9 +16,21 @@ use Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess;
  */
 class WebServiceConsumer implements ConsumerInterface
 {
+    /**
+     * @var Imagepush\ImagepushBundle\Service\AccessControl\ServiceAccess
+     */
+    public $service;
 
-    public function __construct($container, $serviceKey)
+    /**
+     * @param ContainerInterface $container
+     * @param string             $serviceKey
+     */
+    public function __construct(ContainerInterface $container, $serviceKey)
     {
+        if (empty($serviceKey)) {
+            throw new LogicException("serviceKey is not defined");
+        }
+
         $this->container = $container;
 
         $this->producer = $container->get('old_sound_rabbit_mq.' . $serviceKey . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE);
@@ -41,11 +54,16 @@ class WebServiceConsumer implements ConsumerInterface
         $this->logger->addRecord($level, $message);
     }
 
+    /**
+     * @param  AMQPMessage $msg
+     * @return boolean
+     */
     public function execute(AMQPMessage $msg)
     {
 
         $statusCode = ProcessorStatusCode::OK;
 
+        /* @var $message Imagepush\ImagepushBundle\Consumer\Message */
         $message = $this->container->get('imagepush.consumer_message')->setAMQPMessage($msg);
 
         if ($message->attempts >= $this->service->maxAttempts) {
@@ -54,20 +72,22 @@ class WebServiceConsumer implements ConsumerInterface
             return true;
         }
 
+        $this->log(Logger::INFO, "Message: image_id=".$message->body['image_id']);
+
         // Validate parameters
         if ($message->task == MessageTask::FIND_TAGS_AND_MENTIONS) {
 
             $image = $this->dm
                 ->getRepository('ImagepushBundle:Image')
-                ->findOneBy(array("id" => $msg->body['image_id']));
+                ->findOneBy(array("id" => $message->body['image_id']));
 
             if (!$image) {
-                $this->log(Logger::INFO, sprintf("Image id %d does not exist.", $msg->body['image_id']));
+                $this->log(Logger::INFO, sprintf("Image id %d does not exist.", $message->body['image_id']));
 
                 return true;
             }
 
-            $imageId = $msg->body['image_id'];
+            $imageId = $message->body['image_id'];
         }
 
         // Should service be accessed now or sleep?
@@ -94,13 +114,15 @@ class WebServiceConsumer implements ConsumerInterface
 
                 try {
 
-//                $result = $processor->find($imageId);
-                    $result = array("tag_1", rand());
+                    $result = $processor->find($image);
+                    //$result = array("tag_1", rand());
+
+                    $this->log(Logger::INFO, "TAGS=".json_encode($result));
 
                     if (is_array($result)) {
                         $statusCode = ProcessorStatusCode::OK;
 
-                        $this->service->saveTags($imageId, $this->serviceKey, $result);
+                        $processor->saveTagsFound($imageId, $this->serviceKey, $result);
                     } else {
                         $statusCode = $result;
                     }
@@ -126,7 +148,7 @@ class WebServiceConsumer implements ConsumerInterface
             $this->log(Logger::DEBUG, 'Status=0 -- OK! There were tags found! ' . print_r(json_encode($result), true));
         } elseif (ProcessorStatusCode::RETRY_REQUEST_AGAIN == $statusCode) {
             $serviceOk = true;
-            if ($this->producer) {
+            if (null !== $this->producer) {
                 $message->publishToRetry($this->producer);
                 $this->log(Logger::DEBUG, 'Status=1 -- Republish: ' . print_r(json_encode($message->body), true));
             } else {
