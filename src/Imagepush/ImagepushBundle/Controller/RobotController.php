@@ -2,6 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Controller;
 
+use Imagepush\ImagepushBundle\Consumer\MessageTask;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -19,7 +20,13 @@ class RobotController extends Controller
 
         $time = microtime(true);
 
-        $msg = array("image_id" => 43516, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        $this->producer = $this->container->get('old_sound_rabbit_mq.primary_producer');
+        $msg = array("image_id" => 123, "task" => MessageTask::FIND_TAGS_AND_MENTIONS);
+        $this->producer->publish(json_encode($msg));
+        $this->get('logger')->info(sprintf("MESSAGE: %s", json_encode($msg)));
+        die();
+
+        $msg = array("image_id" => 43516, "task" => MessageTask::FIND_TAGS_AND_MENTIONS);
         //$this->get('old_sound_rabbit_mq.reddit_producer')->publish(json_encode($msg));
         $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
         $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
@@ -89,6 +96,13 @@ class RobotController extends Controller
                     ->findOneBy(array("link" => "http://www.google.com/"));
                 //$content = $this->get('imagepush.processor.tag')->processTags($image);
                 $content = $this->get('imagepush.processor.tag.stumbleupon')->find($image);
+                break;
+
+            /**
+             * Update tags for images where new tags were found
+             */
+            case "updateTags":
+                $content = $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTagsForAllImages();
                 break;
 
             /**

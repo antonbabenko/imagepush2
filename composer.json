@@ -20,7 +20,7 @@
         "twig/extensions":               "dev-master",
         "sensio/distribution-bundle":    "2.2.*",
         "sensio/framework-extra-bundle": "2.2.*",
-        "sensio/generator-bundle":       "2.2.*",
+        "sensio/generator-bundle":       "dev-master#99f4c2b7572add4205d87191b40abfc395989381",
         "jms/security-extra-bundle":     "1.4.*",
         "jms/di-extra-bundle":           "1.3.*",
         "jms/metadata":                  "1.1.1",

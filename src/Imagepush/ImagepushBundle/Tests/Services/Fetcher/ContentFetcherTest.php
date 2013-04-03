@@ -41,4 +41,17 @@ class ContentFetcherTest extends WebTestCase
         $this->assertArrayHasKey("Content-length", $result);
     }
 
+    public function testGetRequestToNotExistingPage()
+    {
+
+        $client = self::createClient();
+
+        $service = $client->getContainer()->get('imagepush.fetcher.content');
+
+        $link = "http://imagepush.to/test_page_does_not_exist.html";
+        $result = $service->getRequest($link);
+
+        $this->assertEquals(404, $result);
+    }
+
 }

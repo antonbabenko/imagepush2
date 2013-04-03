@@ -80,6 +80,12 @@ class Image
     protected $tags;
 
     /**
+     * Hash of found tags (not finalized)
+     * @MongoDB\Hash
+     */
+    protected $tagsFound;
+
+    /**
      * @MongoDB\Collection
      * @MongoDB\ReferenceMany(targetDocument="Tag")
      */
@@ -320,6 +326,29 @@ class Image
     }
 
     /**
+     * Set tagsFound
+     *
+     * @param  collection $tagsFound
+     * @return \Image
+     */
+    public function setTagsFound($tagsFound)
+    {
+        $this->tagsFound = $tagsFound;
+
+        return $this;
+    }
+
+    /**
+     * Get tagsFound
+     *
+     * @return collection $tagsFound
+     */
+    public function getTagsFound()
+    {
+        return $this->tagsFound;
+    }
+
+    /**
      * Add tagsRef
      *
      * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
@@ -337,6 +366,16 @@ class Image
     public function getTagsRef()
     {
         return $this->tagsRef;
+    }
+
+    /**
+    * Remove tagsRef
+    *
+    * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+    */
+    public function removeTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+    {
+        $this->tagsRef->removeElement($tagsRef);
     }
 
     /**

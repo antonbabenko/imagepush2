@@ -112,12 +112,6 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
     public function run()
     {
 
-        /* if (!$this->isAllowedToPerformAPICall()) {
-          $this->output[] = sprintf("[Reddit] %s: Not so often. Wait some time.", date(DATE_RSS));
-
-          return $this->output;
-          } */
-
         $urls = $this->getParameter('urls');
         //\D::debug($urls);
 

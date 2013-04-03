@@ -1,9 +1,11 @@
 MAILTO="anton@imagepush.to"
 
-*/15 * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:fetch-from-digg --env=prod
+*/30 * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:fetch-from-reddit --env=prod
 
 */5  * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:process-source --env=prod
 
-0  */6 * * * /Users/Bob/Sites/imagepush2/app/console imagepush:publish-image --env=prod
+*/6  * * * * /Users/Bob/Sites/imagepush2/app/console imagepush:update-tags --env=prod
 
-5  */6 * * * /Users/Bob/Sites/imagepush2/app/console imagepush:generate:sitemap --spaceless=1 --env=prod
+0  */4 * * * /Users/Bob/Sites/imagepush2/app/console imagepush:publish-image --env=prod
+
+5  */4 * * * /Users/Bob/Sites/imagepush2/app/console imagepush:generate:sitemap --spaceless=1 --env=prod

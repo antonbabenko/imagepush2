@@ -37,7 +37,7 @@ class GenerateCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $c = $this->getContainer();
-        $dm = $c->get('doctrine.odm.mongodb.' . $input->getOption('dm') . '_document_manager');
+        $dm = $c->get('doctrine_mongodb.odm.' . $input->getOption('dm') . '_document_manager');
 
         if (!$c->hasParameter('site_url')) {
             throw new \RuntimeException("Sitemap requires base_url parameter [site_url] to be available, through config or parameters");

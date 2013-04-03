@@ -156,10 +156,27 @@ class CustomStrings
     }
 
     /**
+     * Decode all html entities into UTF-8 character
+     *
+     * @param  string $text
+     * @return string
+     */
+    public static function decodeHtmlEntities($text)
+    {
+        $text = html_entity_decode($text, ENT_QUOTES, "UTF-8");
+        $text = preg_replace('/&#(\d+);/me', "chr(\\1)", $text); # decimal notation
+        $text = preg_replace('/&#x([a-f0-9]+);/mei', "chr(0x\\1)", $text);  # hex notation
+
+        return $text;
+    }
+
+    /**
      * Removes endings like (pic), (pics), (image), also remove urls, site titles, etc from the end of the title to make it look nice.
      */
     public static function cleanTitle($text)
     {
+
+        $text = self::decodeHtmlEntities($text);
 
         $startsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeStart))));
         $endsPattern = implode("|", self::makeSafeRegexFromArray(explode("\n", trim(self::$removeEnd))));
@@ -208,7 +225,7 @@ class CustomStrings
         // keep it max 200 chars
         $text = substr($text, 0, 200);
 
-        return $text;
+        return (string) $text;
     }
 
     /**
@@ -216,6 +233,8 @@ class CustomStrings
      */
     public static function cleanTag($tag)
     {
+
+        $tag = self::decodeHtmlEntities($tag);
 
         $tag = mb_strtolower($tag, 'UTF-8');
 
@@ -230,7 +249,7 @@ class CustomStrings
         $tag = trim($tag);
         $tag = Inflect::singularize($tag);
 
-        return $tag;
+        return (string) $tag;
     }
 
 }

@@ -42,6 +42,9 @@ class CustomStringsFixture
             "tags2" => "tags2",
             "tags" => "tag",
             "tag" => "tag",
+            "tag & tag" => "tag & tag",
+            "tag &amp; tag" => "tag & tag",
+            "tag &amp;&nbsp;&copy; tag" => "tag & © tag", // nbsp is not the same as space!
         );
 
         return $data;
@@ -95,6 +98,9 @@ class CustomStringsFixture
             "title. A.B.C." => "title. A.B.C.",
             "title. abc." => "title. abc",
             "title. ab.c." => "title. ab.c",
+            "title & title" => "title & title",
+            "title &amp; title" => "title & title",
+            "title &amp;&nbsp;&copy; title" => "title & © title", // nbsp is not the same as space!
             //"[pic] title" => "title",
         );
 

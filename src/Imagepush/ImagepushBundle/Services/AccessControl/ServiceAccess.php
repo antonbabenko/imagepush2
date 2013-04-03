@@ -2,6 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Services\AccessControl;
 
+use Snc\RedisBundle\Client\Phpredis\Client;
+
 /**
  * Web-services access limits (delays, max attempts, status messages)
  */
@@ -29,10 +31,10 @@ class ServiceAccess
     public $settings;
 
     /**
-     * @param Predis\Client $redis
-     * @param array         $settings
+     * @param Client $redis
+     * @param array  $settings
      */
-    public function __construct($redis, $settings)
+    public function __construct(Client $redis, $settings)
     {
         $this->redis = $redis;
         $this->settings = $settings;

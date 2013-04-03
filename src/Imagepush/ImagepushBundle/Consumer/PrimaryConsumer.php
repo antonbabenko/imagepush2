@@ -19,7 +19,7 @@ class PrimaryConsumer implements ConsumerInterface
     /**
      * Consume message and republish it to other service-related queues depending on task in message.
      *
-     * @param  \PhpAmqpLib\Message\AMQPMessage $msg
+     * @param  AMQPMessage $msg
      * @return boolean
      */
     public function execute(AMQPMessage $msg)
@@ -28,6 +28,10 @@ class PrimaryConsumer implements ConsumerInterface
 
         if (!$message->task) {
             $this->logger->err('Task is missing. Skip message.');
+
+            return true;
+        } elseif (empty(MessageTask::$producers[$message->task])) {
+            $this->logger->err(sprintf('Task %s is not defined. Skip message.', $message->task));
 
             return true;
         }
@@ -54,7 +58,7 @@ class PrimaryConsumer implements ConsumerInterface
 
         foreach ($producers as $name) {
 
-            if ($producer = $this->container->get('old_sound_rabbit_mq.' . $name . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+            if (null !== $producer = $this->container->get('old_sound_rabbit_mq.' . $name . '_producer', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
                 $producer->publish($msg->body);
             } else {
                 $this->logger->crit(sprintf('Producer %s does not exist. Skip message.', $name));
