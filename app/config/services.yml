@@ -3,12 +3,15 @@ services:
     ##################
     # Robot services #
     ##################
-    
-    # Fetcher
-    imagepush.fetcher.digg:
-        class: Imagepush\ImagepushBundle\Services\Fetcher\DiggFetcher
-        arguments: [@service_container]
 
+    # Access control
+    imagepush.access_control.service:
+        class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
+        arguments: [@snc_redis.default, %imagepush.services%]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    # Fetcher
     imagepush.fetcher.reddit:
         class: Imagepush\ImagepushBundle\Services\Fetcher\RedditFetcher
         arguments: [@service_container]
@@ -16,6 +19,49 @@ services:
     imagepush.fetcher.content:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@service_container]
+
+    # RabbitMQ consumers
+    imagepush.consumer_message:
+        class: Imagepush\ImagepushBundle\Consumer\Message
+        arguments: [@service_container, @imagepush.rabbitmq_logger]
+
+
+
+
+    imagepush.consumer.primary:
+        class: Imagepush\ImagepushBundle\Consumer\PrimaryConsumer
+        arguments: [@service_container, @imagepush.rabbitmq_logger]
+
+    imagepush.consumer.twitter:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "twitter"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.reddit:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "reddit"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.delicious:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "delicious"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.stumble_upon:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "stumble_upon"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    imagepush.consumer.source:
+        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+        arguments: [@service_container, "source"]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
 
     # Processor
     imagepush.processor:
@@ -39,10 +85,6 @@ services:
 
     imagepush.processor.tag.source:
         class: Imagepush\ImagepushBundle\Services\Processor\Tag\SourceTag
-        arguments: [@service_container]
-
-    imagepush.processor.tag.digg:
-        class: Imagepush\ImagepushBundle\Services\Processor\Tag\DiggTag
         arguments: [@service_container]
 
     imagepush.processor.tag.stumbleupon:
@@ -78,7 +120,7 @@ services:
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
-        
+
     imagepush.fetcher_logger:
         class: Monolog\Logger
         arguments: [fetcher]
@@ -92,6 +134,12 @@ services:
         calls:
             - [pushHandler, [@imagepush.varnish_log_handler]]
 
+    imagepush.rabbitmq_logger:
+        class: Monolog\Logger
+        arguments: [rabbitmq]
+        calls:
+            - [pushHandler, [@imagepush.rabbitmq_log_handler]]
+
     imagepush.processor_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/processor_%kernel.environment%.log, 100]
@@ -103,17 +151,21 @@ services:
     imagepush.varnish_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/varnish_%kernel.environment%.log, 100]
-    
+
+    imagepush.rabbitmq_log_handler:
+        class: Monolog\Handler\StreamHandler
+        arguments: [%kernel.logs_dir%/rabbitmq_%kernel.environment%.log, 100]
+
     # General log processors
     log_web_processor:
         class: Monolog\Processor\WebProcessor
-        
+
     log_introspection_processor:
         class: Monolog\Processor\IntrospectionProcessor
-        
+
     log_memory_usage_processor:
         class: Monolog\Processor\MemoryUsageProcessor
-        
+
     log_memory_peak_usage_processor:
         class: Monolog\Processor\MemoryPeakUsageProcessor
 
@@ -125,14 +177,14 @@ services:
     imagepush.imagine.controller:
       class: Imagepush\ImagepushBundle\Controller\ImagineController
       arguments: [@liip_imagine.data.manager, @liip_imagine.filter.manager, @liip_imagine.cache.manager, @doctrine.odm.mongodb.document_manager, @liip_imagine, @logger, %kernel.debug%]
-      
+
     # Imagine data loader (via Gaufrette with name "images")
     imagepush.imagine.files.data.loader:
         class: Imagepush\ImagepushBundle\Imagine\CustomDataLoader
         arguments: [@liip_imagine, %liip_imagine.formats%, @gaufrette.images_filesystem]
         tags:
             - { name: liip_imagine.data.loader, loader: custom_data_loader }
- 
+
     # Imagine cache resolver (via Gaufrette with name "images")
     imagepush.imagine.files.cache.resolver:
         class: Imagepush\ImagepushBundle\Imagine\CustomCacheResolver

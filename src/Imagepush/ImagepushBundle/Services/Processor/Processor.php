@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Processor
- * 
+ *
  * @todo: Other classes are:
  *   Processor\Processor - super-class which handles all other processors relations and contains business logic
  *   Processor\Html - handle html content (and get the most suitable image inside html content)
@@ -33,6 +33,7 @@ class Processor
         $this->logger = $container->get('imagepush.processor_logger');
         $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
         $this->varnish = $container->get('imagepush.varnish');
+        //$this->producer = $container->get('old_sound_rabbit_mq.fetch_producer');
     }
 
     /**
@@ -68,9 +69,9 @@ class Processor
         }
 
         /*
-          if ($image->sourceDomainIsBlocked())
-          {
+          if ($image->sourceDomainIsBlocked()) {
           $this->logger->warn(sprintf("ID: %d. %s is blacklisted domain (porn, spam, etc)", $image->id, $image->link));
+
           return false;
           }
          */
@@ -216,6 +217,11 @@ class Processor
         /**
          * Find tags
          */
+        $this->producer = $this->container->get('old_sound_rabbit_mq.find_tags_and_mentions_producer');
+        $msg = array("image_id" => $image->getId());
+        $this->producer->publish(serialize($msg), "find_tags_and_mentions.ALL");
+
+        // Old way:
         $this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
         $tags = $this->container->get('imagepush.processor.tag')->processTags($image);
         $log = "Best tags: " . implode(", ", $tags) . "\n\n";
@@ -231,10 +237,10 @@ class Processor
     /**
      * Process content of found image
      * (verify image size, save original image, generate required thumbnails)
-     * 
+     *
      * @param Image   $image   Image
      * @param Content $content Content
-     * 
+     *
      * @return boolean True if image has been successfully saved
      */
     private function processFoundImage(Image $image, $content)

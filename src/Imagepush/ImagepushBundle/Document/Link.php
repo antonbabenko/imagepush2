@@ -3,11 +3,10 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Original links (indexed, failed, blocked).
- * 
+ *
  * @MongoDB\Document(collection="link", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"link"="asc"}),

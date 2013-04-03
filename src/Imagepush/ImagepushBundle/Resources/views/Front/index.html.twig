@@ -16,7 +16,7 @@
         <section class="thumbnails">
           <h3>LATEST HITS</h3>
           <ul id="prev_images">
-            {% for image in images %} 
+            {% for image in images %}
             {% if loop.index > 1 and loop.index <= 4 %}
             <li>
               <div class="thumbWrapper">
@@ -36,7 +36,7 @@
           <a href="{{ path('viewUpcoming') }}" class="btn-more">View upcoming images</a>
         </section>
       </aside>
-       
+
       <div id="main_image">
       <header>
         <div class="category">
@@ -55,7 +55,7 @@
       </a>
 
       {{ shareHelper.horizontal(images.0, 'small') }}
-      
+
       </div>
       <div class="fclear"></div>
 
@@ -79,6 +79,8 @@
 </div>
 #}
 
-{% render "ImagepushBundle:Front:_thumbBox" %}
+{{ render (controller('ImagepushBundle:Front:_thumbBox')) }}
+
+{# {% render "ImagepushBundle:Front:_thumbBox" %} #}
 
 {% endblock %}

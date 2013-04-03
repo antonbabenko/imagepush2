@@ -17,7 +17,6 @@ class ContentFetcherTest extends WebTestCase
         $link = "http://imagepush.to/";
         $result = $service->getRequest($link);
 
-        $this->assertArrayHasKey("Response", $result);
         $this->assertArrayHasKey("Status", $result);
         $this->assertArrayHasKey("Content", $result);
         $this->assertArrayHasKey("Content-md5", $result);
@@ -35,7 +34,6 @@ class ContentFetcherTest extends WebTestCase
         $link = "http://imagepush.to/";
         $result = $service->headRequest($link);
 
-        $this->assertArrayHasKey("Response", $result);
         $this->assertArrayHasKey("Status", $result);
         $this->assertArrayHasKey("Content", $result);
         $this->assertArrayHasKey("Content-md5", $result);

@@ -7,7 +7,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
  * Tag
- * 
+ *
  * @MongoDB\Document(collection="tags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\TagRepository")
  * @MongoDB\Indexes({
  *   @MongoDB\Index(keys={"text"="asc"}),
@@ -32,7 +32,7 @@ class Tag
     /**
      * Don't rely on it, because it is used only to import from redis db.
      * Remove this field after import.
-     * 
+     *
      * @MongoDB\String
      */
     protected $legacyKey;

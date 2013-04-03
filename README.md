@@ -14,12 +14,11 @@ pear channel-discover pear.symfony-project.com
 pear install phpunit/PHPUnit
 ---
 ImageMagick:
-1) Install ImageMagick via MacPorts (don't use Mac OS X Binary Release from official ImageMagick)
-2) download stable imagick pecl sources (like 3.0.1)
-3) ./configure --with-imagick=/opt/local
-4) make
-5) make install
-6) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://mikepuchol.com/2010/08/26/getting-mamp-1-9-to-work-with-image-magick-imagick-so-and-other-flora/
+1) Install ImageMagick via MacPorts (don't use Mac OS X Binary Release from official ImageMagick):
+sudo port install ImageMagick
+2) Install pecl module with location /opt/local
+pecl install imagick
+3) Edit /Applications/MAMP/Library/bin/envvars as described here to make it to use correct version of modules - http://thoomtech.com/post/8832473042/mamp-imagemagick-lion
 
 ---
 Helpful about DI:
@@ -42,9 +41,11 @@ tar -cpz dump/ -f dump.tar.gz
 s3cmd put dump.tar.gz s3://i.imagepush.to/dump/
 
 Import on localhost:
-s3cmd get s3://i.imagepush.to/dump/dump.tar.gz
+cd ~/tmp
+curl -O http://i.imagepush.to/dump/dump.tar.gz
 tar xvfz dump.tar.gz
-mongorestore --db imagepush_dev -u root -p root37 imagepush_prod/
+mongorestore --db imagepush_dev -u root -p root37 dump/imagepush_prod/
+rm -rf ~/tmp/dum*
 
 ---
 0) save largest version of the image as retrieved from original source and remove aWidth-like fields.
@@ -92,3 +93,34 @@ https://www.google.no/searchbyimage?image_url=http://1.bp.blogspot.com/-MhfcaPKv
 2b) Get list of domains in "Pages that include matching images"
 2c) Decide on good/bad domain name ratio.
 3) Twitter hash tags for this link
+4) HTML source page and check stop keywords in it
+
+---
+Add RabbitMQ plugins:
+sudo rabbitmq-plugins enable rabbitmq_management rabbitmq_jsonrpc rabbitmq_jsonrpc_channel rabbitmq_jsonrpc_channel_examples rabbitmq_management_visualiser
+
+Admin: http://localhost:55672/
+
+---
+
+Note (6.10.2012):
+Using https://github.com/StartupLabs/php-amqplib instead of https://github.com/videlalvaro/php-amqplib in composer.json,
+because this fix has not been merged to main master yet (https://github.com/videlalvaro/php-amqplib/issues/25).
+Use original master when it will include this fix!
+
+Use supervisord to restart rabbitmq consumers:
+http://sonata-project.org/bundles/notification/master/doc/reference/command_line.html
+
+---
+1) Fetch new from reddit
+
+2) Is porn (link1). Queue:
+Find in google?
+Find in twitter?
+Find badwords in html?
+
+3) Queue:
+Find tag (link1) => reddit
+Find tag (link1) => digg
+Find tag (link1) => twitter
+Find mentions (link1) => facebook

@@ -8,27 +8,41 @@ imagepush:
     image.max_ratio: 2.5
     image.min_filesize: 20480   # 20KB in bytes
     image.max_filesize: 8388608 # 8MB in bytes
-    
+
     # Thumbs (Array of thumbnails to generate during processing)
     thumbs: [["in", 463, 1548], ["out", 140, 140], ["in", 625, 2090]]
-        
+
+    services:
+      twitter:
+        delay: 5
+        max_attempts: 5
+      reddit:
+        delay: 3
+        max_attempts: 5
+      stumble_upon:
+        delay: 3
+        max_attempts: 5
+      source:
+        delay: 1
+        max_attempts: 5
+
     fetcher.digg:
       limit: 50 # Max items to fetch every time
       min_diggs: 5 # Minimum diggs score to save. 4-5 is OK.
       min_delay: 10 # 1800. Minimum delay between API requests. Set to 30 mins, but cron runs every 5 minutes, so there are 6 attempts in each interval
-    
+
     fetcher.reddit:
       min_delay: 5  # Minimum delay between API requests (minimum allowed is 2 sec)
       min_score: 50 # Minumum score (ups - downs = score)
       urls: ["http://www.reddit.com/.json", "http://www.reddit.com/r/Images/.json"]
-    
+
     # Tags
     twitter.min_title_length: 15
     reddit.min_subreddit_score: 5
-    
+
     # These tags will not be saved or displayed, because they are not specific enough
     useless_tags: ["reddit.com", "reddit", "askreddit", "pic", "digg", "digguser", "diggrt", "fun", "funny", "pict", "lol", "humor", "humour", "image", "img", "imagepush", "reportthespammer", "fffffffuuuuuuuuuuuu", "flickr", "filetype:jpg", "media:image"]
-    
+
     # These tags will be replaced as synonyms. Should be in single form (not plural)
     synonyms_tags:
         photography: photo
@@ -43,12 +57,11 @@ imagepush:
         worldnews: world news
         busines: business
         busine: business
-    
+
     tag_group_value:
       # Importance of the tag coming from the original source is quiet high (for example, if source if digg, then its category is highly important)
       source: 3
-      digg: 2
       delicious: 2
       stumbleupon: 2.5
       reddit: 1.5
-      twitter: 3
+      twitter: 2

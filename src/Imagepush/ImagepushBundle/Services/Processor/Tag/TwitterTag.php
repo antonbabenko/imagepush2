@@ -9,10 +9,11 @@ class TwitterTag extends Tag implements TagInterface
 
     /**
      * Twitter
-     * 
+     *
      * Twitter search for hashtags
      * Search for url or exact title - https://dev.twitter.com/docs/api/1/get/search
-     * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
+     *
+     * @return array|false Array of found tags; False - if error or not indexed
      */
     public function find(Image $image)
     {

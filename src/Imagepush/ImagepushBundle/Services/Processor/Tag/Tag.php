@@ -37,9 +37,29 @@ class Tag
     }
 
     /**
+     * Save tags and mentions into temporary storage (on Redis) to be calculated,
+     * filtered, ordered during calculate score
+     *
+     * @param type $imageId
+     * @param type $serviceName
+     * @param type $tags
+     */
+    public function saveTags($imageId, $serviceName, $tags)
+    {
+        /**
+         * hash:
+         * image_id =>
+         *   reddit = [tag1 => 3, tag2 => 1]
+         *   twitter = [tag1 => 3, tag2 => 1]
+         *   mentions = [50]
+         */
+        $this->logger->err($imageId . $serviceName . "==" . json_encode($tags));
+    }
+
+    /**
      * Find tags for the source.
-     * 
-     * @return array()|false Array of found tags or false if nothing found
+     *
+     * @return array|false Array of found tags or false if nothing found
      */
     public function processTags(Image $image)
     {
@@ -113,9 +133,9 @@ class Tag
 
     /**
      * Calculate tags score
-     * 
+     *
      * @param array $allTags All tags
-     * 
+     *
      * @return array()|true Array of good tags
      */
     public function calculateTagsScore($allTags = array())
@@ -155,10 +175,10 @@ class Tag
     /**
      * Return array with tag text (as key) and tag mentions counter (as value).
      * Also does synonyms replacement and sort by mentions.
-     * 
+     *
      * @param array $tags
-     * 
-     * @return array Example: array("photo" => 2, "fun" => 1); 
+     *
+     * @return array Example: array("photo" => 2, "fun" => 1);
      */
     public function fixTagsArray($tags = array())
     {
@@ -207,7 +227,7 @@ class Tag
 
     /**
      * Return array of tags which have mentions.
-     * 
+     *
      * @return array
      */
     public function filterTagsByScore($tags, $maxCount = 10)

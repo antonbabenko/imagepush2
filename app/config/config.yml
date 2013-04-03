@@ -1,15 +1,18 @@
 imports:
-    - { resource: parameters.ini }
+    - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: imagepush.yml }
+    - { resource: rabbitmq.yml }
     - { resource: services.yml }
 
 framework:
     esi:             { enabled: true }
-    #translator:      { fallback: %locale% }
+    translator:      { fallback: en }
     secret:          %secret%
-    charset:         UTF-8
-    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    router:
+        strict_requirements: %kernel.debug%
+        resource: "%kernel.root_dir%/config/routing.yml"
+    default_locale:  en
     form:            true
     csrf_protection: true
     validation:      { enable_annotations: true }
@@ -19,14 +22,15 @@ framework:
       #  http: [http://cdn.imagepush.to]
       #assets_version: SomeVersionScheme
     session:
-        default_locale: %locale%
-        auto_start:     true
-        
+        save_path: ~
+    trust_proxy_headers: true
+    trusted_proxies: ['127.0.0.1']
+
 # Twig Configuration
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    
+
     # Settings to use in templates
     globals:
       site_url: %site_url%
@@ -73,10 +77,6 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
 
-jms_security_extra:
-    secure_controllers:  true
-    secure_all_services: false
-
 stof_doctrine_extensions:
     default_locale: en_US
     mongodb:
@@ -117,6 +117,22 @@ knp_gaufrette:
     filesystems:
         images:
             adapter:    %filesystems_images_adapter%
+
+# Redis
+snc_redis:
+    clients:
+        default:
+            type: predis
+            alias: default
+            dsn: redis://localhost/3
+            logging: %kernel.debug%
+            options:
+                profile: 2.4
+                connection_timeout: 10
+                connection_persistent: true
+                read_write_timeout: 30
+                iterable_multibulk: false
+                throw_errors: true
 
 # Not in use (19.7.2012), because purge did not work with Symfony 2.0
 #liip_cache_control:

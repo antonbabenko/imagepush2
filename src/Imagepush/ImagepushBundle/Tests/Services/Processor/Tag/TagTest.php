@@ -60,15 +60,13 @@ class TagTest extends WebTestCase
         $service = $client->getContainer()->get('imagepush.processor.tag');
 
         $sourceTags = array(
-            "digg" => array("fun" => 3, "politic" => 1),
+            "delicious" => array("fun" => 3, "politic" => 1),
             "stumbleupon" => array("fun" => 4, "sport" => 2),
         );
 
         $tags = $service->calculateTagsScore($sourceTags);
 
         $this->assertEquals(array("fun" => 16, "sport" => 5, "politic" => 2), $tags);
-
-
 
         $sourceTags = array();
         $tags = $service->calculateTagsScore($sourceTags);
@@ -84,7 +82,7 @@ class TagTest extends WebTestCase
 
         $sourceTags = array(
             "source" => array("source_tag" => 1),
-            "digg" => array("digg_tag" => 1),
+            "delicious" => array("digg_tag" => 1),
             "stumbleupon" => array("stumbleupon_tag" => 1),
             "twitter" => array("twitter_tag" => 1),
             "reddit" => array("reddit_tag" => 1),
@@ -96,7 +94,7 @@ class TagTest extends WebTestCase
         $tagGroupValue = $client->getContainer()->getParameter('imagepush.tag_group_value');
 
         $this->assertEquals($tagGroupValue["source"], $tags["source_tag"]);
-        $this->assertEquals($tagGroupValue["digg"], $tags["digg_tag"]);
+        //$this->assertEquals($tagGroupValue["digg"], $tags["digg_tag"]);
         $this->assertEquals($tagGroupValue["stumbleupon"], $tags["stumbleupon_tag"]);
         $this->assertEquals($tagGroupValue["twitter"], $tags["twitter_tag"]);
         $this->assertEquals($tagGroupValue["reddit"], $tags["reddit_tag"]);

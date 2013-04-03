@@ -28,9 +28,9 @@ class CustomDataLoader implements LoaderInterface
     /**
      * Constructs
      *
-     * @param ImagineInterface  $imagine
-     * @param array             $formats
-     * @param Filesystem        $fs
+     * @param ImagineInterface $imagine
+     * @param array            $formats
+     * @param Filesystem       $fs
      */
     public function __construct(ImagineInterface $imagine, $formats, Filesystem $fs)
     {
@@ -52,7 +52,7 @@ class CustomDataLoader implements LoaderInterface
         }
 
         $info = pathinfo($path);
-        
+
         //\D::dump($path);
 
         $name = $info['dirname'] . '/' . $info['filename'];
