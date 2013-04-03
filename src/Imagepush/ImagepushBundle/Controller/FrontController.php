@@ -46,7 +46,7 @@ class FrontController extends Controller
      */
     public function viewUpcomingByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => $tag, 'type' => 'upcoming'));
+        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'upcoming'));
 
         return $response;
     }
@@ -56,7 +56,7 @@ class FrontController extends Controller
      */
     public function viewByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => $tag, 'type' => 'current'));
+        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'current'));
 
         return $response;
     }
