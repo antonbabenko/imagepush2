@@ -3,7 +3,6 @@
 namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -12,11 +11,58 @@ class RobotController extends Controller
 {
 
     /**
-     * @Route("/{action}", name="robot")
+     * @Route("/rabbitmq", name="rabbit")
+     * @Template()
+     */
+    public function rabbitPublishAction()
+    {
+
+        $time = microtime(true);
+
+        $msg = array("image_id" => 43516, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        //$this->get('old_sound_rabbit_mq.reddit_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.primary_producer')->publish(json_encode($msg));
+        //sleep(2);
+        //$msg = array("image_id" => 43517, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        /*$this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+        $this->get('old_sound_rabbit_mq.twitter_producer')->publish(json_encode($msg));
+         *
+         */
+        //$msg = array("image_id" => 43518, "task" => \Imagepush\ImagepushBundle\Consumer\MessageTask::FIND_TAGS_AND_MENTIONS);
+        //$producer->publish(json_encode($msg));
+
+        /* $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
+          $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
+          $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
+          $replies = $client->getReplies();
+
+          /*
+          $client = $this->get('old_sound_rabbit_mq.parallel_rpc');
+          $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id1');
+          $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id2');
+          $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id3');
+          $replies = $client->getReplies();
+         */
+
+        echo sprintf("%f", microtime(true) - $time);
+
+        //\D::dump($replies);
+        return new Response();
+    }
+
+    /**
+     * @Route("/robot/{action}", name="robot")
      * @Template()
      */
     public function indexAction($action)
     {
+//        die();
 
         //return new Response("Use CLI commands instead of this");
 
@@ -40,8 +86,9 @@ class RobotController extends Controller
 
                 $image = $dm
                     ->getRepository('ImagepushBundle:Image')
-                    ->findOneBy(array("id" => 100015));
-                $content = $this->get('imagepush.processor.tag')->processTags($image);
+                    ->findOneBy(array("link" => "http://www.google.com/"));
+                //$content = $this->get('imagepush.processor.tag')->processTags($image);
+                $content = $this->get('imagepush.processor.tag.stumbleupon')->find($image);
                 break;
 
             /**

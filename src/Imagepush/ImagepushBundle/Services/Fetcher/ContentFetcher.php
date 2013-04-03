@@ -2,7 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Services\Fetcher;
 
-use Goutte\Client;
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\CurlException;
 
 /**
  * Class which get link content and format response as array
@@ -29,7 +30,7 @@ class ContentFetcher
 
     /**
      * Send GET request
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     public function getRequest($uri)
@@ -41,7 +42,7 @@ class ContentFetcher
 
     /**
      * Send HEAD request
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     public function headRequest($uri)
@@ -53,45 +54,41 @@ class ContentFetcher
 
     /**
      * Make HTTP request to url
-     * 
+     *
      * @return array|integer Array with data or status code
      */
     protected function makeRequest($uri)
     {
 
-        $client = new Client();
-
-        $client->setServerParameters(array('HTTP_USER_AGENT' => $this->userAgent));
+        $client = new Client($uri);
+        $client->setUserAgent($this->userAgent);
 
         // Increase curl timeout
-        $guzzleClient = $client->getClient();
-        $guzzleClient->getConfig()->set('curl.CURLOPT_TIMEOUT', 337);
+        $client->getConfig()->set('curl.CURLOPT_TIMEOUT', 337);
 
-        $client->setClient($guzzleClient);
-
-        //\D::debug($client->getClient()->getConfig()->getAll());
-
-        $client->request($this->requestType, $uri);
+        if ($this->requestType == "HEAD") {
+            $request = $client->head();
+        } else {
+            $request = $client->get();
+        }
 
         try {
-            $response = $client->getResponse();
-            //\D::dump($response->getContent());
-        } catch (\Guzzle\Http\Exception\CurlException $e) {
+            $response = $request->send();
+        } catch (CurlException $e) {
             // @todo: catch errors and log them
             return 500;
         }
 
-        if (200 == $response->getStatus()) {
+        if ($response->isSuccessful()) {
             return array(
-                "Response" => $response,
-                "Status" => $response->getStatus(),
-                "Content" => $response->getContent(),
-                "Content-md5" => md5($response->getContent()),
-                "Content-type" => $response->getHeader("Content-type"),
-                "Content-length" => $response->getHeader("Content-length"),
+                "Status" => $response->getStatusCode(),
+                "Content" => $response->getBody(true),
+                "Content-md5" => md5($response->getBody(true)),
+                "Content-type" => $response->getContentType(),
+                "Content-length" => $response->getContentLength(),
             );
         } else {
-            return $response->getStatus();
+            return $response->getStatusCode();
         }
     }
 

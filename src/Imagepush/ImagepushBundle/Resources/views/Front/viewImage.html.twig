@@ -20,7 +20,7 @@
 {{ image.tags|default([])|join(',') }}
 {% endspaceless %}
 {% endblock %}
-  
+
 {% block image_src %}
 {% spaceless %}
 {{ macros.thumb_url(image, "in", 463, 1548, true) }}
@@ -66,16 +66,16 @@
           </nav>
         </div>
       </header>
-      
+
       {{ shareHelper.horizontal(image, 'large') }}
-      
+
       <div style="text-align:center;">
         <figure class="bigImg">
           <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 625, 2090, "w") }}" height="{{ image.thumbProperty("in", 625, 2090, "h") }}" />
         </figure>
 
-        {% render "ImagepushBundle:Front:_comments" with {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) } %}
-        
+        {{ render (controller('ImagepushBundle:Front:_comments', {'href': url('viewImage', {'id': image.id, 'slug': image.slug}) })) }}
+
       </div>
 
       <footer>
@@ -89,10 +89,10 @@
         {% endif %} #}
       </footer>
     </article>
-    
+
   </div>
 </section>
 
-{% render "ImagepushBundle:Front:_thumbBox" with {'initialTags': image.tags, 'skipImageId': image.id} %}
+{{ render (controller('ImagepushBundle:Front:_thumbBox', {'initialTags': image.tags, 'skipImageId': image.id})) }}
 
 {% endblock %}

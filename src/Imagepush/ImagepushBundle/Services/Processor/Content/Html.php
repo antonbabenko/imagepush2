@@ -37,7 +37,7 @@ class Html
 
     /**
      * Get DOM object for the content
-     * 
+     *
      * @return \DOMDocument $dom
      */
     public function getDom()
@@ -57,7 +57,7 @@ class Html
 
     /**
      * Get the full url of images in image_src or og:image
-     * 
+     *
      * @return array|false Array with urls
      */
     public function getFullImageSrc()
@@ -161,11 +161,11 @@ class Html
 
     /**
      * Generate full url (with scheme, host, path)
-     * 
-     * @param string  $link    Link to modify
+     *
+     * @param string $link     Link to modify
      * @param string $location Full URI where this $href was found
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function generateFullUrl($link, $location)
     {

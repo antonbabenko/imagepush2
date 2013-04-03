@@ -10,7 +10,7 @@ class AbstractFetcher
 
     /**
      * Fetched data
-     * 
+     *
      * @param object $data
      */
     public $data;
@@ -36,7 +36,7 @@ class AbstractFetcher
 
     /**
      * AbstractFetcher
-     * 
+     *
      * @param ContainerInterface $container
      */
     public function __construct($container, $fetcherType = null)
@@ -56,7 +56,7 @@ class AbstractFetcher
 
     /**
      * Get parameter
-     * 
+     *
      * @return $name
      */
     public function getParameter($name, $default = null)
@@ -83,7 +83,7 @@ class AbstractFetcher
 
     /**
      * Wait some seconds before next call, if necessary.
-     * 
+     *
      */
     public function delayBeforeNextApiCall()
     {

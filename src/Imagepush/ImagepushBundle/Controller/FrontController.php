@@ -63,7 +63,7 @@ class FrontController extends Controller
 
     /**
      * Universal function to show images by tags/ by type (upcoming/current)
-     * 
+     *
      * @Template()
      * @Cache(expires="+5 minutes")
      * @Cache(smaxage="300")
@@ -263,7 +263,7 @@ class FrontController extends Controller
             $maxImages = 4;
         }
 
-        //$tagImages = 
+        //$tagImages =
         $allImages = $usedImages = array();
         $totalImages = 0;
 

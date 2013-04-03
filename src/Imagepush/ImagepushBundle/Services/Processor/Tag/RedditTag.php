@@ -9,14 +9,14 @@ class RedditTag extends Tag implements TagInterface
 
     /**
      * Reddit
-     * 
+     *
      * a) search for link by url: http://www.reddit.com/api/info.json?url=http%3A%2F%2Fi.imgur.com%2FM52mw.png
      * b) get subreddits
      * c) get subreddits of the related links
      * YQL is forbidden for some things because of reddit's robots.txt, but it is allowed to fetch reddit pages directly
-     * 
+     *
      * @param Image $image
-     * 
+     *
      * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
      */
     public function find(Image $image)
