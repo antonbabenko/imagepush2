@@ -39,5 +39,6 @@ security:
             #    realm: "Secured Demo Area"
 
     access_control:
-        # internal routes + esi
-        - { path: ^/esi, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
+        # ESI fragments
+        - { path: ^/_fragment, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
+        - { path: ^/_fragment, roles: ROLE_NO_ACCESS }
