@@ -18,8 +18,8 @@ $kernel = new AppKernel(SF_ENVIRONMENT, SF_DEBUG);
 $kernel->loadClassCache();
 $request = Request::createFromGlobals();
 
-Request::trustProxyData();
+Request::enableHttpMethodParameterOverride();
 
 $response = $kernel->handle($request);
 $response->send();
-//$kernel->terminate($request, $response);
+$kernel->terminate($request, $response);
