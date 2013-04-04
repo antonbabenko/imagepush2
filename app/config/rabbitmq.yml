@@ -1,7 +1,7 @@
 # RabbitMQ
 old_sound_rabbit_mq:
-    debug: %kernel.debug%
-    enable_collector: %kernel.debug%
+    debug: true # %kernel.debug%
+    enable_collector: true # %kernel.debug%
     connections:
         default:
             host:      %old_sound_rabbit_mq.host%
