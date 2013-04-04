@@ -28,8 +28,6 @@ class Publisher
     public function publishImageWithMostTagsFound()
     {
 
-        $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTags();
-
         // get images with most tags found
         $imagesWithFoundTags = $this->redis->zrevrangebyscore("found_tags_counter", "+inf", "-inf", array("withscores" => true, "limit" => array(0, 1000)));
 
@@ -93,7 +91,7 @@ class Publisher
 
         $tags = $image->getTags();
         foreach ($tags as $tag) {
-            $oneTag = $this->dm->getRepository("ImagepushBundle:Tag")->findOneBy(array("text" => $goodTag));
+            $oneTag = $this->dm->getRepository("ImagepushBundle:Tag")->findOneBy(array("text" => $tag));
             if ($oneTag) {
                 $oneTag->incUsedInAvailable();
                 $this->dm->persist($oneTag);
