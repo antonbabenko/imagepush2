@@ -216,7 +216,8 @@ class FrontController extends Controller
         $parameters = array("tags" => $tags);
 
         $response = $this->render('ImagepushBundle:Front:_trendingNow.html.twig', $parameters);
-//        $response->setSharedMaxAge(3600);
+        $response->setSharedMaxAge(3600);
+
         return $response;
     }
 
@@ -228,7 +229,8 @@ class FrontController extends Controller
         $parameters = array("href" => $href);
 
         $response = $this->render('ImagepushBundle:Front:_comments.html.twig', $parameters);
-//        $response->setSharedMaxAge(86400);
+        $response->setSharedMaxAge(86400);
+
         return $response;
     }
 
@@ -351,7 +353,8 @@ class FrontController extends Controller
             "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
 
         $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
-//        $response->setSharedMaxAge(86400);
+        $response->setSharedMaxAge(86400);
+
         return $response;
     }
 
@@ -361,7 +364,8 @@ class FrontController extends Controller
     public function _sidebarAction()
     {
         $response = $this->render('ImagepushBundle:Front:_sidebar.html.twig');
-//        $response->setSharedMaxAge(3600);
+        $response->setSharedMaxAge(3600);
+
         return $response;
     }
 
@@ -371,7 +375,8 @@ class FrontController extends Controller
     public function _footerAction()
     {
         $response = $this->render('ImagepushBundle:Front:_footer.html.twig');
-//        $response->setSharedMaxAge(3600);
+        $response->setSharedMaxAge(3600);
+
         return $response;
     }
 
