@@ -73,6 +73,17 @@ class RobotController extends Controller
 
         //return new Response("Use CLI commands instead of this");
 
+        //$this->container
+        //        ->get('imagepush.imagine.files.cache.resolver')
+        //        ->store(new Response($content->getContent()), 'i/' . $image->getFile(), "");
+        $this->logger("START!");
+        $image = $this->get('doctrine.odm.mongodb.document_manager')->getRepository('ImagepushBundle:Image')
+                 ->findOneBy(array("id" => 74222));
+        $this->get('imagepush.processor')->generateRequiredThumbs($image);
+        $this->logger("END!");
+
+        die();
+
         $content = "";
 
         switch ($action) {
