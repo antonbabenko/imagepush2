@@ -62,8 +62,6 @@ if (empty($yml["parameters"]["aws_key"]) || empty($yml["parameters"]["aws_secret
 
 ###################################################################################################*/
 
-//CFRuntime::disable_ssl_verification();
-
 /**
  * Create a list of credential sets that can be used with the SDK.
  */
