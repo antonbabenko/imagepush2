@@ -25,7 +25,7 @@ class UpdateTagsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTagsForAllImages();
+        $content = $this->getContainer()->get('imagepush.processor.tag')->updateTagsFromFoundTagsForAllImages();
 
         $output->writeLn($content, true);
     }
