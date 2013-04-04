@@ -99,20 +99,6 @@ class Tag
     public function updateTagsFromFoundTagsForAllImages()
     {
         $imageIds = $this->redis->smembers("images_with_new_found_tags");
-        $imageIds = array("74264",
- "74265",
- "74267",
- "74273",
- "74276",
- "74277",
- "74284",
- "74285",
- "74287",
- "74288",
-            "74277",
-            "74290",
-            "74289",
-            "74289");
         $imageIds = array_map("intval", $imageIds); // ID is an integer
 
         if (empty($imageIds)) {
@@ -168,19 +154,14 @@ class Tag
             $foundTags[$service] = $this->array_icount_values($foundTags[$service]);
         }
         $foundTags = $this->calculateTagsScore($foundTags);
-        $this->logger->err("Good found tags1: " . json_encode($foundTags));
 
         $goodTags = $this->filterTagsByScore($foundTags, 20);
-        $this->logger->err("Good found tags2: " . json_encode($goodTags));
 
         $goodTags = array_keys($goodTags);
 
-        $this->logger->err("Good found tags3: " . implode(", ", $goodTags));
-
         if (count($goodTags)) {
             $goodTags = array_unique(array_merge((array) $image->getTags(), $goodTags));
-            $goodTags = array_diff($goodTags, array("1"));
-            $this->logger->err("Good found tags4!!!!: " . implode(", ", $goodTags));
+            $this->logger->info("Saving tags: " . implode(", ", $goodTags));
             $this->saveTagsForImage($image, $goodTags);
         }
 
