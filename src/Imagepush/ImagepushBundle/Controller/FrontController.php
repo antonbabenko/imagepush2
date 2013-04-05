@@ -391,4 +391,15 @@ class FrontController extends Controller
         return array();
     }
 
+    /**
+     * Munin pings this URL to check if site is alive
+     *
+     * @Route("/status", name="status")
+     * @Template()
+     */
+    public function statusAction()
+    {
+        return new Response("OK");
+    }
+
 }
