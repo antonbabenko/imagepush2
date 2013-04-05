@@ -113,13 +113,20 @@ class FrontController extends Controller
      * @Cache(expires="+1 hour")
      * @Cache(smaxage="86400")
      */
-    public function viewImageAction($id)
+    public function viewImageAction($id, $slug)
     {
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
+        $params["id"] = (int) $id;
+
+        // Let me to preview images manualy
+        if ("preview" !== strtolower($slug)) {
+            $params["isAvailable"] = true;
+        }
+
         $image = $dm
             ->getRepository('ImagepushBundle:Image')
-            ->findOneBy(array("id" => (int) $id, "isAvailable" => true));
+            ->findOneBy($params);
 
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');
