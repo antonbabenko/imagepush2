@@ -39,6 +39,9 @@ imagepush:
         - "http://www.reddit.com/r/Images/.json"
         - "http://www.reddit.com/r/technology/.json"
 
+    # Publisher
+    min_tags_to_publish_image: 6
+    
     # Tags
     twitter.min_title_length: 15
     reddit.min_subreddit_score: 5

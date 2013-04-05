@@ -33,7 +33,15 @@ class Publisher
 
         //\D::debug($imagesWithFoundTags);
 
+        $minTagsCount = $this->container->getParameter('imagepush.min_tags_to_publish_image', 5);
+
         foreach ($imagesWithFoundTags as $imageWithFoundTags => $foundTagsCounter) {
+
+            if ($foundTagsCounter < $minTagsCount) {
+                $this->logger->info(sprintf("Image (id: %d) has %d tags, but %d is needed to be published! Will try to publish best image (by votes, old manual way).", $imageWithFoundTags, $foundTagsCounter, $minTagsCount));
+                break;
+            }
+
             $image = $this->dm
                 ->createQueryBuilder('ImagepushBundle:Image')
                 ->field('id')->equals($imageWithFoundTags)
