@@ -35,9 +35,9 @@ imagepush:
       min_delay: 5  # Minimum delay between API requests (minimum allowed is 2 sec)
       min_score: 50 # Minumum score (ups - downs = score)
       urls: 
-        -: "http://www.reddit.com/.json"
-        -: "http://www.reddit.com/r/Images/.json"
-        -: "http://www.reddit.com/r/technology/.json"
+        - "http://www.reddit.com/.json"
+        - "http://www.reddit.com/r/Images/.json"
+        - "http://www.reddit.com/r/technology/.json"
 
     # Tags
     twitter.min_title_length: 15
