@@ -65,7 +65,7 @@ class Publisher
 
                 $this->redis->zrem("found_tags_counter", $imageWithFoundTags);
 
-                $log = sprintf("Image with most tags has been published! Tags: %d, Tags values: %s, Image id: %d", $count, json_encode($image->getTags()), $image->getId());
+                $log = sprintf("Image (id: %d) has highest tags score and has been published! Tags: %s were found %d times", $image->getId(), json_encode($image->getTags()), $foundTagsCounter);
                 $this->logger->info($log);
 
                 // Publish only one image at the time, so break this loop
