@@ -50,6 +50,10 @@ before 'symfony:composer:update', 'composer:copy_vendors'
 # Remove old releases
 after "deploy", "deploy:cleanup"
 
+########
+# NOTE: Run "sudo service php-fpm restart" after deployment to refresh APC cache
+########
+
 #################################################################
 #################################################################
 #################################################################
