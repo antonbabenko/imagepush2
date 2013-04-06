@@ -108,19 +108,20 @@ class FrontController extends Controller
     }
 
     /**
-     * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, name="viewImage")
+     * @Route("/p/{id}", requirements={"id"="\d+"}, defaults={"slug"="", "preview"="1"}, name="previewImage")
+     * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, defaults={"preview"="0"}, name="viewImage")
      * @Template()
      * @Cache(expires="+1 hour")
      * @Cache(smaxage="86400")
      */
-    public function viewImageAction($id, $slug)
+    public function viewImageAction($id, $slug, $preview)
     {
         $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
         $params["id"] = (int) $id;
 
         // Let me to preview images manualy
-        if ("preview" !== strtolower($slug)) {
+        if (empty($preview)) {
             $params["isAvailable"] = true;
         }
 
