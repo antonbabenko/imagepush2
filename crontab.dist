@@ -9,3 +9,6 @@ MAILTO="anton@imagepush.to"
 0 */4 * * * /mnt/www/imagepush/current/app/console imagepush:publish-image --env=prod
 
 5 */4 * * * /mnt/www/imagepush/current/app/console imagepush:generate:sitemap --spaceless=1 --env=prod
+
+# Rerun rabbit consumers if needed
+10  * * * * /mnt/www/imagepush/current/bin/launch-rabbit-consumers.sh
