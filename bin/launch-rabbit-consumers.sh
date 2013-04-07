@@ -14,7 +14,7 @@ for text in "${TEXT[@]}"
 do
     #echo "$text"
 
-NB_LAUNCHED=$(ps x | grep "$text" | grep -v grep | wc -l)
+NB_LAUNCHED=$(ps ax | grep "$text" | grep -v grep | wc -l)
 
 # Running without --messages parameter means that it will work forever, which is good for production
 TASK="/usr/bin/env php ${text} --env=${SYMFONY_ENV}"
