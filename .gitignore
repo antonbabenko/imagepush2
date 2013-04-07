@@ -20,6 +20,7 @@ nbproject
 .rsync_cache
 .DS_Store
 .tmp_staging/
+idea/
 composer.phar
 #composer.lock
 nohup.out
