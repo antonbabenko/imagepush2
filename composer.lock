@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "bb9aa751600151bb8ae21e5e437d0367",
+    "hash": "ddaca72f3d06046d48396201c13957de",
     "packages": [
         {
             "name": "amazonwebservices/aws-sdk-for-php",
@@ -2373,21 +2373,21 @@
         },
         {
             "name": "symfony/icu",
-            "version": "1.2.x-dev",
+            "version": "1.1.x-dev",
             "target-dir": "Symfony/Component/Icu",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Icu.git",
-                "reference": "v1.2.0"
+                "reference": "v1.1.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.2.0",
-                "reference": "v1.2.0",
+                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.1.0",
+                "reference": "v1.1.0",
                 "shasum": ""
             },
             "require": {
-                "lib-icu": ">=4.4",
+                "lib-icu": ">=4.0",
                 "php": ">=5.3.3",
                 "symfony/intl": ">=2.3"
             },
@@ -2417,7 +2417,7 @@
                 "icu",
                 "intl"
             ],
-            "time": "2013-04-05 10:34:44"
+            "time": "2013-04-05 10:33:20"
         },
         {
             "name": "symfony/monolog-bundle",

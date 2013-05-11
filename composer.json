@@ -26,6 +26,7 @@
         "jms/metadata":                  "1.1.1",
         "doctrine/mongodb-odm-bundle":   "3.0.x-dev",
         "stof/doctrine-extensions-bundle": "dev-master",
+        "symfony/icu": "1.1.*",
 
         "incenteev/composer-parameter-handler": "~2.0",
         "oldsound/rabbitmq-bundle":      "1.0.0",
