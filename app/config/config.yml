@@ -24,7 +24,7 @@ framework:
       #assets_version: SomeVersionScheme
     session:
         save_path: ~
-    trust_proxy_headers: true
+#    trust_proxy_headers: true
     trusted_proxies: ['127.0.0.1']
 
 # Twig Configuration
