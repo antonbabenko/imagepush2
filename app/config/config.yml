@@ -57,7 +57,7 @@ assetic:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://%database_user%:%database_password%@%database_host%:%database_port%
+            server: %mongodb_connection%
             options:
                 connect: true
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies

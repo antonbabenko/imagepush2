@@ -1,8 +1,5 @@
 parameters:
-    database_host: localhost
-    database_port: 27017
-    database_user: ~
-    database_password: ~
+    mongodb_connection: mongodb://localhost:27017
 
     redis_host: localhost
     redis_port: 6379

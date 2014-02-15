@@ -9,11 +9,11 @@ services:
   - redis
 
 before_script:
-#    - mongo admin --eval 'db.addUser("root", "password");'
+    - mongo localhost --eval 'db.addUser("root", "password")'
 #    - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
     - echo "extension=mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+#    - echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 #    - pecl install imagick
 #    - echo "extension=imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - cp app/config/parameters.yml.dist app/config/parameters.yml
