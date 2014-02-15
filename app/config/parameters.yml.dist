@@ -1,0 +1,42 @@
+parameters:
+    database_host: localhost
+    database_port: 27017
+    database_user: root
+    database_password: password
+
+    redis_host: localhost
+    redis_port: 6379
+    redis_db: 3
+
+    mailer_transport: gmail
+    mailer_host: localhost
+    mailer_user: user
+    mailer_password: pass
+
+    old_sound_rabbit_mq.host: localhost
+    old_sound_rabbit_mq.port: 5672
+    old_sound_rabbit_mq.user: guest
+    old_sound_rabbit_mq.password: guest
+    old_sound_rabbit_mq.vhost: "/"
+
+    secret: 123sadglsjkg11lsjg
+    site_url: http://dev-anton.imagepush.to
+
+    # Varnish URL together with port (if not default)
+    varnish_url: http://dev-anton.imagepush.to:8080
+
+    # dev-anton
+    filesystems_images_adapter: anton_dev
+    cdn_images_url: http://dev-anton.imagepush.to
+
+    # prod
+    #filesystems_images_adapter: prod
+    #cdn_images_url: http://cdn.imagepush.to
+    
+    # Amazon bucket name for "images"
+    s3_bucket_name: imagepushtest
+    #s3_bucket_name: i.imagepush.to
+
+    aws_key:        key
+    aws_secret_key: secret
+    amazon_default_cache_config: apc
