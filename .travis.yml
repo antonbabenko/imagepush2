@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 5.4
+  - 5.5
 
 services:
   - mongodb
@@ -9,7 +9,7 @@ services:
   - redis
 
 before_script:
-    - mongo localhost --eval 'use admin; db.addUser("root", "password");'
+    - mongo admin --eval 'db.addUser("root", "password");'
 #    - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
     - echo "extension=mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
