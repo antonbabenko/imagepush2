@@ -2,14 +2,9 @@
 #    - "composer install --prefer-source"
 
 tools:
-    # Code Coverage
-    php_code_coverage:
-        enabled:              false
-        test_command:         phpunit
-        filter:
-            excluded_paths:
-                - 'vendor/*'
-                - 'tests/*'
+    # Travis CI provides code coverage
+    external_code_coverage:
+        timeout: 600 # Timeout in seconds.
 
 
     # Code Sniffer

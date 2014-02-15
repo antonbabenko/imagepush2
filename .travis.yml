@@ -9,14 +9,19 @@ services:
   - redis
 
 before_script:
-    - mongo localhost --eval 'db.addUser("root", "password")'
-#    - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
-    - echo "extension=mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-#    - echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-#    - pecl install imagick
-#    - echo "extension=imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - cp app/config/parameters.yml.dist app/config/parameters.yml
-    - composer install --dev
+  - mongo localhost --eval 'db.addUser("root", "password")'
+  - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+  - echo "extension=mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - cp app/config/parameters.yml.dist app/config/parameters.yml
+  - composer install --dev
 
-script: phpunit -c app
+script: phpunit -c app --coverage-clover=coverage.clover
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+# reduce commit history of git checkout
+git:
+  depth: 1
