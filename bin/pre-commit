@@ -1,0 +1,114 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * This script fixes code style for files which are going to be committed.
+ * If errors were found commit will be interrupted and errors will be fixed.
+ * Then you need to manually stage your changes and run commit again
+ *
+ * To install this hook just run "pre-commit --install"
+ */
+
+// $PROJECT_ROOT - where your project root directory is located
+$PROJECT_ROOT = __DIR__ . '/../';
+// $PHP_BIN - PHP executable binary
+$PHP_BIN = exec('which php');
+// $PHPCSFIXER_BIN - php-cs-fixer executable
+$PHPCSFIXER_BIN = $PROJECT_ROOT . 'bin/php-cs-fixer';
+// $PHP_CS_FIXER_FILE_PATTERN - php-cs-fixer.phar will fix files whose names fit this regular expression
+$PHP_CS_FIXER_FILE_PATTERN = '/\.(php|twig|yml)$/';
+
+$options = getopt('i', array('install'));
+if (isset($options['i']) || isset($options['install'])) {
+    install();
+
+    echo "Git hook successfully installed" . PHP_EOL;
+    exit(1);
+}
+
+function install()
+{
+    global $PROJECT_ROOT;
+
+    //create link
+    $link = $PROJECT_ROOT . '.git/hooks/pre-commit';
+    @unlink($link);
+
+    exec(sprintf('ln -s %s %s', __FILE__, $link));
+}
+
+function getStashedFiles($filePattern)
+{
+    $against = exec('git rev-parse --verify HEAD') ? 'HEAD' : '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
+
+    $files = array();
+    exec('git diff-index --name-only --cached --diff-filter=ACMR ' . $against . ' --', $files);
+
+    return array_filter($files, function($file) use ($filePattern) {
+        return (bool) preg_match($filePattern, $file);
+    });
+}
+
+function runPhpLint()
+{
+    global $PHP_BIN, $PROJECT_ROOT, $PHP_CS_FIXER_FILE_PATTERN;
+
+    $filesWithErrors = array();
+    foreach (getStashedFiles($PHP_CS_FIXER_FILE_PATTERN) as $file) {
+        $output = '';
+        $returnCode = null;
+        exec(sprintf('%s -l %s 2>/dev/null', $PHP_BIN, $PROJECT_ROOT . $file), $output, $returnCode);
+
+        if ($returnCode) {
+            $filesWithErrors[] = $file;
+        }
+    }
+
+    return $filesWithErrors;
+}
+
+function runPhpCsFixer()
+{
+    global $PHPCSFIXER_BIN, $PHP_CS_FIXER_FILE_PATTERN, $PROJECT_ROOT;
+
+    $changedFiles = array();
+    foreach (getStashedFiles($PHP_CS_FIXER_FILE_PATTERN) as $file) {
+        $output = '';
+        $returnCode = null;
+        exec(sprintf('%s fix %s --level=all', $PHPCSFIXER_BIN, $PROJECT_ROOT . $file), $output, $returnCode);
+
+        if ($returnCode) {
+            $changedFiles[] = $file;
+        }
+    }
+
+    return $changedFiles;
+}
+
+$phpSyntaxErrors = runPhpLint();
+$phpCSErrors = runPhpCsFixer();
+
+if ($phpSyntaxErrors) {
+    echo "Php syntax errors were found in next files:" . PHP_EOL;
+
+    foreach ($phpSyntaxErrors as $error) {
+        echo $error . PHP_EOL;
+    }
+}
+
+if ($phpCSErrors) {
+    echo "Incorrect coding standards were detected and fixed." . PHP_EOL;
+    echo "Please stash changes and run commit again." . PHP_EOL;
+    echo "List of changed files:" . PHP_EOL;
+
+    foreach ($phpCSErrors as $error) {
+        echo $error . PHP_EOL;
+    }
+}
+
+$exitCode = 0;
+if ($phpSyntaxErrors || $phpCSErrors) {
+    $exitCode = 1;
+}
+
+exit($exitCode);
