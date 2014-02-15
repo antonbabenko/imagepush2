@@ -48,7 +48,7 @@ class ContentFetcherTest extends WebTestCase
 
         $service = $client->getContainer()->get('imagepush.fetcher.content');
 
-        $link = "http://imagepush.to/test_page_does_not_exist.html";
+        $link = "http://example.com/test_page_does_not_exist.html";
         $result = $service->getRequest($link);
 
         $this->assertEquals(404, $result);
