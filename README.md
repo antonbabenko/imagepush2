@@ -2,6 +2,8 @@
 
 Author and maintainer: [Anton Babenko](http://github.com/antonbabenko)
 
+[![Build Status](https://travis-ci.org/antonbabenko/imagepush2.png?branch=master)](https://travis-ci.org/antonbabenko/imagepush2)
+
 TODO
 ----
 * Cleanup a bit more for public
