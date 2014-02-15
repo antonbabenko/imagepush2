@@ -108,12 +108,6 @@ class CustomStrings
         $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
         $text = trim($text, '-');
 
-        // There is a bug on php 5.3.6 on mamp with iconv, which always returns empty string
-        // transliterate
-        if (function_exists('iconv') && PHP_VERSION != '5.3.6' && PHP_OS != 'Darwin') {
-            $text = iconv('UTF-8', 'US-ASCII//TRANSLIT//IGNORE', $text);
-        }
-
         // lowercase
         if (function_exists('mb_strtolower')) {
             $text = mb_strtolower($text, 'UTF-8');
