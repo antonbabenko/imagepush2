@@ -15,7 +15,8 @@ before_script:
   - cp app/config/parameters.yml.dist app/config/parameters.yml
   - composer install --dev
 
-script: phpunit -c app --coverage-clover=coverage.clover
+script:
+  - phpunit -c app --coverage-clover=coverage.clover
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
