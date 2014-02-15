@@ -2,10 +2,12 @@ language: php
 
 php:
   - 5.4
-  - 5.5
+
+services: mongodb
 
 before_script:
-    - curl -s http://getcomposer.org/installer | php
-    - php composer.phar install --dev
+    - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+    - cp app/config/parameters.yml.dist app/config/parameters.yml
+    - composer install --dev
 
-script: phpunit --coverage-clover clover -с app
+script: phpunit -с app
