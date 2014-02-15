@@ -10,4 +10,4 @@ before_script:
     - cp app/config/parameters.yml.dist app/config/parameters.yml
     - composer install --dev
 
-script: phpunit -с app
+script: phpunit -c app
