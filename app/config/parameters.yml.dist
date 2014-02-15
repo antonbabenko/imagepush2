@@ -1,8 +1,8 @@
 parameters:
     database_host: localhost
     database_port: 27017
-    database_user: root
-    database_password: password
+    database_user: ~
+    database_password: ~
 
     redis_host: localhost
     redis_port: 6379
