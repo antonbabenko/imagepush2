@@ -9,8 +9,7 @@ set :repository,  "git@github.com:antonbabenko/imagepush2.git"
 set :scm,         :git
 set :scm_verbose, false
 
-set :deploy_via,  :remote_cache    # dev/test/update servers
-#set :deploy_via,  :rsync_with_remote_cache # prod
+set :deploy_via,  :remote_cache
 
 set :model_manager, "doctrine"
 
