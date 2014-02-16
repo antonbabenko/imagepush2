@@ -32,6 +32,7 @@ set :dump_assetic_assets, true
 set :normalize_asset_timestamps, false
 set :interactive_mode, false
 set :symfony_env_prod, "prod"
+set :keep_releases, 3
 
 set :shared_files,        ["app/config/parameters.yml", "web/sitemap.xml.gz"]
 set :shared_children,     [app_path + "/logs"]
@@ -42,10 +43,6 @@ logger.level = Logger::MAX_LEVEL
 #################################################################
 # Extra commands to run before or after #########################
 #################################################################
-
-# Copy vendors from previous release
-#before 'symfony:composer:install', 'composer:copy_vendors'
-#before 'symfony:composer:update', 'composer:copy_vendors'
 
 # Remove old releases
 after "deploy", "deploy:cleanup"
