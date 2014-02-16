@@ -30,6 +30,7 @@ class AppKernel extends Kernel
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
+            new Ornicar\ApcBundle\OrnicarApcBundle(),
 
             // Project bundles
             new Imagepush\ImagepushBundle\ImagepushBundle(),

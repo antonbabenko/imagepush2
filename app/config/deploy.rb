@@ -17,9 +17,7 @@ set :model_manager, "doctrine"
 set :use_composer, true
 set :composer_bin, "/usr/local/bin/composer"
 
-#set :composer_options,  "--verbose --prefer-dist --no-interaction --dev" # Default also contains --no-scripts, but we need it to update parameters.yml
-set :composer_options,  "--verbose --prefer-dist --no-interaction --no-scripts" # Default also contains --no-scripts.
-# TODO: Implement this - http://capifony.org/cookbook/upload-parameters-file.html instead of Incenteev script to update parameters.yml
+set :composer_options,  "--verbose --prefer-source --no-interaction --no-scripts"
 
 set :use_sudo,      false
 set :user, "ec2-user"
@@ -50,19 +48,19 @@ before 'symfony:composer:update', 'composer:copy_vendors'
 # Remove old releases
 after "deploy", "deploy:cleanup"
 
-########
-# NOTE: Run "sudo service php-fpm restart" after deployment to refresh APC cache
-########
+# Clear APC cache
+after "deploy", "symfony:apc_clear"
 
 #################################################################
 #################################################################
 #################################################################
 
-namespace :composer do
-  task :copy_vendors, :except => { :no_release => true } do
-    capifony_pretty_print "--> Copy vendor file from previous release"
+namespace :symfony do
+  task :apc_clear do
+    capifony_pretty_print "--> Clear APC cache"
 
-    run "vendorDir=#{current_path}/vendor; if [ -d $vendorDir ] || [ -h $vendorDir ]; then cp -a $vendorDir #{latest_release}/vendor; fi;"
+    run "#{try_sudo} sh -c 'cd #{latest_release} && #{php_bin} #{symfony_console} apc:clear --env=#{symfony_env_prod}'"
+
     capifony_puts_ok
   end
 end

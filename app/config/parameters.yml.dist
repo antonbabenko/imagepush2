@@ -37,3 +37,5 @@ parameters:
     aws_key:        key
     aws_secret_key: secret
     amazon_default_cache_config: apc
+
+    apc_clear_host: http://dev-anton.imagepush.to

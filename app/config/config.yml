@@ -135,6 +135,10 @@ snc_redis:
                 iterable_multibulk: false
                 throw_errors: true
 
+ornicar_apc:
+    host: %apc_clear_host%
+    web_dir: %kernel.root_dir%/../web
+
 # Not in use (19.7.2012), because purge did not work with Symfony 2.0
 #liip_cache_control:
 #    rules:
