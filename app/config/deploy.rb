@@ -16,6 +16,7 @@ set :model_manager, "doctrine"
 
 set :use_composer, true
 set :composer_bin, "/usr/local/bin/composer"
+set :copy_vendors, true
 
 set :composer_options,  "--verbose --prefer-source --no-interaction --no-scripts"
 
@@ -26,6 +27,7 @@ ssh_options[:forward_agent] = true
 default_run_options[:pty] = true
 ssh_options[:keys] = ENV["EC2_ANTON_CERT_FILE"]
 
+set :assets_install, true
 set :dump_assetic_assets, true
 set :normalize_asset_timestamps, false
 set :interactive_mode, false
@@ -42,8 +44,8 @@ logger.level = Logger::MAX_LEVEL
 #################################################################
 
 # Copy vendors from previous release
-before 'symfony:composer:install', 'composer:copy_vendors'
-before 'symfony:composer:update', 'composer:copy_vendors'
+#before 'symfony:composer:install', 'composer:copy_vendors'
+#before 'symfony:composer:update', 'composer:copy_vendors'
 
 # Remove old releases
 after "deploy", "deploy:cleanup"
