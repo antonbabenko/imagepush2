@@ -31,7 +31,7 @@
             }
         },
         shorteners: {
-            bitly: { username: 'antonbabenko', apiKey: 'R_5962066cd056895f0f0c5b62c1bd6341' }
+            bitly: { username: '{% endraw %}{{ bitly_username }}{% raw %}', apiKey: '{% endraw %}{{ bitly_api_key }}{% raw %}' }
         }
     };
     var addthis_config = { data_ga_property: 'UA-20823942-1', data_track_clickback: true, data_track_addressbar: true, ui_508_compliant: true, services_exclude: 'print', ui_use_image_picker : true };

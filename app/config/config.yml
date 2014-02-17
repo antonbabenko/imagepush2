@@ -36,6 +36,8 @@ twig:
     globals:
       site_url: %site_url%
       cdn_images_url: %cdn_images_url%
+      bitly_username: %bitly_username%
+      bitly_api_key: %bitly_api_key%
       settings:
         show_banners_and_static_helpers: true
         show_comments: true

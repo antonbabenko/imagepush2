@@ -39,3 +39,6 @@ parameters:
     amazon_default_cache_config: apc
 
     apc_clear_host: http://dev-anton.imagepush.to
+
+    bitly_username: ~
+    bitly_api_key: ~
