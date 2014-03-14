@@ -27,7 +27,6 @@ class FrontController extends Controller
 
     /**
      * @Extra\Route("/upcoming", name="viewUpcoming")
-     * @Extra\Template()
      */
     public function viewUpcomingAction()
     {
@@ -39,12 +38,7 @@ class FrontController extends Controller
      */
     public function viewUpcomingByTagAction($tag)
     {
-        $response = $this->forward(
-            'ImagepushBundle:Front:viewMultiple',
-            ['tag' => urldecode($tag), 'type' => 'upcoming']
-        );
-
-        return $response;
+        return $this->forward('ImagepushBundle:Front:viewMultiple', ['tag' => urldecode($tag), 'type' => 'upcoming']);
     }
 
     /**
@@ -52,12 +46,7 @@ class FrontController extends Controller
      */
     public function viewByTagAction($tag)
     {
-        $response = $this->forward(
-            'ImagepushBundle:Front:viewMultiple',
-            ['tag' => urldecode($tag), 'type' => 'current']
-        );
-
-        return $response;
+        return $this->forward('ImagepushBundle:Front:viewMultiple', ['tag' => urldecode($tag), 'type' => 'current']);
     }
 
     /**
@@ -82,16 +71,17 @@ class FrontController extends Controller
             $params = compact('tag');
 
             // Opposite type field has number of images in each tag, so we can show or hide the opposite type link
-            $isOppositeTypeExists = ('current' !== $type ? $tagObject->getUsedInAvailable() : $tagObject->getUsedInUpcoming());
+            $isOppositeTypeExists = (bool) ('current' !== $type ? $tagObject->getUsedInAvailable() : $tagObject->getUsedInUpcoming());
         }
 
         $images = $this->get('repository.image')->findImages($type, 30, $params);
+        var_dump($images[0]->getTagsTextAsArray());
 
         return [
             "type" => $type,
             "tag" => $tag,
             "images" => $images,
-            "isOppositeTypeExists" => (bool) $isOppositeTypeExists
+            "isOppositeTypeExists" => $isOppositeTypeExists
         ];
     }
 
@@ -112,6 +102,8 @@ class FrontController extends Controller
         $nextImage = $this->get('repository.image')->findOneImageRelatedToObject('next', $image);
         $prevImage = $this->get('repository.image')->findOneImageRelatedToObject('prev', $image);
 
+//        var_dump($image->getTagsTextAsArray());
+//        var_dump($nextImage->getTagsTextAsArray());
         return [
             'image' => $image,
             'nextImage' => $nextImage,
@@ -131,10 +123,7 @@ class FrontController extends Controller
     public function latestImagesFeedAction($_format)
     {
 
-        $response = $this->forward(
-            'ImagepushBundle:Front:viewMultiple',
-            ['type' => 'current', '_format' => $_format]
-        );
+        $response = $this->forward('ImagepushBundle:Front:viewMultiple', ['type' => 'current', '_format' => $_format]);
 
         if ($_format == "rss2" || $_format == "rss") {
             $response->headers->set('Content-Type', 'application/rss+xml');
@@ -191,6 +180,27 @@ class FrontController extends Controller
         }
 
         return new Response($result);
+    }
+
+    /**
+     * @Extra\Route("/about", name="about")
+     * @Extra\Template()
+     * @Extra\Cache(expires="+1 hour")
+     * @Extra\Cache(smaxage="86400")
+     */
+    public function aboutAction()
+    {
+        return [];
+    }
+
+    /**
+     * Munin pings this URL to check if site is alive
+     *
+     * @Extra\Route("/status", name="status")
+     */
+    public function statusAction()
+    {
+        return new Response("OK");
     }
 
     /**
@@ -323,46 +333,24 @@ class FrontController extends Controller
 
     /**
      * Display sidebar box
-     */
-    public function _sidebarAction()
-    {
-        $response = $this->render('ImagepushBundle:Front:_sidebar.html.twig');
-        $response->setSharedMaxAge(3600);
-
-        return $response;
-    }
-
-    /**
-     * Display footer
-     */
-    public function _footerAction()
-    {
-        $response = $this->render('ImagepushBundle:Front:_footer.html.twig');
-        $response->setSharedMaxAge(3600);
-
-        return $response;
-    }
-
-    /**
-     * @Extra\Route("/about", name="about")
+     *
      * @Extra\Template()
-     * @Extra\Cache(expires="+1 hour")
      * @Extra\Cache(smaxage="86400")
      */
-    public function aboutAction()
+    public function _sidebarAction()
     {
         return [];
     }
 
     /**
-     * Munin pings this URL to check if site is alive
+     * Display footer
      *
-     * @Extra\Route("/status", name="status")
      * @Extra\Template()
+     * @Extra\Cache(smaxage="86400")
      */
-    public function statusAction()
+    public function _footerAction()
     {
-        return new Response("OK");
+        return [];
     }
 
 }

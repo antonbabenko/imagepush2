@@ -25,7 +25,6 @@ class ImageRepository extends EntityRepository
             ->setParameter('id', $id)
             ->setParameter('available', (bool) $onlyAvailable)
             ->getQuery()
-            ->setMaxResults(1)
             ->setResultCacheLifetime(600)
             ->getOneOrNullResult();
 
@@ -78,7 +77,7 @@ class ImageRepository extends EntityRepository
         $result = $query
             ->getQuery()
             ->setMaxResults($limit)
-            ->setResultCacheLifetime(60)
+//            ->setResultCacheLifetime(60)
             ->execute();
 
         return $result;

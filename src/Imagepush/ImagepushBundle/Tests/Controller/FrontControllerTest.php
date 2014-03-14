@@ -23,7 +23,7 @@ class FrontControllerTest extends WebTestCase
         $this->assertCount(7, $crawler->filter('.thumbnails ul li'), '3 images (latest hits) + 4 images (latest in tag1)');
 
         $trendsFilter = $crawler->filter('#latest_trends ul li a')->each(function ($node) { return $node->text(); });
-        $this->assertEquals(['tag1', 'tag5'], $trendsFilter, 'There are 2 trending tags');
+        $this->assertEquals(['tag1', 'tag2', 'tag3'], $trendsFilter, 'There are 2 trending tags');
     }
 
     public function testUpcoming()
