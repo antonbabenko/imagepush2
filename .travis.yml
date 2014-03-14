@@ -19,6 +19,7 @@ before_script:
   - mysql -e 'create database imagepush_test;'
 #  - sed s/database_password:/myapp_test/ app/config/parameters.ini-dist | sed s/%database_login%/root/ | sed s/%database_password%// > app/config/parameters.ini
   - composer install --dev
+  - bin/build -d -c -e test
 
 script:
   - phpunit -c app --coverage-clover=coverage.clover
