@@ -1,3 +1,4 @@
+# @todo: Migrate these services into ImagepushBundle/Resources/config/
 services:
 
     ##################

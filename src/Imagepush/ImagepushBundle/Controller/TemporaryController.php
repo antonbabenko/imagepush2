@@ -3,8 +3,7 @@
 namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as Extra;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\LatestTag;
 
@@ -12,8 +11,8 @@ class TemporaryController extends Controller
 {
 
     /**
-     * @Route("/updateLatestTags", name="updateLatestTags")
-     * @Template("::base.html.twig")
+     * @Extra\Route("/updateLatestTags", name="updateLatestTags")
+     * @Extra\Template("::base.html.twig")
      */
     public function updateLatestTagsAction()
     {
@@ -64,8 +63,8 @@ class TemporaryController extends Controller
     }
 
     /**
-     * @Route("/updateContentType", name="updateS3ContentType")
-     * @Template("::base.html.twig")
+     * @Extra\Route("/updateContentType", name="updateS3ContentType")
+     * @Extra\Template("::base.html.twig")
      */
     public function updateS3ContentTypeAction()
     {

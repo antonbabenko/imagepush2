@@ -10,9 +10,11 @@ web/i/*
 app/bootstrap.php.cache
 app/cache/*
 app/logs/*
+/bin/phpunit
 build/
 vendor/
 app/config/parameters.yml
+app/config/parameters_test.yml
 .buildpath
 .project
 .settings/

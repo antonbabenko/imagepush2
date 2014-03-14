@@ -91,8 +91,6 @@ class Publisher
         //\D::debug($image->getId());
         //die();
         //\D::dump($image->getMongoId());
-        // update timestamp to now
-        $image->setTimestamp(time());
 
         $image->setIsAvailable(true);
         $image->setIsInProcess(false);

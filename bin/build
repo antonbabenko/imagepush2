@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+ENV="dev"
+DROP_DATABASE=false
+CREATE_DATABASE=false
+
+function usage()
+{
+cat << EOF
+usage: $0 options
+
+OPTIONS:
+   -h      Show this message
+   -e      Symfony environment name [default: "dev"]
+   -d      Drop databases
+   -c      Create databases
+EOF
+}
+
+while getopts ":e:dch" OPTION; do
+    case $OPTION in
+        e)
+            ENV=$OPTARG
+            ;;
+        d)
+            DROP_DATABASE=true
+            ;;
+        c)
+            CREATE_DATABASE=true
+            ;;
+        h)
+            usage
+            exit 1
+            ;;
+     esac
+done
+
+function executeSfCommand()
+{
+    php app/console --env=$ENV $1
+}
+
+if [ $ENV = "prod" ]; then
+    echo "This script is only for development process and could not be executed for \"prod\" environment"
+    exit 1
+fi
+
+rm -rf web/bundles
+rm -rf app/cache/$ENV/*
+
+if $DROP_DATABASE; then
+    executeSfCommand "doctrine:database:drop --force"
+
+    if ! $CREATE_DATABASE; then
+        exit 0;
+    fi
+fi
+
+if $CREATE_DATABASE; then
+    executeSfCommand "doctrine:database:create"
+fi
+
+executeSfCommand "doctrine:schema:update --force"
+
+if [ $ENV == 'test' ]; then
+    executeSfCommand "doctrine:fixtures:load-data-and-save-ref-repo"
+else
+    executeSfCommand "doctrine:fixtures:load --no-interaction"
+fi
+
+executeSfCommand "assets:install web --symlink"
+executeSfCommand "assetic:dump"
+executeSfCommand "cache:clear"

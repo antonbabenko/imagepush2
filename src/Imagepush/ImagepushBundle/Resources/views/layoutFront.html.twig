@@ -79,7 +79,7 @@
           {{ siteHelper.html('google_site_search_form', true) }}
         </div>
 
-        {{ render_esi(controller('ImagepushBundle:Front:_trendingNow', { 'max': 20 })) }}
+        {{ render_esi(controller('ImagepushBundle:Front:_trendingNow', { 'limit': 20 })) }}
 
       </header>
 

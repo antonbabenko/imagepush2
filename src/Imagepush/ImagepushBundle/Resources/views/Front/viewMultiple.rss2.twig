@@ -19,7 +19,7 @@
                 </a>
                 {% endspaceless %}]]></description>
             <guid isPermaLink="false">{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</guid>
-            <pubDate>{{ image.timestamp|date('c') }}</pubDate>
+            <pubDate>{{ image.createdAt|date('c') }}</pubDate>
             {% set length = image.thumbProperty("in", 463, 1548, "s") %}
             <enclosure url="{{ macros.thumb_url(image, "in", 463, 1548) }}" type="{{image.mimeType|default('image/jpeg')}}"{% if length %} length="{{length}}"{% endif %}></enclosure>
             {% for tag in image.tags %}

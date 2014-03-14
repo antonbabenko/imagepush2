@@ -76,7 +76,7 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
             $image = new Image();
             $image->setSourceType("reddit");
             $image->setLink($item->url);
-            $image->setTimestamp((int) $item->created);
+            $image->setCreatedAt(new \DateTime('@'.(int) $item->created));
             $image->setTitle(CustomStrings::cleanTitle($item->title));
             $image->setSlug(CustomStrings::slugify($item->title));
 

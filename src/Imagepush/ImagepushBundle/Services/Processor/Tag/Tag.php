@@ -184,7 +184,6 @@ class Tag
             $image->addTagsRef($tag);
 
             $latestTag = new LatestTag();
-            $latestTag->setTimestamp(time());
             $latestTag->setText($goodTag);
             //\D::dump($latestTag);
 
@@ -256,7 +255,6 @@ class Tag
                 $image->addTagsRef($tag);
 
                 $latestTag = new LatestTag();
-                $latestTag->setTimestamp(time());
                 $latestTag->setText($bestTag);
                 //\D::dump($latestTag);
 

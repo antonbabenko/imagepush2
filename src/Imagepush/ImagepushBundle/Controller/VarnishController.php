@@ -4,8 +4,7 @@ namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as Extra;
 
 class VarnishController extends Controller
 {
@@ -13,7 +12,7 @@ class VarnishController extends Controller
     /**
      * Purge Varnish cache
      *
-     * @Route("/purge{url}", name="purgeUrl", requirements={"url"=".*"})
+     * @Extra\Route("/purge{url}", name="purgeUrl", requirements={"url"=".*"})
      */
     public function purgeAction($url)
     {

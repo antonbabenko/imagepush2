@@ -2,61 +2,60 @@
 
 namespace Imagepush\ImagepushBundle\Controller;
 
+use Imagepush\ImagepushBundle\Entity\Image;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as Extra;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FrontController extends Controller
 {
 
     /**
-     * @Route("/", name="index")
-     * @Template()
-     * @Cache(expires="+10 minutes")
-     * @Cache(smaxage="3600")
+     * @Extra\Route("/", name="index")
+     * @Extra\Template()
+     * @Extra\Cache(expires="+10 minutes")
+     * @Extra\Cache(smaxage="3600")
      */
     public function indexAction()
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $images = $this->get('repository.image')->findImages('current', 7);
 
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("current", 7);
-
-        return array("images" => array_values($images));
+        return compact('images');
     }
 
     /**
-     * @Route("/upcoming", name="viewUpcoming")
-     * @Template()
+     * @Extra\Route("/upcoming", name="viewUpcoming")
+     * @Extra\Template()
      */
     public function viewUpcomingAction()
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => null, 'type' => 'upcoming'));
-
-        return $response;
+        return $this->forward('ImagepushBundle:Front:viewMultiple', ['tag' => null, 'type' => 'upcoming']);
     }
 
     /**
-     * @Route("/tag/{tag}/upcoming", name="viewUpcomingByTag")
+     * @Extra\Route("/tag/{tag}/upcoming", name="viewUpcomingByTag")
      */
     public function viewUpcomingByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'upcoming'));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            ['tag' => urldecode($tag), 'type' => 'upcoming']
+        );
 
         return $response;
     }
 
     /**
-     * @Route("/tag/{tag}", name="viewByTag")
+     * @Extra\Route("/tag/{tag}", name="viewByTag")
      */
     public function viewByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'current'));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            ['tag' => urldecode($tag), 'type' => 'current']
+        );
 
         return $response;
     }
@@ -64,99 +63,78 @@ class FrontController extends Controller
     /**
      * Universal function to show images by tags/ by type (upcoming/current)
      *
-     * @Template()
-     * @Cache(expires="+5 minutes")
-     * @Cache(smaxage="300")
+     * @Extra\Template()
+     * @Extra\Cache(expires="+5 minutes")
+     * @Extra\Cache(smaxage="300")
      */
     public function viewMultipleAction($type, $tag = null)
     {
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
-
-        $params = array();
+        $params = [];
 
         $isOppositeTypeExists = false;
 
         if (!is_null($tag)) {
-            $params = array("tag" => $tag);
-
-            $tagObject = $dm->createQueryBuilder('ImagepushBundle:Tag')
-                ->field('text')->equals($tag)
-                ->getQuery()
-                ->getSingleResult();
-
-            if (!$tagObject) {
+            if (null == $tagObject = $this->get('repository.tag')->findOneByText($tag)) {
                 throw new NotFoundHttpException(sprintf('There are no %s images to show by tag: %s', $type, $tag));
             }
 
-            // Opposite type field has number of images in each tag, so we can show or hide the opposite type link
-            $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
+            $params = compact('tag');
 
-            $isOppositeTypeExists = (bool) $tagObject->{$oppositeTypeField}();
+            // Opposite type field has number of images in each tag, so we can show or hide the opposite type link
+            $isOppositeTypeExists = ('current' !== $type ? $tagObject->getUsedInAvailable() : $tagObject->getUsedInUpcoming());
         }
 
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages($type, 30, $params);
+        $images = $this->get('repository.image')->findImages($type, 30, $params);
 
-        return array(
+        return [
             "type" => $type,
             "tag" => $tag,
             "images" => $images,
-            "isOppositeTypeExists" => $isOppositeTypeExists
-        );
+            "isOppositeTypeExists" => (bool) $isOppositeTypeExists
+        ];
     }
 
     /**
-     * @Route("/p/{id}", requirements={"id"="\d+"}, defaults={"slug"="", "preview"="1"}, name="previewImage")
-     * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, defaults={"preview"="0"}, name="viewImage")
-     * @Template()
-     * @Cache(expires="+1 hour")
-     * @Cache(smaxage="86400")
+     * @Extra\Route("/p/{id}", requirements={"id"="\d+"}, defaults={"slug"="", "preview"="1"}, name="previewImage")
+     * @Extra\Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, defaults={"preview"="0"}, name="viewImage")
+     * @Extra\Template()
+     * @Extra\Cache(expires="+1 hour")
+     * @Extra\Cache(smaxage="86400")
      */
     public function viewImageAction($id, $slug, $preview)
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
 
-        $params["id"] = (int) $id;
-
-        // Let me to preview images manualy
-        if (empty($preview)) {
-            $params["isAvailable"] = true;
-        }
-
-        $image = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findOneBy($params);
-
-        if (!$image) {
+        if (false == $image = $this->get('repository.image')->findOneImageBy($id, 0 == $preview)) {
             throw new NotFoundHttpException('Image doesn\'t exist');
         }
 
-        $nextImage = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->getOneImageRelatedToTimestamp("next", $image->getTimestamp());
+        $nextImage = $this->get('repository.image')->findOneImageRelatedToObject('next', $image);
+        $prevImage = $this->get('repository.image')->findOneImageRelatedToObject('prev', $image);
 
-        $prevImage = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->getOneImageRelatedToTimestamp("prev", $image->getTimestamp());
-
-        return array("image" => $image, "nextImage" => $nextImage, "prevImage" => $prevImage);
+        return [
+            'image' => $image,
+            'nextImage' => $nextImage,
+            'prevImage' => $prevImage,
+        ];
     }
 
     /**
      * Latest images feeds (rss2.0, rss, atom formats)
      *
-     * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
-     * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
-     * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
-     * @Cache(expires="+10 minutes")
-     * @Cache(maxage="1800")
+     * @Extra\Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
+     * @Extra\Route("/rss", name="rssFeed", defaults={"_format"="rss"})
+     * @Extra\Route("/atom", name="atomFeed", defaults={"_format"="atom"})
+     * @Extra\Cache(expires="+10 minutes")
+     * @Extra\Cache(maxage="1800")
      */
     public function latestImagesFeedAction($_format)
     {
 
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('type' => 'current', '_format' => $_format));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            ['type' => 'current', '_format' => $_format]
+        );
 
         if ($_format == "rss2" || $_format == "rss") {
             $response->headers->set('Content-Type', 'application/rss+xml');
@@ -170,8 +148,8 @@ class FrontController extends Controller
     /**
      * Send email to myself, when user mark image as unappropriate or vote up/down.
      *
-     * @Route("/flag", name="flagImage", defaults={"type"="flag"})
-     * @Route("/vote", name="voteImage", defaults={"type"="vote"})
+     * @Extra\Route("/flag", name="flagImage", defaults={"type"="flag"})
+     * @Extra\Route("/vote", name="voteImage", defaults={"type"="vote"})
      */
     public function voteOrFlagImageAction(Request $request, $type)
     {
@@ -198,9 +176,14 @@ class FrontController extends Controller
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($subject)
-                ->setFrom(array('noreply@imagepush.to' => "Imagepush votes"))
+                ->setFrom(['noreply@imagepush.to' => "Imagepush votes"])
                 ->setTo('anton@imagepush.to')
-                ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type, "hash" => md5($image->getId()))))
+                ->setBody(
+                    $this->renderView(
+                        'ImagepushBundle:Emails:voteOrFlagImage.html.twig',
+                        ['image' => $image, "type" => $type, "hash" => md5($image->getId())]
+                    )
+                )
                 ->setContentType("text/html");
             $result = $this->get('mailer')->send($message);
         } else {
@@ -212,88 +195,70 @@ class FrontController extends Controller
 
     /**
      * Display top box with trending tags
+     *
+     * @Extra\Template()
+     * @Extra\Cache(smaxage="3600")
      */
-    public function _trendingNowAction($max = 20)
+    public function _trendingNowAction($limit = 20)
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $tags = $this->get('repository.latest_tag')->getLatestTrends($limit);
 
-        $tags = $dm
-            ->getRepository('ImagepushBundle:LatestTag')
-            ->getLatestTrends($max);
-
-        $parameters = array("tags" => $tags);
-
-        $response = $this->render('ImagepushBundle:Front:_trendingNow.html.twig', $parameters);
-        $response->setSharedMaxAge(3600);
-
-        return $response;
+        return compact('tags');
     }
 
     /**
      * Display comment box
+     *
+     * @Extra\Template()
+     * @Extra\Cache(smaxage="86400")
      */
     public function _commentsAction($href)
     {
-        $parameters = array("href" => $href);
-
-        $response = $this->render('ImagepushBundle:Front:_comments.html.twig', $parameters);
-        $response->setSharedMaxAge(86400);
-
-        return $response;
+        return compact('href');
     }
 
     /**
      * Display thumb box
+     *
+     * @Extra\Template()
+     * @Extra\Cache(smaxage="86400")
      */
-    public function _thumbBoxAction($initialTags = array(), $skipImageId = false)
+    public function _thumbBoxAction($image = null)
     {
+        if ($image instanceof Image) {
+            $tags = $image->getTagsTextAsArray();
+            $usedImages[] = $image->getId();
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
-
-        //\D::dump($initialTags);
-        if (count($initialTags)) {
-            $tags = $initialTags;
             $groupTags = false;
             $maxImages = 16;
         } else {
-            $tags = $dm
-                ->getRepository('ImagepushBundle:LatestTag')
-                ->getLatestTrends(100);
-            //\D::dump($tags);
+            $tags = $this->get('repository.latest_tag')->getLatestTrends(20);
+            $tags = array_column($tags, 'text');
 
-            if (!count($tags)) {
-                return;
+            if (!count($tags) && $image = $this->get('repository.image')->findOneImageRelatedToObject('prev')) {
+                $tags = $image->getTagsTextAsArray();
             }
 
-            $tags = array_keys($tags);
+            $usedImages = [];
 
             $groupTags = true;
             $maxImages = 4;
         }
 
-        //$tagImages =
-        $allImages = $usedImages = array();
-        $totalImages = 0;
+        $allImages = [];
 
-        // skip main image
-        if (!empty($skipImageId)) {
-            $usedImages[] = $skipImageId;
-        }
-
-        //\D::dump($tags);
         // Get all images by tags
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("current", 10 * count($tags), array("tag" => $tags));
-        $images = array_values($images);
-
-        //\D::dump($images);
+        if (count($tags)) {
+            $images = $this->get('repository.image')->findImages('current', 10 * count($tags), ['tag' => $tags]);
+        } else {
+            $images = $this->get('repository.image')->findImages('current', 100);
+        }
 
         if ($groupTags) {
             // Group by tags
             foreach ($tags as $tag) {
 
-                $tagImages = array();
+                $tagImages = [];
 
                 // Max 10 groups of images
                 if (count($allImages) >= 10) {
@@ -308,7 +273,7 @@ class FrontController extends Controller
                     }
 
                     if (!in_array($image->getId(), $usedImages)) {
-                        if (in_array($tag, $image->getTags())) {
+                        if (in_array($tag, $image->getTagsTextAsArray())) {
                             $tagImages[] = $image;
                             $usedImages[] = $image->getId();
                         }
@@ -320,11 +285,11 @@ class FrontController extends Controller
                     continue;
                 }
 
-                $allImages[] = array("tag" => $tag, "images" => $tagImages);
+                $allImages[] = ["tag" => $tag, "images" => $tagImages];
             }
         } else {
             // Do not group images, but order by timestamp
-            $tagImages = $foundTags = array();
+            $tagImages = $foundTags = [];
 
             // Prepare images for "related images" box, where they all are in one group
             foreach ($images as $image) {
@@ -337,7 +302,7 @@ class FrontController extends Controller
                     $tagImages[] = $image;
                     $usedImages[] = $image->getId();
 
-                    $foundTags = array_merge($foundTags, (array) $image->getTags());
+                    $foundTags = array_merge($foundTags, $image->getTagsTextAsArray());
                 }
             }
 
@@ -346,24 +311,14 @@ class FrontController extends Controller
             arsort($foundTags);
             $foundTags = array_slice(array_flip($foundTags), 0, 5);
 
-            $allImages[] = array("usedTags" => $foundTags, "images" => $tagImages);
-            $totalImages += count($tagImages);
-            //\D::dump($allImages);
+            $allImages[] = ["usedTags" => $foundTags, "images" => $tagImages];
         }
 
-        //\D::dump($allImages);
-        //\D::dump($initialTags);
-
-        $parameters = array(
-            "allImages" => $allImages,
-            "initialTags" => $initialTags,
-            "skipImageId" => $skipImageId,
-            "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
-
-        $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
-        $response->setSharedMaxAge(86400);
-
-        return $response;
+        return [
+            'allImages' => $allImages,
+            'tags' => $tags,
+            'groupTags' => $groupTags,
+        ];
     }
 
     /**
@@ -389,21 +344,21 @@ class FrontController extends Controller
     }
 
     /**
-     * @Route("/about", name="about")
-     * @Template()
-     * @Cache(expires="+1 hour")
-     * @Cache(smaxage="86400")
+     * @Extra\Route("/about", name="about")
+     * @Extra\Template()
+     * @Extra\Cache(expires="+1 hour")
+     * @Extra\Cache(smaxage="86400")
      */
     public function aboutAction()
     {
-        return array();
+        return [];
     }
 
     /**
      * Munin pings this URL to check if site is alive
      *
-     * @Route("/status", name="status")
-     * @Template()
+     * @Extra\Route("/status", name="status")
+     * @Extra\Template()
      */
     public function statusAction()
     {

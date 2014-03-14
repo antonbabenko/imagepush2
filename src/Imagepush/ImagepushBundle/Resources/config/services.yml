@@ -1,0 +1,27 @@
+services:
+    repository.abstract:
+        abstract: true
+        public: true
+        factory_service: doctrine.orm.entity_manager
+        factory_method: getRepository
+
+    # Repositories
+    repository.image:
+        parent: repository.abstract
+        class: Imagepush\ImagepushBundle\Entity\ImageRepository
+        arguments: [ Imagepush\ImagepushBundle\Entity\Image ]
+
+    repository.tag:
+        parent: repository.abstract
+        class: Imagepush\ImagepushBundle\Entity\TagRepository
+        arguments: [ Imagepush\ImagepushBundle\Entity\Tag ]
+
+    repository.link:
+        parent: repository.abstract
+        class: Imagepush\ImagepushBundle\Entity\LinkRepository
+        arguments: [ Imagepush\ImagepushBundle\Entity\Link ]
+
+    repository.latest_tag:
+        parent: repository.abstract
+        class: Imagepush\ImagepushBundle\Entity\LatestTagRepository
+        arguments: [ Imagepush\ImagepushBundle\Entity\LatestTag ]

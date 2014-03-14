@@ -1,17 +1,14 @@
 {% import "ImagepushBundle:Helpers:siteHelper.html.twig" as siteHelper %}
 {% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
 
-{% set currentImagePlacement = 0 %}
 {% if allImages is defined %}
 {% for group in allImages %}
-
-{% if group.images is defined %}
 
 <section class="additionalContent"><div class="contentWrapper">
     <header>
       <h3>
-        {% if initialTags|length == 0 %}
-        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag|url_encode()}) }}">{{group.tag}}</a>
+        {% if groupTags %}
+        LATEST IN <a href="{{ path('viewByTag', {'tag': group.tag|url_encode()}) }}">{{ group.tag }}</a>
         {% else %}
         RELATED IMAGES BY {{group.usedTags|length > 1 ? 'TAGS' : 'TAG' }}&nbsp;
 
@@ -28,15 +25,6 @@
       <ul>
         {% for image in group.images %}
 
-        {#
-        {% if withAd and currentImagePlacement == bannerPlacement %}
-        <li>
-          <div class="adWrapper">
-            {{ siteHelper.html('square_125x125') }}
-          </div>
-        </li>
-        {% else %}
-        #}
         <li>
           <div class="thumbWrapper">
             <div class="details">
@@ -48,17 +36,11 @@
             </a>
           </div>
         </li>
-        {#
-        {% endif %}
-
-        {% set currentImagePlacement = currentImagePlacement + 1 %}
-        #}
 
         {% endfor %}
       </ul>
     </section>
   </div></section>
 
-{% endif %}
 {% endfor %}
 {% endif %}

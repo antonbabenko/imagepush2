@@ -5,15 +5,14 @@ namespace Imagepush\ImagepushBundle\Controller;
 use Imagepush\ImagepushBundle\Consumer\MessageTask;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as Extra;
 
 class RobotController extends Controller
 {
 
     /**
-     * @Route("/rabbitmq", name="rabbit")
-     * @Template()
+     * @Extra\Route("/rabbitmq", name="rabbit")
+     * @Extra\Template()
      */
     public function rabbitPublishAction()
     {
@@ -64,8 +63,8 @@ class RobotController extends Controller
     }
 
     /**
-     * @Route("/robot/{action}", name="robot")
-     * @Template()
+     * @Extra\Route("/robot/{action}", name="robot")
+     * @Extra\Template()
      */
     public function indexAction($action)
     {
@@ -135,8 +134,6 @@ class RobotController extends Controller
                 //$fs->write('s3.txt', 'some content');
 
                 $content = $fs->has('s3.txt');
-                \D::dump($content);
-                \D::dump($fs);
                 $fileContent = file_get_contents("http://dev-anton.imagepush.to/test_images/1.jpg");
                 $fileContentType = "image/jpeg";
                 //$content = $this->get('imagepush.processor.image')->testMakeThumbs($fileContent, $fileContentType);
