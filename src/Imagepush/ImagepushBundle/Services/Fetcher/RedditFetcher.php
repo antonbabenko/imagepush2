@@ -56,7 +56,7 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
     /**
      * Check and save
      *
-     * @return boolean
+     * @return false|null
      *
      * @throws \Exception
      */
@@ -107,7 +107,7 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
     }
 
     /**
-     * @return type
+     * @return string[]
      */
     public function run()
     {

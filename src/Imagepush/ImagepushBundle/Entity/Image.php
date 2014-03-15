@@ -539,9 +539,9 @@ class Image
      *
      * @param type $filter       Filter name ("in", "out")
      * @param type $size         Filter size (eg, "120x150")
-     * @param type $actualWidth  Actual width
-     * @param type $actualHeight Actual height
-     * @param type $filesize     File size
+     * @param integer $actualWidth  Actual width
+     * @param integer $actualHeight Actual height
+     * @param integer $filesize     File size
      */
     public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0, $filesize = 0)
     {

@@ -171,7 +171,7 @@ class Tag
     /**
      * Add imagesRef
      *
-     * @param Imagepush\ImagepushBundle\Document\Image $imagesRef
+     * @param Image $imagesRef
      */
     public function addImagesRef(\Imagepush\ImagepushBundle\Document\Image $imagesRef)
     {
@@ -181,7 +181,7 @@ class Tag
     /**
      * Get imagesRef
      *
-     * @return Doctrine\Common\Collections\Collection $imagesRef
+     * @return ArrayCollection $imagesRef
      */
     public function getImagesRef()
     {

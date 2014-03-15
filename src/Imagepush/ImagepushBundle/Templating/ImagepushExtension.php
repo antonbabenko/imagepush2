@@ -15,7 +15,7 @@ class ImagepushExtension extends \Twig_Extension
     /**
      * Constructs by setting $container
      *
-     * @param Container $container
+     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
