@@ -15,7 +15,7 @@ abstract class AbstractEnum
     /**
      * @param string $key
      *
-     * @return mixed
+     * @return integer
      *
      * @throws \InvalidArgumentException
      */
@@ -55,7 +55,7 @@ abstract class AbstractEnum
     }
 
     /**
-     * @param string|int $key
+     * @param string $key
      *
      * @return bool
      */

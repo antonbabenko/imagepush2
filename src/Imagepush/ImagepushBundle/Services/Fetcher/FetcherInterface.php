@@ -8,9 +8,18 @@ namespace Imagepush\ImagepushBundle\Services\Fetcher;
 interface FetcherInterface
 {
 
+    /**
+     * @return string[]
+     */
     public function run();
 
+    /**
+     * @return false|null
+     */
     public function checkAndSaveData();
 
+    /**
+     * @return boolean
+     */
     public function isWorthToSave($item);
 }

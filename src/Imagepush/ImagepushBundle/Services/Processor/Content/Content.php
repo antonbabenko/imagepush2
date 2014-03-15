@@ -93,6 +93,9 @@ class Content
         return (!empty($this->data["Content-type"]) && (preg_match('/(x|ht)ml/i', $this->data["Content-type"])));
     }
 
+    /**
+     * @param string $link
+     */
     public function get($link)
     {
         $this->link = $link;

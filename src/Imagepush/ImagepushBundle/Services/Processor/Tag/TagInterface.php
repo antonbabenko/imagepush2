@@ -10,7 +10,7 @@ interface TagInterface
     /**
      * Find tags for the Image
      *
-     * @param Imagepush\ImagepushBundle\Document\Image $image
+     * @param Image $image
      *
      * @return array Array of tags with weight
      */

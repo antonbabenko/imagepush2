@@ -39,6 +39,11 @@ class LoadImageData extends AbstractFixture implements DependentFixtureInterface
         $this->recountUsedTags();
     }
 
+    /**
+     * @param integer $id
+     * @param boolean $available
+     * @param string[] $tags
+     */
     protected function loadImage($id, $available, $tags)
     {
 

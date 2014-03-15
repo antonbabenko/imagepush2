@@ -38,6 +38,7 @@ class AbstractFetcher
      * AbstractFetcher
      *
      * @param ContainerInterface $container
+     * @param string $fetcherType
      */
     public function __construct($container, $fetcherType = null)
     {
@@ -57,7 +58,9 @@ class AbstractFetcher
     /**
      * Get parameter
      *
-     * @return $name
+     * @param string $name
+     * @param integer $default
+     * @return integer
      */
     public function getParameter($name, $default = null)
     {

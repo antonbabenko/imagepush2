@@ -2,13 +2,11 @@
 
 namespace Imagepush\ImagepushBundle\Imagine;
 
-use Symfony\Component\HttpFoundation\Response,
-    Symfony\Component\HttpFoundation\Request,
-    Symfony\Component\HttpFoundation\RedirectResponse,
-    Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver,
-    Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface,
-    Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver;
+use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
 use Gaufrette\Filesystem;
 
 class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareInterface
@@ -37,7 +35,6 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
      * Resolves filtered path for rendering in the browser
      *
      * @param Request $request
-     * @param string  $path
      * @param string  $filter
      *
      * @return string target path

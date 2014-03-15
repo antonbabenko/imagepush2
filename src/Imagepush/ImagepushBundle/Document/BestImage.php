@@ -68,7 +68,7 @@ class BestImage
     /**
      * Set timestamp
      *
-     * @param timestamp $timestamp
+     * @param integer $timestamp
      *
      * @return BestImage
      */

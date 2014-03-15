@@ -47,6 +47,9 @@ class WebServiceConsumer implements ConsumerInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @param string $message
+     */
     public function log($level, $message)
     {
         $message = sprintf('%s: %s', $this->service->key, $message);

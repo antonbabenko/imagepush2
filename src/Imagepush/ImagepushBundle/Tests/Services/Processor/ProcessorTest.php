@@ -3,7 +3,6 @@
 namespace Imagepush\ImagepushBundle\Tests\Services\Processor;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Imagepush\ImagepushBundle\Document\Image;
 
 class ProcessorTest extends WebTestCase
 {

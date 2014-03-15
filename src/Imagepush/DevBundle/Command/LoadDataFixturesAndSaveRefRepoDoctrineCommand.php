@@ -5,11 +5,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
-
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Bundle\DoctrineBundle\Command\DoctrineCommand;
-
 use Doctrine\Common\Tester\DataFixture\ReferenceRepositorySerializer;
 use Doctrine\Common\Tester\DataFixture\Purger\MysqlORMPurger;
 
@@ -74,7 +72,7 @@ class LoadDataFixturesAndSaveRefRepoDoctrineCommand extends DoctrineCommand
         $purger = new MysqlORMPurger($em);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
         $executor = new ORMExecutor($em, $purger);
-        $executor->setLogger(function($message) use ($output) {
+        $executor->setLogger(function ($message) use ($output) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
             });
         $executor->execute($fixtures, $input->getOption('append'));
