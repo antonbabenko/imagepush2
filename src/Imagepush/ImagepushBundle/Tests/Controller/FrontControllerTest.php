@@ -17,7 +17,7 @@ class FrontControllerTest extends WebTestCase
 
         $this->assertCount(1, $crawler->filter('figure.bigImg'));
         $this->assertCount(1, $crawler->filter('a#main_image_link'));
-        $this->assertEquals('http://cdn.imagepush.to/in/463x1548/i/file5.jpg', $crawler->filter('img#main_image_img')->attr('src'));
+        $this->assertContains('imagepush.to/in/463x1548/i/file5.jpg', $crawler->filter('img#main_image_img')->attr('src'));
 
         $this->assertEquals('Article title 5', $crawler->filter('h1#main_image_title')->text(), 'Current latest image');
         $this->assertCount(7, $crawler->filter('.thumbnails ul li'), '3 images (latest hits) + 4 images (latest in tag1)');

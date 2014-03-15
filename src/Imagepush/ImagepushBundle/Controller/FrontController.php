@@ -75,7 +75,6 @@ class FrontController extends Controller
         }
 
         $images = $this->get('repository.image')->findImages($type, 30, $params);
-        var_dump($images[0]->getTagsTextAsArray());
 
         return [
             "type" => $type,
@@ -102,8 +101,6 @@ class FrontController extends Controller
         $nextImage = $this->get('repository.image')->findOneImageRelatedToObject('next', $image);
         $prevImage = $this->get('repository.image')->findOneImageRelatedToObject('prev', $image);
 
-//        var_dump($image->getTagsTextAsArray());
-//        var_dump($nextImage->getTagsTextAsArray());
         return [
             'image' => $image,
             'nextImage' => $nextImage,

@@ -103,7 +103,7 @@ class Image
     /**
      * @var array
      *
-     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="images")
+     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="images", fetch="EAGER")
      */
     private $tags;
 

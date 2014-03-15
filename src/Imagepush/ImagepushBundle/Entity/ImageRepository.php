@@ -57,27 +57,53 @@ class ImageRepository extends EntityRepository
 
         extract($params);
 
+        $imageIds = null;
+
+        // Get list of image IDs before fetching complete images if filtering by tags
+        if (isset($tag)) {
+            $imageIds = $this->_em->createQueryBuilder()
+                ->select('i.id')
+                ->from('ImagepushBundle:Image', 'i')
+                ->join('i.tags', 't')
+                ->andWhere('t.text in (:text)')
+                ->andWhere('i.available = :available')
+                ->setParameter('text', $tag)
+                ->setParameter('available', (int) ($type == 'current'))
+                ->getQuery()
+                ->setResultCacheLifetime(600)
+                ->getScalarResult()
+            ;
+
+            if (false == $imageIds = array_column($imageIds, 'id')) {
+                return [];
+            }
+        }
+
         $query = $this->createQueryBuilder('i')
             ->select('i, t')
             ->join('i.tags', 't')
-            ->where('i.available = :available')
             ->orderBy('i.createdAt', 'DESC')
             ->addOrderBy('i.id', 'DESC')
-            ->setParameter('available', $type == 'current')
         ;
 
-        // Tag or tags
-        if (isset($tag)) {
+        if ($imageIds) {
+            // Add filter by retrieved image IDs
             $query = $query
-                ->andWhere('t.text in (:text)')
-                ->setParameter('text', $tag)
+                ->andWhere('i.id in (:ids)')
+                ->setParameter('ids', $imageIds)
+            ;
+        } else {
+            // Add filter by availability
+            $query = $query
+                ->andWhere('i.available = :available')
+                ->setParameter('available', (int) ($type == 'current'))
             ;
         }
 
         $result = $query
             ->getQuery()
             ->setMaxResults($limit)
-//            ->setResultCacheLifetime(60)
+            ->setResultCacheLifetime(60)
             ->execute();
 
         return $result;

@@ -5,7 +5,6 @@ services:
         factory_service: doctrine.orm.entity_manager
         factory_method: getRepository
 
-    # Repositories
     repository.image:
         parent: repository.abstract
         class: Imagepush\ImagepushBundle\Entity\ImageRepository
