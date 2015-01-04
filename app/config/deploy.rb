@@ -46,23 +46,11 @@ logger.level = Logger::MAX_LEVEL
 # Remove old releases
 after "deploy", "deploy:cleanup"
 
-# I am using php 5.5 locally, but 5.3 on production, so it acts a bit differently.
-# This should be removed once php5.5 is installed on production.
-before "symfony:cache:warmup", "fix_after_deployment:composer_install"
-
 # Clear APC cache
 after "deploy", "symfony:apc_clear"
 
 #################################################################
 #################################################################
-#################################################################
-
-namespace :fix_after_deployment do
-  task :composer_install do
-    run "#{try_sudo} sh -c 'cd #{latest_release} && composer install'"
-  end
-end
-
 #################################################################
 
 namespace :symfony do

@@ -68,11 +68,11 @@
      */ ?>
     #}
 
-    {{ siteHelper.html('google_tag_manager') }}
-
   </head>
   <body>
-    <div id="body">
+  {{ siteHelper.html('google_tag_manager') }}
+
+  <div id="body">
       <header class="clearfix">
         <div class="logo"><a href="{{ path('index') }}" title="Imagepush"><img src="{{ asset('images/imagepush-logo.png') }}" alt="Imagepush" width="94" height="59" class="not_lazy" /></a></div>
         <div class="search_box">
