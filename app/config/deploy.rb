@@ -17,7 +17,7 @@ set :use_composer, true
 set :composer_bin, "/usr/local/bin/composer"
 set :copy_vendors, true
 
-set :composer_options,  "--verbose --prefer-source --no-interaction --no-scripts"
+set :composer_options, "--no-dev --prefer-dist --optimize-autoloader --no-progress"
 
 set :use_sudo,      false
 set :user, "ec2-user"
