@@ -4,7 +4,7 @@ namespace Imagepush\ImagepushBundle\Tests\Services\Fetcher;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class ContentFetcherTest extends WebTestCase
+class RedditFetcherTest extends WebTestCase
 {
 
     public function testGetRequest()

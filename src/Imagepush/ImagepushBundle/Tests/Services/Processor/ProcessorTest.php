@@ -27,13 +27,11 @@ class ProcessorTest extends WebTestCase
       $client = self::createClient();
       //$service = $client->getContainer()->get('imagepush.processor');
       //$result = $service->processSource();
-      //\D::debug($result);
 
       $dm = $client->getContainer()->get('doctrine.odm.mongodb.document_manager');
       $hash = "a8097ad76766456a21273292d4981238";
 
       $result = $dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $hash));
-      \D::debug($result);
       }
      */
 

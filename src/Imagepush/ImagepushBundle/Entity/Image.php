@@ -59,14 +59,14 @@ class Image
     /**
      * @var string
      *
-     * @ORM\Column(name="file", type="string", length=255)
+     * @ORM\Column(name="file", type="string", length=255, nullable=true)
      */
     private $file;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="mimeType", type="string", length=255)
+     * @ORM\Column(name="mimeType", type="string", length=255, nullable=true)
      */
     private $mimeType;
 
@@ -119,14 +119,14 @@ class Image
      *
      * @ORM\Column(name="available", type="boolean")
      */
-    private $available;
+    private $available = false;
 
     /**
      * @var boolean
      *
      * @ORM\Column(name="inProcess", type="boolean")
      */
-    private $inProcess;
+    private $inProcess = false;
 
     /**
      * @var array
@@ -537,8 +537,8 @@ class Image
      *
      * @todo Optimize image handling
      *
-     * @param type $filter       Filter name ("in", "out")
-     * @param type $size         Filter size (eg, "120x150")
+     * @param type    $filter       Filter name ("in", "out")
+     * @param type    $size         Filter size (eg, "120x150")
      * @param integer $actualWidth  Actual width
      * @param integer $actualHeight Actual height
      * @param integer $filesize     File size
@@ -591,8 +591,6 @@ class Image
     {
 
         $key = $filter . "/" . $width . "x" . $height;
-
-        //\D::dump($key);
 
         if (array_key_exists($key, $this->thumbs)) {
 

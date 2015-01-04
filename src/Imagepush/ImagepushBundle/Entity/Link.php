@@ -3,7 +3,6 @@
 namespace Imagepush\ImagepushBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-//use Imagepush\ImagepushBundle\Enum\LinkStatusEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @ORM\UniqueConstraint(name="link_unique_idx", columns={"link"})
  *      },
  *      indexes={
+ *          @ORM\Index(name="link_idx", columns={"link"}),
  *          @ORM\Index(name="status_idx", columns={"status"})
  *      }
  * )

@@ -1,7 +1,7 @@
 imagepush:
   settings:
     # Image
-    image.allowed_content_types: ["image/gif", "image/jpeg", "image/jpg", "image/png"]
+    #image.allowed_content_types: ["image/gif", "image/jpeg", "image/jpg", "image/png"]
     image.min_width: 450
     image.min_height: 180
     image.min_ratio: 0.3
@@ -34,14 +34,16 @@ imagepush:
     fetcher.reddit:
       min_delay: 5  # Minimum delay between API requests (minimum allowed is 2 sec)
       min_score: 50 # Minumum score (ups - downs = score)
-      urls: 
+      urls:
         - "http://www.reddit.com/.json"
         - "http://www.reddit.com/r/Images/.json"
         - "http://www.reddit.com/r/technology/.json"
 
+    fetcher.reddit.min_score: 50 # Minumum score (ups - downs = score)
+
     # Publisher
     min_tags_to_publish_image: 6
-    
+
     # Tags
     twitter.min_title_length: 15
     reddit.min_subreddit_score: 5

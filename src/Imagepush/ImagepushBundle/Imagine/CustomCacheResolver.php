@@ -59,10 +59,6 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
     public function store(Response $response, $targetPath, $filter)
     {
 
-        //\D::dump($response->headers->get('Content-Type'));
-        //$targetPath = $filter . "/". $targetPath;
-        //\D::dump($targetPath);
-
         $contentType = $response->headers->get('Content-Type', "image/jpeg");
 
         // max-age=31536000 -> 1 year
@@ -80,11 +76,6 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
             $opt['headers']['Cache-Control'] = "max-age=31536000, public";
 
             $amazonS3 = $this->container->get('imagepush.amazon.s3');
-
-            //\D::dump($amazonS3);
-            //\D::dump($bucket);
-            //\D::dump($targetPath);
-            //\D::dump(\AmazonS3::ACL_PUBLIC);
 
             $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
             $amazonS3->change_content_type($bucket, $targetPath, $contentType, $opt);

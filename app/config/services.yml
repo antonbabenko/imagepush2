@@ -5,22 +5,6 @@ services:
     # Robot services #
     ##################
 
-    # Access control
-    imagepush.access_control.service:
-        class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
-        arguments: [@snc_redis.default, %imagepush.services%]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
-    # Fetcher
-    imagepush.fetcher.reddit:
-        class: Imagepush\ImagepushBundle\Services\Fetcher\RedditFetcher
-        arguments: [@service_container]
-
-    imagepush.fetcher.content:
-        class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
-        arguments: [@service_container]
-
     # RabbitMQ consumers
     imagepush.consumer_message:
         class: Imagepush\ImagepushBundle\Consumer\Message
@@ -199,15 +183,18 @@ services:
         arguments: [@service_container]
         tags:
             - { name: twig.extension }
+
     twig.extension.sitemap:
         class: Imagepush\SitemapBundle\Twig\Extension\SitemapExtension
+        arguments: ["%site_url%"]
         tags:
             - { name: twig.extension }
-        arguments: ["%site_url%"]
+
     twig.extension.debug:
         class: Twig_Extensions_Extension_Debug
         tags:
             - { name: twig.extension }
+
     twig.extension.text:
         class: Twig_Extensions_Extension_Text
         tags:

@@ -2,6 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Services\AccessControl;
 
+use Monolog\Logger;
 use Snc\RedisBundle\Client\Phpredis\Client;
 
 /**
@@ -12,7 +13,6 @@ class ServiceAccess
     /**
      * Server status messages
      */
-
     const STATUS_OK = "OK";
     const STATUS_FAIL = "FAIL";
 
@@ -31,6 +31,11 @@ class ServiceAccess
     public $settings;
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * @param Client $redis
      * @param array  $settings
      */
@@ -41,9 +46,9 @@ class ServiceAccess
     }
 
     /**
-     * @param Monolog\Logger $logger
+     * @param Logger $logger
      */
-    public function setLogger($logger = null)
+    public function setLogger(Logger $logger = null)
     {
         $this->logger = $logger;
     }

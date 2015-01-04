@@ -103,7 +103,7 @@ class ImageRepository extends EntityRepository
         $result = $query
             ->getQuery()
             ->setMaxResults($limit)
-            ->setResultCacheLifetime(60)
+            ->setResultCacheLifetime(600)
             ->execute();
 
         return $result;
@@ -172,6 +172,27 @@ class ImageRepository extends EntityRepository
             ->setMaxResults(1)
             ->setResultCacheLifetime(600)
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Get oldest unprocessed image and change status for it to "in process"
+     *
+     * @return Image|false
+     */
+    public function findUnprocessedSource()
+    {
+        $image = $this->createQueryBuilder('i')
+            ->andWhere('i.inProcess = :inProcess')
+            ->andWhere('i.available = :available')
+            ->orderBy('i.createdAt', 'ASC')
+            ->setParameter('inProcess', false)
+            ->setParameter('available', false)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        return $image;
     }
 
 }

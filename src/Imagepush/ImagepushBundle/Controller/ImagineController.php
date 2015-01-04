@@ -85,8 +85,6 @@ class ImagineController
      */
     public function filterAction(Request $request, $path, $filter)
     {
-        //\D::debug($path);
-
         $width = $height = 0;
         $maxWidth = $maxHeight = 8000;
 
@@ -140,13 +138,11 @@ class ImagineController
 
         $config['filters']['thumbnail']['size'] = array($width, $height);
 
-        //\D::dump($config);
         $filterConfig->set($filter, $config);
 
         $response = $this->filterManager->get($request, $filter, $image, $path);
 
         if ($targetPath) {
-            //$this->logger->err(sprintf("[!!!!!] Target path %s Imageid: %d", $targetPath, $imageId));
             // Store resized image and get response and filesize
             $stored = $this->cacheManager->store($response, $targetPath, $filter);
             $response = $stored["response"];
@@ -173,7 +169,6 @@ class ImagineController
                         $this->logger->err("Image id: " . $imageId . "; Error on image thumb update: " . $e->getMessage());
                     }
                 }
-                //\D::dump($image);
             }
         }
 

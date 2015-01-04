@@ -53,8 +53,6 @@ class CustomDataLoader implements LoaderInterface
 
         $info = pathinfo($path);
 
-        //\D::dump($path);
-
         $name = $info['dirname'] . '/' . $info['filename'];
         $targetFormat = empty($this->formats) || in_array($info['extension'], $this->formats) ? $info['extension'] : null;
 

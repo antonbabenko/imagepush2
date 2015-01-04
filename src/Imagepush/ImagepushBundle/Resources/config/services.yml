@@ -20,7 +20,44 @@ services:
         class: Imagepush\ImagepushBundle\Entity\LinkRepository
         arguments: [ Imagepush\ImagepushBundle\Entity\Link ]
 
+    repository.processed_hash:
+        parent: repository.abstract
+        class: Imagepush\ImagepushBundle\Entity\ProcessedHashRepository
+        arguments: [ Imagepush\ImagepushBundle\Entity\ProcessedHash ]
+
     repository.latest_tag:
         parent: repository.abstract
         class: Imagepush\ImagepushBundle\Entity\LatestTagRepository
         arguments: [ Imagepush\ImagepushBundle\Entity\LatestTag ]
+
+
+    # Access control
+    imagepush.access_control.service:
+        class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
+        arguments: [@snc_redis.default, %imagepush.services%]
+        calls:
+            - [ setLogger, [@imagepush.rabbitmq_logger]]
+
+    # Fetcher
+    imagepush.fetcher.reddit:
+        class: Imagepush\ImagepushBundle\Services\Fetcher\RedditFetcher
+        arguments: [@service_container]
+        calls:
+            - [ setDataTransformer, [ @data_transformer.reddit ]]
+
+    imagepush.fetcher.client:
+        class: Imagepush\ImagepushBundle\Services\Fetcher\Client
+        arguments: [@service_container]
+
+    # Fetcher services
+    data_transformer.reddit:
+        class: Imagepush\ImagepushBundle\DataTransformer\RedditTransformer
+        calls:
+            - [setDeterminer, [ @determiner.reddit] ]
+
+    determiner.reddit:
+        class: Imagepush\ImagepushBundle\Determiner\RedditDeterminer
+        arguments: [ %imagepush.fetcher.reddit.min_score% ]
+        calls:
+            - [setContainer, [ @service_container ] ]
+            - [setLogger, [ @imagepush.fetcher_logger ] ]

@@ -6,9 +6,10 @@ Author and maintainer: [Anton Babenko](http://github.com/antonbabenko)
 
 TODO
 ----
-* Cleanup a bit more for public
+* [WIP] Cleanup a bit more for public
 * Update github issues with relevant tasks
 * Write how to install & how to contribute guides
+* Fetch from facebook in universal way (fetch => loop => convert to object => validate object => is worth to save? => save!)
 * Have fun :)
 
 License:

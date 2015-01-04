@@ -28,8 +28,6 @@ class BestImageController extends Controller
             throw new \Exception("Incorrect hash");
         }
 
-        //\D::dump($id);
-
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');
         } elseif ($image->getIsAvailable()) {
