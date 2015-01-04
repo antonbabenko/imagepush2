@@ -22,7 +22,7 @@ class Content
     public $container;
 
     /**
-     * @var imagepush.fetcher.content $fetcher
+     * @var imagepush.fetcher.client $fetcher
      */
     public $fetcher;
 
@@ -33,8 +33,10 @@ class Content
 
     public function __construct(ContainerInterface $container)
     {
+//        throw new \RuntimeException('Obsolete class. Remove it.');
+
         $this->container = $container;
-        $this->fetcher = $container->get('imagepush.fetcher.content');
+        $this->fetcher = $container->get('imagepush.fetcher.client');
         $this->fsImages = $container->get('knp_gaufrette.filesystem_map')->get('images');
         $this->htmlContent = $container->get('imagepush.processor.content.html')->setContent($this);
     }
@@ -93,12 +95,13 @@ class Content
         return (!empty($this->data["Content-type"]) && (preg_match('/(x|ht)ml/i', $this->data["Content-type"])));
     }
 
+    /**
+     * @param string $link
+     */
     public function get($link)
     {
         $this->link = $link;
-        $response = $this->fetcher->getRequest($link);
-        //\D::debug($link);
-        //\D::debug($response);
+        $response = $this->fetcher->get($link);
 
         if (is_array($response)) {
             $this->data = $response;

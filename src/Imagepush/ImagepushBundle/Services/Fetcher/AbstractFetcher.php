@@ -2,6 +2,12 @@
 
 namespace Imagepush\ImagepushBundle\Services\Fetcher;
 
+use Doctrine\ORM\EntityManager;
+use Imagepush\ImagepushBundle\DataTransformer\TransformerInterface;
+use Psr\Log\LoggerInterface;
+use Snc\RedisBundle\Client\Phpredis\Client as RedisClient;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * AbstractFetcher
  */
@@ -9,43 +15,40 @@ class AbstractFetcher
 {
 
     /**
-     * Fetched data
-     *
-     * @param object $data
+     * @var string
      */
-    public $data;
-
+    public $fetcherType;
     /**
      * Counters for fetched, saved items, output array.
      */
     public $fetchedCounter = 0;
     public $savedCounter = 0;
-    public $output;
-
     /**
-     * @var Logger $logger
+     * @var LoggerInterface $logger
      */
     public $logger;
-    public $dm;
-    public $parameters;
-
     /**
-     * @var string $fetcherType
+     * @var EntityManager
      */
-    public $fetcherType;
+    public $em;
+    /**
+     * @var TransformerInterface
+     */
+    public $dataTransformer;
+    public $parameters;
 
     /**
      * AbstractFetcher
      *
      * @param ContainerInterface $container
+     *
+     * @throws \Exception
      */
-    public function __construct($container, $fetcherType = null)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->logger = $container->get('imagepush.fetcher_logger');
-        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
 
-        if (!$this->fetcherType = $fetcherType) {
+        if (null == $this->fetcherType) {
             throw new \Exception("AbstractFetcher should have fetcherType defined before construct");
         }
 
@@ -55,9 +58,31 @@ class AbstractFetcher
     }
 
     /**
+     * Wait some seconds before next call, if necessary.
+     */
+    public function delayBeforeNextApiCall()
+    {
+        $minDelay = $this->getParameter('min_delay', 60);
+
+        $secFromLastCall = time() - (int) $this->getCache()->get($this->fetcherType . '_last_api_call_time');
+
+        if ($secFromLastCall <= $minDelay) {
+            $sleep = $minDelay - $secFromLastCall + 1;
+
+            $this->getLogger()->info(sprintf('Should sleep %s seconds before next API call', $sleep));
+
+            sleep($sleep);
+        }
+
+        $this->getCache()->set($this->fetcherType . '_last_api_call_time', time());
+    }
+
+    /**
      * Get parameter
      *
-     * @return $name
+     * @param  string  $name
+     * @param  integer $default
+     * @return integer
      */
     public function getParameter($name, $default = null)
     {
@@ -69,41 +94,59 @@ class AbstractFetcher
     }
 
     /**
-     * Check if API call is allowed now (check delay)
+     * @return RedisClient
      */
-    public function isAllowedToPerformAPICall()
+    public function getCache()
     {
-        /* $lastAPICallTime = (int) apc_fetch($this->fetcherType . "_last_api_call_time");
-          if ($lastAPICallTime + $this->getParameter("min_delay", 60) >= time()) {
-          return false;
-          }
-
-          return true; */
+        return $this->container->get('snc_redis.default');
     }
 
     /**
-     * Wait some seconds before next call, if necessary.
-     *
+     * @return TransformerInterface
      */
-    public function delayBeforeNextApiCall()
+    public function getDataTransformer()
     {
-        // APC doesn't work in CLI mode, so do delay manually:
-        sleep($this->getParameter("min_delay", 60));
-
-        /* if (!$this->isAllowedToPerformAPICall()) {
-          sleep($this->getParameter("min_delay", 60));
-          }
-
-          apc_store($this->fetcherType . "_last_api_call_time", time());
-         */
+        return $this->dataTransformer;
     }
 
     /**
-     * @todo: check by domain name and content on that domain (filter porn, xxx, sex)
+     * @param TransformerInterface $dataTransformer
      */
-    public function isWorthToSave($item)
+    public function setDataTransformer(TransformerInterface $dataTransformer)
     {
-        return true;
+        $this->dataTransformer = $dataTransformer;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->container->get('imagepush.fetcher.client');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    public function getEntityManager()
+    {
+        return $this->container->get('doctrine.orm.entity_manager');
     }
 
 }

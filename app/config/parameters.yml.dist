@@ -1,9 +1,16 @@
 parameters:
     mongodb_connection: mongodb://localhost:27017
 
+    database_host:     localhost
+    database_port:     3307
+    database_name:     imagepush_dev
+    database_user:     root
+    database_password:
+
     redis_host: localhost
     redis_port: 6379
-    redis_db: 3
+    redis_default_db: 3
+    redis_doctrine_db: 4
 
     mailer_transport: gmail
     mailer_host: localhost

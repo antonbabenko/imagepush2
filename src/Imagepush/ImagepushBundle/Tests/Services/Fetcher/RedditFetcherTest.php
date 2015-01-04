@@ -1,0 +1,57 @@
+<?php
+
+namespace Imagepush\ImagepushBundle\Tests\Services\Fetcher;
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+class RedditFetcherTest extends WebTestCase
+{
+
+    public function testGetRequest()
+    {
+
+        $client = self::createClient();
+
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
+
+        $link = "http://imagepush.to/";
+        $result = $service->getRequest($link);
+
+        $this->assertArrayHasKey("Status", $result);
+        $this->assertArrayHasKey("Content", $result);
+        $this->assertArrayHasKey("Content-md5", $result);
+        $this->assertArrayHasKey("Content-type", $result);
+        $this->assertArrayHasKey("Content-length", $result);
+    }
+
+    public function testHeadRequest()
+    {
+
+        $client = self::createClient();
+
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
+
+        $link = "http://imagepush.to/";
+        $result = $service->headRequest($link);
+
+        $this->assertArrayHasKey("Status", $result);
+        $this->assertArrayHasKey("Content", $result);
+        $this->assertArrayHasKey("Content-md5", $result);
+        $this->assertArrayHasKey("Content-type", $result);
+        $this->assertArrayHasKey("Content-length", $result);
+    }
+
+    public function testGetRequestToNotExistingPage()
+    {
+
+        $client = self::createClient();
+
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
+
+        $link = "http://example.com/test_page_does_not_exist.html";
+        $result = $service->getRequest($link);
+
+        $this->assertEquals(404, $result);
+    }
+
+}

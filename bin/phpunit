@@ -1,5 +1,0 @@
-#!/bin/sh
-
-phpunit -c app --testdox
-
-# phpunit -c app --tap

@@ -158,8 +158,8 @@ class CustomStrings
     public static function decodeHtmlEntities($text)
     {
         $text = html_entity_decode($text, ENT_QUOTES, "UTF-8");
-        $text = preg_replace_callback('/&#(\d+);/m', function($matches) {return chr($matches[0]);}, $text); # decimal notation
-        $text = preg_replace_callback('/&#x([a-f0-9]+);/mi', function($matches) {return chr("0x".$matches[0]);}, $text); # hex notation
+        $text = preg_replace_callback('/&#(\d+);/m', function ($matches) {return chr($matches[0]);}, $text); # decimal notation
+        $text = preg_replace_callback('/&#x([a-f0-9]+);/mi', function ($matches) {return chr("0x".$matches[0]);}, $text); # hex notation
 
         return $text;
     }

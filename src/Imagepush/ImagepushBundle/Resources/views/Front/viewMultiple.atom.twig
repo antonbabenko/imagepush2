@@ -9,8 +9,8 @@
     {% for imageKey, image in images %}
     <entry>
         <id>{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</id>
-        <published>{{ image.timestamp|date('c') }}</published>
-        <updated>{{ image.timestamp|date('c') }}</updated>
+        <published>{{ image.createdAt|date('c') }}</published>
+        <updated>{{ image.createdAt|date('c') }}</updated>
         <link type="text/html" rel="alternate" href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
         <title>{{ image.title }}</title>
         <author>

@@ -1,3 +1,3 @@
 <loc>{{ path('viewImage', {'id': image.id, 'slug': image.slug})|sitemap_url_absolute }}</loc>
-<lastmod>{{ image.timestamp|sitemap_date }}</lastmod>
+<lastmod>{{ image.createdAt|sitemap_date }}</lastmod>
 <changefreq>daily</changefreq>

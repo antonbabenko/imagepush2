@@ -20,10 +20,6 @@ class DeliciousTagTest extends WebTestCase
 
         $tags = $service->find($image);
 
-        /**
-         * \D::debug($tags);
-         */
-
         $this->assertGreaterThanOrEqual(1, $tags, 'There are at least 1 tag');
         $this->assertArrayHasKey("twitter", $tags, 'Tag is "twitter"');
     }

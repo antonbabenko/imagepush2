@@ -1,0 +1,70 @@
+{
+    "type":"object",
+    "$schema": "http://json-schema.org/draft-03/schema",
+    "id": "http://jsonschema.net",
+    "required":true,
+    "properties":{
+        "data": {
+            "type":"object",
+            "id": "http://jsonschema.net/data",
+            "required":true,
+            "properties":{
+                "children": {
+                    "type":"array",
+                    "id": "http://jsonschema.net/data/children",
+                    "required":false,
+                    "items":
+                    {
+                        "type":"object",
+                        "id": "http://jsonschema.net/data/children/0",
+                        "required":false,
+                        "properties":{
+                            "data": {
+                                "type":"object",
+                                "id": "http://jsonschema.net/data/children/0/data",
+                                "required":true,
+                                "properties":{
+                                    "is_self": {
+                                        "type":"boolean",
+                                        "id": "http://jsonschema.net/data/children/0/data/is_self",
+                                        "required":true
+                                    },
+                                    "name": {
+                                        "type":"string",
+                                        "id": "http://jsonschema.net/data/children/0/data/name",
+                                        "required":true
+                                    },
+                                    "over_18": {
+                                        "type":"boolean",
+                                        "id": "http://jsonschema.net/data/children/0/data/over_18",
+                                        "required":true
+                                    },
+                                    "score": {
+                                        "type":"number",
+                                        "id": "http://jsonschema.net/data/children/0/data/score",
+                                        "required":true
+                                    },
+                                    "subreddit": {
+                                        "type":"string",
+                                        "id": "http://jsonschema.net/data/children/0/data/subreddit",
+                                        "required":true
+                                    },
+                                    "title": {
+                                        "type":"string",
+                                        "id": "http://jsonschema.net/data/children/0/data/title",
+                                        "required":true
+                                    },
+                                    "url": {
+                                        "type":"string",
+                                        "id": "http://jsonschema.net/data/children/0/data/url",
+                                        "required":true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

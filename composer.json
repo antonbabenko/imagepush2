@@ -2,48 +2,57 @@
     "name": "imagepush/imagepush.to",
     "description": "imagepush.to",
     "authors": [
-    {
-        "name": "Anton Babenko",
-        "email": "anton@antonbabenko.com"
-    }
+        {
+            "name": "Anton Babenko",
+            "email": "anton@antonbabenko.com"
+        },
+        {
+            "name": "Community contributions (anybody here? :))",
+            "homepage": "https://github.com/antonbabenko/imagepush2/contributors"
+        }
     ],
     
     "require": {
-        "php":                           ">=5.3.3",
+        "php":                           ">=5.4",
 
-        "symfony/symfony":               "2.3.*",
+        "symfony/symfony":               "2.3.*@stable",
         "symfony/assetic-bundle":        "2.1.*",
-        "symfony/monolog-bundle":        "2.2.*",
-        "symfony/swiftmailer-bundle":    "2.2.*",
+        "symfony/monolog-bundle":        "2.3.*",
+        "symfony/swiftmailer-bundle":    "2.3.*",
         "doctrine/orm":                  ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle":      "1.2.*",
         "twig/extensions":               "1.0.*",
-        "sensio/distribution-bundle":    "2.2.*",
-        "sensio/framework-extra-bundle": "2.2.*",
-        "sensio/generator-bundle":       "2.2.*",
-        "jms/security-extra-bundle":     "1.4.*",
-        "jms/di-extra-bundle":           "1.3.*",
-        "jms/metadata":                  "1.1.1",
+        "sensio/distribution-bundle":    "2.3.*",
+        "sensio/framework-extra-bundle": "2.3.*",
+        "sensio/generator-bundle":       "2.3.*",
+        "jms/security-extra-bundle":     "1.5.*",
+        "jms/di-extra-bundle":           "1.4.*",
+        "jms/metadata":                  "1.3.*",
+        "symfony/icu":                   "1.1.*",
         "doctrine/mongodb-odm-bundle":   "3.0.x-dev",
         "stof/doctrine-extensions-bundle": "dev-master",
-        "symfony/icu": "1.1.*",
+        "doctrine/doctrine-fixtures-bundle": "dev-master",
+        "doctrine/doctrine-migrations-bundle": "dev-master",
 
         "incenteev/composer-parameter-handler": "~2.0",
         "oldsound/rabbitmq-bundle":      "1.0.0",
-        "snc/redis-bundle":              "1.1.4",
-        "predis/predis":                 "0.8.3",
+        "snc/redis-bundle":              "1.1.*",
         "liip/imagine-bundle":           "dev-master",
         "amazonwebservices/aws-sdk-for-php": "1.5.10",
         "knplabs/knp-gaufrette-bundle":  "0.1.4",
         "guzzle/guzzle":                 "dev-master",
-        "ornicar/apc-bundle": "*"
+        "ornicar/apc-bundle":            "*",
+        "justinrainbow/json-schema":      "~1.3",
+        "guzzlehttp/guzzle": "~4"
+    },
 
-    },
     "require-dev": {
-        "phpunit/phpunit": "~3.7@stable",
-        "fabpot/php-cs-fixer": "0.3.*@dev"
+        "phpunit/phpunit":               "~3.7@stable",
+        "fabpot/php-cs-fixer":           "0.3.*@dev",
+        "fp/fumocker":                   "~1@stable",
+        "makasim/doctrine-tester":       "dev-master"
     },
-    
+
     "scripts": {
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -60,6 +69,13 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
         ]
     },
+
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/makasim/doctrine-tester.git"
+        }
+    ],
 
     "minimum-stability": "dev",
 

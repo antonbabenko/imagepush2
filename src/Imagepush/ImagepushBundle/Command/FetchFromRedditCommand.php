@@ -2,6 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Command;
 
+use Imagepush\ImagepushBundle\Logger\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,12 +24,14 @@ class FetchFromRedditCommand extends ContainerAwareCommand
     /**
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     *
+     * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->getContainer()->get('imagepush.fetcher.reddit')->run();
-
-        $output->writeLn($content, true);
+        $fetcher = $this->getContainer()->get('imagepush.fetcher.reddit');
+        $fetcher->setLogger(new OutputLogger($output));
+        $fetcher->run();
     }
 
 }

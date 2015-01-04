@@ -74,7 +74,7 @@
                 {% if image.tags|length %}
                 <p class="details">Tags:
                   {% for tag in image.tags %}
-                  <a href="{{ path('viewByTag', {'tag': tag|url_encode()}) }}">{{tag}}</a>&nbsp;
+                  <a href="{{ path('viewByTag', {'tag': tag.text|url_encode()}) }}">{{ tag.text }}</a>&nbsp;
                   {% endfor %}
                 {% endif %}
 
@@ -100,7 +100,7 @@
                   </div>
                   Fetched from
                   <a href="{{image.link}}" target="_blank" rel="external nofollow">{{image._originalHost|replace({'www.': ''}) }}</a>
-                  on {{ image.datetime|date('Y/m/d \\a\\t H:i') }}
+                  on {{ image.createdAt|date('Y/m/d \\a\\t H:i') }}
                 </span>
                 {% endif %}
               </footer>

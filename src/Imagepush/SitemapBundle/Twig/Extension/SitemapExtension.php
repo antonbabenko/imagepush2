@@ -27,10 +27,6 @@ class SitemapExtension extends \Twig_Extension
 
     public function formatDate($date)
     {
-        if ($date instanceof \MongoTimestamp) {
-            $date = new \DateTime("@" . $date->__toString());
-        }
-
         return $date->format('Y-m-d');
     }
 

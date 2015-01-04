@@ -26,6 +26,9 @@ class HtmlTest extends WebTestCase
         parent::tearDown();
     }
 
+    /**
+     * @param string $file
+     */
     private function getFixtureFile($file)
     {
         // @todo: replace with public uri or put html files into web folder

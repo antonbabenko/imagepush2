@@ -12,7 +12,7 @@ class ContentFetcherTest extends WebTestCase
 
         $client = self::createClient();
 
-        $service = $client->getContainer()->get('imagepush.fetcher.content');
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
 
         $link = "http://imagepush.to/";
         $result = $service->getRequest($link);
@@ -29,7 +29,7 @@ class ContentFetcherTest extends WebTestCase
 
         $client = self::createClient();
 
-        $service = $client->getContainer()->get('imagepush.fetcher.content');
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
 
         $link = "http://imagepush.to/";
         $result = $service->headRequest($link);
@@ -46,7 +46,7 @@ class ContentFetcherTest extends WebTestCase
 
         $client = self::createClient();
 
-        $service = $client->getContainer()->get('imagepush.fetcher.content');
+        $service = $client->getContainer()->get('imagepush.fetcher.client');
 
         $link = "http://example.com/test_page_does_not_exist.html";
         $result = $service->getRequest($link);

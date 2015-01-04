@@ -184,9 +184,7 @@ class Tag
             $image->addTagsRef($tag);
 
             $latestTag = new LatestTag();
-            $latestTag->setTimestamp(time());
             $latestTag->setText($goodTag);
-            //\D::dump($latestTag);
 
             $tag->addImagesRef($image);
             $tag->incUsedInUpcoming(1);
@@ -233,10 +231,8 @@ class Tag
         }
 
         $allTags = $this->calculateTagsScore($allTags);
-        //\D::debug($allTags);
 
         $bestTags = $this->filterTagsByScore($allTags, 20);
-        //\D::debug($bestTags);
 
         $bestTags = array_keys($bestTags);
 
@@ -256,9 +252,7 @@ class Tag
                 $image->addTagsRef($tag);
 
                 $latestTag = new LatestTag();
-                $latestTag->setTimestamp(time());
                 $latestTag->setText($bestTag);
-                //\D::dump($latestTag);
 
                 $tag->addImagesRef($image);
                 $tag->incUsedInUpcoming(1);

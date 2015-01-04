@@ -31,8 +31,6 @@ class Publisher
         // get images with most tags found
         $imagesWithFoundTags = $this->redis->zrevrangebyscore("found_tags_counter", "+inf", "-inf", array("withscores" => true, "limit" => array(0, 1000)));
 
-        //\D::debug($imagesWithFoundTags);
-
         $minTagsCount = $this->container->getParameter('imagepush.min_tags_to_publish_image', 5);
 
         foreach ($imagesWithFoundTags as $imageWithFoundTags => $foundTagsCounter) {
@@ -57,8 +55,6 @@ class Publisher
 
             // Filter found tags (bad, duplicates) and merge with already saved tags
             $count = $this->container->get('imagepush.processor.tag')->updateTagsFromFoundTags($image);
-
-            //\D::debug($count);
 
             if ($count > 0) {
                 $this->publishImage($image);
@@ -87,12 +83,6 @@ class Publisher
 
     protected function publishImage(Image $image)
     {
-
-        //\D::debug($image->getId());
-        //die();
-        //\D::dump($image->getMongoId());
-        // update timestamp to now
-        $image->setTimestamp(time());
 
         $image->setIsAvailable(true);
         $image->setIsInProcess(false);

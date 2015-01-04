@@ -329,7 +329,7 @@ class Image
      * Set tagsFound
      *
      * @param  collection $tagsFound
-     * @return \Image
+     * @return Image
      */
     public function setTagsFound($tagsFound)
     {
@@ -351,7 +351,7 @@ class Image
     /**
      * Add tagsRef
      *
-     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     * @param Tag $tagsRef
      */
     public function addTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
     {
@@ -361,7 +361,7 @@ class Image
     /**
      * Get tagsRef
      *
-     * @return Doctrine\Common\Collections\Collection $tagsRef
+     * @return ArrayCollection $tagsRef
      */
     public function getTagsRef()
     {
@@ -371,7 +371,7 @@ class Image
     /**
     * Remove tagsRef
     *
-    * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+    * @param Tag $tagsRef
     */
     public function removeTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
     {
@@ -494,9 +494,9 @@ class Image
      *
      * @param type $filter       Filter name ("in", "out")
      * @param type $size         Filter size (eg, "120x150")
-     * @param type $actualWidth  Actual width
-     * @param type $actualHeight Actual height
-     * @param type $filesize     File size
+     * @param integer $actualWidth  Actual width
+     * @param integer $actualHeight Actual height
+     * @param integer $filesize     File size
      */
     public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0, $filesize = 0)
     {

@@ -28,6 +28,8 @@ class AppKernel extends Kernel
             new Liip\ImagineBundle\LiipImagineBundle(),
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+            new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
+            new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new Ornicar\ApcBundle\OrnicarApcBundle(),
@@ -35,22 +37,58 @@ class AppKernel extends Kernel
             // Project bundles
             new Imagepush\ImagepushBundle\ImagepushBundle(),
             new Imagepush\SitemapBundle\SitemapBundle(),
+            new Imagepush\DataMigrationBundle\DataMigrationBundle(),
             );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
-
-            include_once __DIR__ . "/../src/CustomDebug.php";
+            $bundles[] = new Imagepush\DevBundle\ImagepushDevBundle();
         }
 
         return $bundles;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__ . '/config/config_' . $this->getEnvironment() . '.yml');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function initializeContainer()
+    {
+        static $first = true;
+
+        if ('test' !== $this->getEnvironment()) {
+            parent::initializeContainer();
+
+            return;
+        }
+
+        $debug = $this->debug;
+
+        if (!$first) {
+            // disable debug mode on all but the first initialization
+            $this->debug = false;
+        }
+
+        // will not work with --process-isolation
+        $first = false;
+
+        try {
+            parent::initializeContainer();
+        } catch (\Exception $e) {
+            $this->debug = $debug;
+            throw $e;
+        }
+
+        $this->debug = $debug;
     }
 
 }

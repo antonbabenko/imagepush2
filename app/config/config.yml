@@ -5,6 +5,9 @@ imports:
     - { resource: rabbitmq.yml }
     - { resource: services.yml }
 
+parameters:
+    doctrine.dbal.connection.wrapper_class: ~
+
 framework:
     esi:             { enabled: true }
     fragments:       { path: /_fragment }
@@ -72,6 +75,39 @@ doctrine_mongodb:
             mappings:
                 StofDoctrineExtensionsBundle: false
 
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver:   pdo_mysql
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
+                wrapper_class: %doctrine.dbal.connection.wrapper_class%
+                mapping_types:
+                    enum: string
+    orm:
+        auto_generate_proxy_classes: %kernel.debug%
+        default_entity_manager: default
+        entity_managers:
+            default:
+#                metadata_cache_driver: array
+#                query_cache_driver: array
+#                result_cache_driver: array
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                connection: default
+                auto_mapping: false
+                mappings:
+                    ImagepushBundle: ~
+                    DataMigrationBundle: ~
+                    StofDoctrineExtensionsBundle: false
+
 # Swiftmailer Configuration
 swiftmailer:
     transport: %mailer_transport%
@@ -81,6 +117,12 @@ swiftmailer:
 
 stof_doctrine_extensions:
     default_locale: en_US
+    translation_fallback: true
+    orm:
+        default:
+          sluggable: true
+          softdeleteable: true
+          timestampable: true
     mongodb:
         default:
           timestampable: true
@@ -124,10 +166,9 @@ knp_gaufrette:
 snc_redis:
     clients:
         default:
-            #type: predis
             type: phpredis
             alias: default
-            dsn: redis://%redis_host%:%redis_port%/%redis_db%
+            dsn: redis://%redis_host%:%redis_port%/%redis_default_db%
             logging: %kernel.debug%
             options:
                 profile: 2.6
@@ -136,6 +177,28 @@ snc_redis:
                 read_write_timeout: 30
                 iterable_multibulk: false
                 throw_errors: true
+        doctrine:
+            type: phpredis
+            alias: doctrine
+            dsn: redis://%redis_host%:%redis_port%/%redis_doctrine_db%
+            logging: %kernel.debug%
+            options:
+                profile: 2.6
+                connection_timeout: 10
+                connection_persistent: true
+                read_write_timeout: 30
+                iterable_multibulk: false
+                throw_errors: true
+    doctrine:
+#        metadata_cache:
+#            client: doctrine
+#            entity_manager: default
+        result_cache:
+            client: doctrine
+            entity_manager: default
+#        query_cache:
+#            client: doctrine
+#            entity_manager: default
 
 ornicar_apc:
     host: %apc_clear_host%

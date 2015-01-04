@@ -43,7 +43,6 @@ class Html
     public function getDom()
     {
         if (!$this->dom) {
-            //\D::debug($this->content->getContent());
             $content = $this->content->getContent();
 
             libxml_use_internal_errors(true); // to allow html5 tags
@@ -118,10 +117,6 @@ class Html
 
             $url = $this->generateFullUrl($src, $this->content->getLink());
 
-            //\D::debug($url);
-            //\D::dump($w);
-            //\D::dump($h);
-            //\D::dump($r);
             // Check image ratio, min width, min height
             if ($r &&
                 $r >= $this->container->getParameter('imagepush.image.min_ratio') &&

@@ -16,7 +16,7 @@
 
         <a href="{{ url('markBestImage', {'id': image.id, 'hash': hash}) }}" title="{{image.title}}">Mark as best image</a><br><br>
 
-        Date: {{image.datetime|date('Y/m/d \\a\\t H:i')}}<br><br>
+        Date: {{image.createdAt|date('Y/m/d \\a\\t H:i')}}<br><br>
 
         <a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" title="{{image.title}}">
             <img src="{{ macros.thumb_url(image, "in", 625, 2090) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 625, 2090, "w") }}" height="{{ image.thumbProperty("in", 625, 2090, "h") }}" />

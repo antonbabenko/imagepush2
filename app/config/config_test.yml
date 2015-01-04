@@ -1,5 +1,9 @@
 imports:
     - { resource: config_dev.yml }
+    - { resource: parameters_test.yml }
+
+#parameters:
+#    doctrine.dbal.connection.wrapper_class: "Imagepush\\DevBundle\\Doctrine\\DBAL\\PersistedConnection"
 
 framework:
     test: ~

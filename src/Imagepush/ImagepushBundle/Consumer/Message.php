@@ -47,7 +47,7 @@ class Message
      *
      * @param \PhpAmqpLib\Message\AMQPMessage $msg
      *
-     * @return array
+     * @return Message
      */
     public function setAMQPMessage(AMQPMessage $msg)
     {

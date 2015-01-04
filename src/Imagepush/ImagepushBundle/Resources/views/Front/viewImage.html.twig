@@ -18,7 +18,7 @@
 
 {% block meta_keywords %}
 {% spaceless %}
-{{ image.tags|default([])|join(',') }}
+{{ image.tags.text|default([])|join(',') }}
 {% endspaceless %}
 {% endblock %}
 
@@ -49,8 +49,8 @@
           <li><h1>{{image.title}}</h1></li>
         </ul>
         <div class="headerMeta">
-          <time datetime="{{image.datetime|date(constant('DATE_ATOM'))}}">
-            <strong>Published:</strong> {{image.datetime|date('Y/m/d \\a\\t H:i')}}
+          <time datetime="{{image.createdAt|date(constant('DATE_ATOM'))}}">
+            <strong>Published:</strong> {{image.createdAt|date('Y/m/d \\a\\t H:i')}}
           </time>
           <nav>
             {% if prevImage is not empty %}
@@ -94,6 +94,6 @@
   </div>
 </section>
 
-{{ render (controller('ImagepushBundle:Front:_thumbBox', {'initialTags': image.tags, 'skipImageId': image.id})) }}
+{{ render (controller('ImagepushBundle:Front:_thumbBox', {'image': image})) }}
 
 {% endblock %}

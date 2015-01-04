@@ -1,4 +1,4 @@
-server 'imagepush.to', :app, :web, :primary => true
+server 'anton-server', :app, :web, :primary => true
 
 set :branch, "master"
 

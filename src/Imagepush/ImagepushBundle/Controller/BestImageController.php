@@ -6,16 +6,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as Extra;
 use Imagepush\ImagepushBundle\Document\BestImage;
 
 class BestImageController extends Controller
 {
 
     /**
-     * @Route("/bestimage/{id}", requirements={"id"="\d+"}, name="markBestImage")
-     * @Template()
+     * @Extra\Route("/bestimage/{id}", requirements={"id"="\d+"}, name="markBestImage")
+     * @Extra\Template()
      */
     public function markBestImageAction(Request $request, $id)
     {
@@ -28,8 +27,6 @@ class BestImageController extends Controller
         } else {
             throw new \Exception("Incorrect hash");
         }
-
-        //\D::dump($id);
 
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');

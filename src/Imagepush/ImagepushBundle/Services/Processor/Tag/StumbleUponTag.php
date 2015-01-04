@@ -34,8 +34,6 @@ class StumbleUponTag extends Tag implements TagInterface
 
         $response = @json_decode($content->getContent(), true);
 
-        //\D::debug($response);
-
         if (empty($response["result"]["in_index"])) {
             return array();
         }
