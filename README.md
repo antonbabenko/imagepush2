@@ -1,4 +1,4 @@
-[Imagepush.to](http://imagepush.to/) web-site source code released 15.2.2014.
+[Imagepush.to](https://imagepush.to/) web-site source code released 15.2.2014.
 
 Author and maintainer: [Anton Babenko](http://github.com/antonbabenko)
 

@@ -1,24 +1,24 @@
 {% import "ImagepushBundle:Helpers:macros.html.twig" as macros %}
 <?xml version="1.0" encoding="UTF-8" ?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns="http://purl.org/rss/1.0/">
-    <channel rdf:about="http://imagepush.to">
+    <channel rdf:about="https://imagepush.to">
         <title>Imagepush.to - Best images hourly</title>
-        <link>http://imagepush.to/</link>
+        <link>https://imagepush.to/</link>
         <description>Best images hourly</description>
         <items>
             <rdf:Seq>
                 {% for imageKey, image in images %}
-                <rdf:li rdf:resource="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
+                <rdf:li rdf:resource="{{ url('viewImage', {'id': image.id, 'slug': image.slug})|replace({'http://': 'https://'}) }}" />
                 {% endfor %}
             </rdf:Seq>
         </items>
     </channel>
     {% for imageKey, image in images %}
-    <item rdf:about="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}">
+    <item rdf:about="{{ url('viewImage', {'id': image.id, 'slug': image.slug})|replace({'http://': 'https://'}) }}">
         <title>{{ image.title }}</title>
-        <link>{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}</link>
+        <link>{{ url('viewImage', {'id': image.id, 'slug': image.slug})|replace({'http://': 'https://'}) }}</link>
         <description>
-            &lt;a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}"&gt;
+            &lt;a href="{{ url('viewImage', {'id': image.id, 'slug': image.slug})|replace({'http://': 'https://'}) }}"&gt;
             &lt;img src="{{ macros.thumb_url(image, "in", 463, 1548) }}" alt="{{image.title}}" width="{{ image.thumbProperty("in", 463, 1548, "w") }}" height="{{ image.thumbProperty("in", 463, 1548, "h") }}" border="0"&gt;
             &lt;/a&gt;
         </description>
