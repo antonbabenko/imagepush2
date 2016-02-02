@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block og_url %}
-<meta property="og:url" content="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
-<link rel="canonical" href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}) }}" />
+<meta property="og:url" content="{{ url('viewImage', {'id': image.id, 'slug': image.slug}, true) }}" />
+<link rel="canonical" href="{{ url('viewImage', {'id': image.id, 'slug': image.slug}, true) }}" />
 {% endblock %}
 
 {% block og_image %}

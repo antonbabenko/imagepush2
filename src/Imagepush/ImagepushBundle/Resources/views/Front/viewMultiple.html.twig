@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block og_url %}
-<meta property="og:url" content="{{app.request.getUri}}" />
-<link rel="canonical" href="{{app.request.getUri}}" />
+<meta property="og:url" content="{{app.request.getUri|replace({'http://': 'https://'})}}" />
+<link rel="canonical" href="{{app.request.getUri|replace({'http://': 'https://'})}}" />
 {% endblock %}
 
 {% block content %}
