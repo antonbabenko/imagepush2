@@ -1,5 +1,11 @@
 services:
 
+#    a_service:
+#        class: Aws\Credentials\Credentials
+#        arguments:
+#            - a-different-fake-key
+#            - a-different-fake-secret
+
     ##################
     # Robot services #
     ##################

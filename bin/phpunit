@@ -1,5 +1,1 @@
-#!/bin/sh
-
-phpunit -c app --testdox
-
-# phpunit -c app --tap
+../vendor/phpunit/phpunit/composer/bin/phpunit

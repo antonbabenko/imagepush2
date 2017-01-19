@@ -31,6 +31,7 @@ class AppKernel extends Kernel
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new Ornicar\ApcBundle\OrnicarApcBundle(),
+            new Aws\Symfony\AwsBundle(),
 
             // Project bundles
             new Imagepush\ImagepushBundle\ImagepushBundle(),
