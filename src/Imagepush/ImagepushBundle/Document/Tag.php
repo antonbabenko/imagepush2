@@ -58,6 +58,13 @@ class Tag
         $this->imagesRef = new ArrayCollection();
     }
 
+    public function fromArray(array $data)
+    {
+        $this->setText(array_values($data['text'])[0]);
+        $this->setUsedInAvailable(array_values($data['usedInAvailable'])[0]);
+        $this->setUsedInUpcoming(array_values($data['usedInUpcoming'])[0]);
+    }
+
     /**
      * Get mongoId
      *

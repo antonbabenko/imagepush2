@@ -7,6 +7,21 @@ services:
 #            - a-different-fake-secret
 
     ##################
+    # DynamoDB repository
+    ##################
+    imagepush.repository.image:
+        class: Imagepush\ImagepushBundle\Repository\ImageRepository
+        arguments: [@aws.dynamodb]
+
+    imagepush.repository.tag:
+        class: Imagepush\ImagepushBundle\Repository\TagRepository
+        arguments: [@aws.dynamodb]
+
+    imagepush.repository.latest_tag:
+        class: Imagepush\ImagepushBundle\Repository\LatestTagRepository
+        arguments: [@aws.dynamodb]
+
+    ##################
     # Robot services #
     ##################
 

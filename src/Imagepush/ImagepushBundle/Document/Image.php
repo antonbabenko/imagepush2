@@ -3,7 +3,6 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
@@ -115,6 +114,62 @@ class Image
         $this->thumbs = array();
     }
 
+    public function fromArray(array $data)
+    {
+        $this->setId(intval(array_values($data['id'])[0]));
+        $this->setTitle(array_values($data['title'])[0]);
+        $this->setSlug(array_values($data['slug'])[0]);
+        $this->setTimestamp(array_values($data['timestamp'])[0]);
+        $this->setLink(array_values($data['link'])[0]);
+        $this->setFile(array_values($data['file'])[0]);
+        $this->setMimeType(array_values($data['mimeType'])[0]);
+        $this->setSourceType(array_values($data['sourceType'])[0]);
+        $this->setIsAvailable(array_values($data['isAvailable'])[0]);
+        $this->setIsInProcess(array_values($data['isInProcess'])[0]);
+
+        if (isset($data['tags'])) {
+            $this->setTags(
+                array_values($data['tags'])[0]
+            );
+        }
+
+        if (isset($data['sourceTags'])) {
+            $this->setSourceTags(
+                array_values($data['sourceTags'])[0]
+            );
+        }
+
+        if (isset($data['thumbs'])) {
+            $t = [];
+            foreach (array_values($data['thumbs'])[0] as $tk => $tv) {
+                $tvv = [];
+                foreach (array_values($tv)[0] as $tvk => $tvvalue) {
+                    $tvv += [$tvk => intval(array_values($tvvalue)[0])];
+                }
+                $t += [$tk => $tvv];
+            }
+
+            $this->setThumbs($t);
+        }
+
+//        \D::dump($data['thumbs']);
+//        \D::dump($this->getThumbs());
+
+        // @todo: remaining types - only for latest images
+//        if ($image->getTagsFound()) {
+//            $t = [];
+//            foreach ($image->getTagsFound() as $tk => $tv) {
+//                $t += [$tk => ['SS' => array_values(array_unique(array_map('strval', array_keys($tv))))]];
+//            }
+//
+//            $item['tagsFound'] = [
+//                'M' => $t
+//            ];
+//
+//        }
+
+    }
+
     /**
      * Get original host (to show in template)
      */
@@ -200,9 +255,12 @@ class Image
      */
     public function getDatetime()
     {
-        return new \DateTime("@" . $this->timestamp->__toString());
         // done... @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
-        //return $this->timestamp instanceof \MongoTimestamp ? new \DateTime("@" . $this->timestamp->__toString()) : new \DateTime;
+        if ($this->timestamp instanceof \MongoTimestamp) {
+            return new \DateTime("@" . $this->timestamp->__toString());
+        } else {
+            return new \DateTime("@" . $this->timestamp);
+        }
     }
 
     /**
@@ -369,10 +427,10 @@ class Image
     }
 
     /**
-    * Remove tagsRef
-    *
-    * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
-    */
+     * Remove tagsRef
+     *
+     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     */
     public function removeTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
     {
         $this->tagsRef->removeElement($tagsRef);
@@ -458,7 +516,7 @@ class Image
         $file = floor($this->getId() / 10000) . "/";
         $file .= floor($this->getId() / 1000) . "/";
         $file .= floor($this->getId() / 100) . "/";
-        $file .= ( $this->getId() % 100) . "." . $fileExt;
+        $file .= ($this->getId() % 100) . "." . $fileExt;
 
         $this->setFile($file);
 
@@ -468,7 +526,7 @@ class Image
     /**
      * Set thumbs
      *
-     * @param hash $thumbs
+     * @param array $thumbs
      *
      * @return Image
      */

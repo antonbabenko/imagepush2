@@ -64,7 +64,8 @@ doctrine_mongodb:
                 connect: true
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
     hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
-    default_database: imagepush_%kernel.environment%
+    default_database: imagepush_imported
+#    default_database: imagepush_%kernel.environment%
     document_managers:
         default:
             metadata_cache_driver: array # apc
@@ -141,9 +142,9 @@ snc_redis:
 aws:
     version: latest
     region: eu-west-1
-    credentials:
-        key: not-a-real-key
-        secret: "@@not-a-real-secret" # this will be escaped as '@not-a-real-secret'
+    credentials: # these should be separate keys during development
+        key: "%aws_dynamodb_key%"
+        secret: "%aws_dynamodb_secret_key%"
     DynamoDb:
         region: eu-west-1
     S3:

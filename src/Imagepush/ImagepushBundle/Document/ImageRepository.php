@@ -7,14 +7,6 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 class ImageRepository extends DocumentRepository
 {
 
-    public function findAllOrderedByName()
-    {
-        return $this->createQueryBuilder()
-                ->sort('name', 'ASC')
-                ->getQuery()
-                ->execute();
-    }
-
     /**
      * @return array()
      */

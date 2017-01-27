@@ -21,11 +21,7 @@ class FrontController extends Controller
      */
     public function indexAction()
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
-
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("current", 7);
+        $images = $this->get('imagepush.repository.image')->findCurrentImages(7);
 
         return array("images" => array_values($images));
     }
@@ -46,7 +42,10 @@ class FrontController extends Controller
      */
     public function viewUpcomingByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'upcoming'));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            array('tag' => urldecode($tag), 'type' => 'upcoming')
+        );
 
         return $response;
     }
@@ -56,7 +55,10 @@ class FrontController extends Controller
      */
     public function viewByTagAction($tag)
     {
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('tag' => urldecode($tag), 'type' => 'current'));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            array('tag' => urldecode($tag), 'type' => 'current')
+        );
 
         return $response;
     }
@@ -70,20 +72,17 @@ class FrontController extends Controller
      */
     public function viewMultipleAction($type, $tag = null)
     {
+        $cacheKey = 'view_multiple_' . md5($type.$tag);
+        $result = apc_fetch($cacheKey, $inCache);
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
-
-        $params = array();
+        if (false !== $inCache) {
+            return unserialize($result);
+        }
 
         $isOppositeTypeExists = false;
 
         if (!is_null($tag)) {
-            $params = array("tag" => $tag);
-
-            $tagObject = $dm->createQueryBuilder('ImagepushBundle:Tag')
-                ->field('text')->equals($tag)
-                ->getQuery()
-                ->getSingleResult();
+            $tagObject = $this->get('imagepush.repository.tag')->findOneByText($tag);
 
             if (!$tagObject) {
                 throw new NotFoundHttpException(sprintf('There are no %s images to show by tag: %s', $type, $tag));
@@ -95,16 +94,20 @@ class FrontController extends Controller
             $isOppositeTypeExists = (bool) $tagObject->{$oppositeTypeField}();
         }
 
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages($type, 30, $params);
+        $ids = $this->get('imagepush.repository.image')->findImagesIdByTag($tag, 30);
 
-        return array(
+        $images = $this->get('imagepush.repository.image')->findManyByIds($ids, $type == 'current');
+
+        $result = [
             "type" => $type,
             "tag" => $tag,
             "images" => $images,
             "isOppositeTypeExists" => $isOppositeTypeExists
-        );
+        ];
+
+        apc_store($cacheKey, serialize($result), 60);
+
+        return $result;
     }
 
     /**
@@ -116,32 +119,33 @@ class FrontController extends Controller
      */
     public function viewImageAction($id, $slug, $preview)
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $cacheKey = 'view_image_' . md5($id.$preview);
+        $result = apc_fetch($cacheKey, $inCache);
 
-        $params["id"] = (int) $id;
-
-        // Let me to preview images manualy
-        if (empty($preview)) {
-            $params["isAvailable"] = true;
+        if (false !== $inCache) {
+            return unserialize($result);
         }
 
-        $image = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findOneBy($params);
+        $repo = $this->get('imagepush.repository.image');
+
+        $image = $repo->findOneBy($id, empty($preview));
 
         if (!$image) {
             throw new NotFoundHttpException('Image doesn\'t exist');
         }
 
-        $nextImage = $dm
-            ->getRepository('ImagepushBundle:Image')
+        $nextImage = $repo
             ->getOneImageRelatedToTimestamp("next", $image->getTimestamp());
 
-        $prevImage = $dm
-            ->getRepository('ImagepushBundle:Image')
+        $prevImage = $repo
             ->getOneImageRelatedToTimestamp("prev", $image->getTimestamp());
 
-        return array("image" => $image, "nextImage" => $nextImage, "prevImage" => $prevImage);
+        $result = ["image" => $image, "nextImage" => $nextImage, "prevImage" => $prevImage];
+
+        apc_store($cacheKey, serialize($result), 3600);
+
+        return $result;
+
     }
 
     /**
@@ -156,7 +160,10 @@ class FrontController extends Controller
     public function latestImagesFeedAction($_format)
     {
 
-        $response = $this->forward('ImagepushBundle:Front:viewMultiple', array('type' => 'current', '_format' => $_format));
+        $response = $this->forward(
+            'ImagepushBundle:Front:viewMultiple',
+            array('type' => 'current', '_format' => $_format)
+        );
 
         if ($_format == "rss2" || $_format == "rss") {
             $response->headers->set('Content-Type', 'application/rss+xml');
@@ -176,11 +183,9 @@ class FrontController extends Controller
     public function voteOrFlagImageAction(Request $request, $type)
     {
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        $repo = $this->get('imagepush.repository.image');
 
-        $image = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findOneById((int) $request->get('id'));
+        $image = $repo->findOneBy((int) $request->get('id'), false);
 
         if ($image) {
 
@@ -200,7 +205,12 @@ class FrontController extends Controller
                 ->setSubject($subject)
                 ->setFrom(array('noreply@imagepush.to' => "Imagepush votes"))
                 ->setTo('anton@imagepush.to')
-                ->setBody($this->renderView('ImagepushBundle:Emails:voteOrFlagImage.html.twig', array('image' => $image, "type" => $type, "hash" => md5($image->getId()))))
+                ->setBody(
+                    $this->renderView(
+                        'ImagepushBundle:Emails:voteOrFlagImage.html.twig',
+                        array('image' => $image, "type" => $type, "hash" => md5($image->getId()))
+                    )
+                )
                 ->setContentType("text/html");
             $result = $this->get('mailer')->send($message);
         } else {
@@ -215,15 +225,10 @@ class FrontController extends Controller
      */
     public function _trendingNowAction($max = 20)
     {
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
-
-        $tags = $dm
-            ->getRepository('ImagepushBundle:LatestTag')
+        $tags = $this->get('imagepush.repository.latest_tag')
             ->getLatestTrends($max);
 
-        $parameters = array("tags" => $tags);
-
-        $response = $this->render('ImagepushBundle:Front:_trendingNow.html.twig', $parameters);
+        $response = $this->render('ImagepushBundle:Front:_trendingNow.html.twig', ["tags" => $tags]);
         $response->setSharedMaxAge(3600);
 
         return $response;
@@ -234,9 +239,7 @@ class FrontController extends Controller
      */
     public function _commentsAction($href)
     {
-        $parameters = array("href" => $href);
-
-        $response = $this->render('ImagepushBundle:Front:_comments.html.twig', $parameters);
+        $response = $this->render('ImagepushBundle:Front:_comments.html.twig', ["href" => $href]);
         $response->setSharedMaxAge(86400);
 
         return $response;
@@ -247,32 +250,34 @@ class FrontController extends Controller
      */
     public function _thumbBoxAction($initialTags = array(), $skipImageId = false)
     {
+        $cacheKey = 'thumb_box_' . md5(json_encode($initialTags) . json_encode($skipImageId));
+        $response = apc_fetch($cacheKey, $inCache);
 
-        $dm = $this->get('doctrine.odm.mongodb.document_manager');
+        if (false !== $inCache) {
+            return unserialize($response);
+        }
 
-        //\D::dump($initialTags);
+        $imageRepo = $this->get('imagepush.repository.image');
+        $latestTagRepo = $this->get('imagepush.repository.latest_tag');
+
         if (count($initialTags)) {
             $tags = $initialTags;
             $groupTags = false;
             $maxImages = 16;
         } else {
-            $tags = $dm
-                ->getRepository('ImagepushBundle:LatestTag')
-                ->getLatestTrends(100);
-            //\D::dump($tags);
+            $tags = $latestTagRepo
+                ->getLatestTrends(20);
 
             if (!count($tags)) {
-                return;
+                return new Response();
             }
-
-            $tags = array_keys($tags);
 
             $groupTags = true;
             $maxImages = 4;
         }
 
-        //$tagImages =
-        $allImages = $usedImages = array();
+        $allImages = $usedImages = [];
+        $images = [];
         $totalImages = 0;
 
         // skip main image
@@ -280,18 +285,37 @@ class FrontController extends Controller
             $usedImages[] = $skipImageId;
         }
 
-        //\D::dump($tags);
-        // Get all images by tags
-        $images = $dm
-            ->getRepository('ImagepushBundle:Image')
-            ->findImages("current", 10 * count($tags), array("tag" => $tags));
-        $images = array_values($images);
-
-        //\D::dump($images);
-
         if ($groupTags) {
-            // Group by tags
+
+            $ids = [];
+            $tagsIds = [];
+
+            // @cache-me-please - now APC is doing caching
             foreach ($tags as $tag) {
+                // Get some images by tags
+                $tmpIds = $imageRepo->findImagesIdByTag($tag, 10);
+
+                if ($tmpIds) {
+                    $ids = array_merge($ids, $tmpIds);
+                    $tagsIds[$tag] = $tmpIds;
+                }
+            }
+
+            $ids = array_unique($ids);
+
+            if (count($ids)) {
+                $tmpIds = array_chunk($ids, 100);
+
+                foreach ($tmpIds as $tmpId) {
+                    $tmpImages = $imageRepo->findManyByIds($tmpId, true, false);
+                    if ($tmpImages) {
+                        $images = $images + $tmpImages;
+                    }
+                }
+            }
+
+            // Group by tags
+            foreach ($tagsIds as $tag => $tmpIds) {
 
                 $tagImages = array();
 
@@ -301,17 +325,17 @@ class FrontController extends Controller
                 }
 
                 // Make sure that each image is shown just once, if image belongs to multiple tags
-                foreach ($images as $image) {
+                foreach ($tmpIds as $id) {
 
                     if (count($tagImages) >= $maxImages) {
                         break;
                     }
 
-                    if (!in_array($image->getId(), $usedImages)) {
-                        if (in_array($tag, $image->getTags())) {
-                            $tagImages[] = $image;
-                            $usedImages[] = $image->getId();
-                        }
+                    if (isset($images[$id]) && !in_array($id, $usedImages)) {
+                        $usedImages[] = $id;
+                        $image = $images[$id];
+
+                        $tagImages[] = $image;
                     }
                 }
 
@@ -326,42 +350,66 @@ class FrontController extends Controller
             // Do not group images, but order by timestamp
             $tagImages = $foundTags = array();
 
-            // Prepare images for "related images" box, where they all are in one group
-            foreach ($images as $image) {
+            $ids = [];
+            foreach ($tags as $tag) {
+                // Get all images by tags
+                $tmpIds = $imageRepo->findImagesIdByTag($tag, 30);
 
-                if (count($tagImages) >= $maxImages) {
-                    break;
+                if ($tmpIds) {
+                    $ids = array_merge($ids, $tmpIds);
+                }
+            }
+
+            $ids = array_unique($ids);
+
+            if (count($ids)) {
+
+                $tmpIds = array_chunk($ids, 100);
+
+                foreach ($tmpIds as $tmpId) {
+                    $tmpImages = $imageRepo->findManyByIds($tmpId, true, false);
+                    if ($tmpImages) {
+                        $images = $images + $tmpImages;
+                    }
                 }
 
-                if (!in_array($image->getId(), $usedImages)) {
-                    $tagImages[] = $image;
-                    $usedImages[] = $image->getId();
+                // Prepare images for "related images" box, where they all are in one group
+                foreach ($ids as $id) {
 
-                    $foundTags = array_merge($foundTags, (array) $image->getTags());
+                    if (count($tagImages) >= $maxImages) {
+                        break;
+                    }
+
+                    if (isset($images[$id]) && !in_array($id, $usedImages)) {
+                        $image = $images[$id];
+
+                        $tagImages[] = $image;
+
+                        $foundTags = array_merge($foundTags, (array) $image->getTags());
+                    }
                 }
             }
 
             // Reorder tags
             $foundTags = array_count_values($foundTags);
             arsort($foundTags);
-            $foundTags = array_slice(array_flip($foundTags), 0, 5);
+            $foundTags = array_keys(array_slice($foundTags, 0, 5));
 
             $allImages[] = array("usedTags" => $foundTags, "images" => $tagImages);
             $totalImages += count($tagImages);
-            //\D::dump($allImages);
         }
 
-        //\D::dump($allImages);
-        //\D::dump($initialTags);
-
-        $parameters = array(
+        $parameters = [
             "allImages" => $allImages,
             "initialTags" => $initialTags,
             "skipImageId" => $skipImageId,
-            "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0);
+            "bannerPlacement" => $totalImages > 0 ? mt_rand(0, $totalImages - 1) : 0
+        ];
 
         $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
         $response->setSharedMaxAge(86400);
+
+        apc_store($cacheKey, serialize($response), 1800);
 
         return $response;
     }
