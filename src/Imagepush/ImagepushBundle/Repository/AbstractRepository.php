@@ -147,7 +147,6 @@ class AbstractRepository
 
     /**
      * @param $request array   Associative array with 'request' for getItem command
-     * @param $tableName
      *
      * @return array|null
      */
@@ -163,6 +162,60 @@ class AbstractRepository
         }
 
         return $result;
+    }
+
+    /**
+     * @param $request array   Associative array with 'request' for putItem command
+     *
+     * @return bool False if there were any exceptions during putItem
+     */
+    public function putItem(array $request)
+    {
+
+        try {
+            $this->ddb->putItem($request);
+        } catch (DynamoDbException $e) {
+//            \D::debug($e->getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $request array   Associative array with 'request' for deleteItem command
+     *
+     * @return bool False if there were any exceptions during deleteItem
+     */
+    public function deleteItem(array $request)
+    {
+
+        try {
+            $this->ddb->deleteItem($request);
+        } catch (DynamoDbException $e) {
+//            \D::debug($e->getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $request array   Associative array with 'request' for putItem command
+     *
+     * @return bool False if there were any exceptions during putItem
+     */
+    public function updateItem(array $request)
+    {
+
+        try {
+            $this->ddb->updateItem($request);
+        } catch (DynamoDbException $e) {
+//            \D::debug($e->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
 }

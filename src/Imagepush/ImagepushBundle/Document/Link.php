@@ -97,4 +97,20 @@ class Link
         return $this->status;
     }
 
+    public function toItem()
+    {
+
+        $item = [
+            'link' => [
+                'S' => strval($this->getLink())
+            ],
+            'status' => [
+                'S' => strval($this->getStatus())
+            ],
+        ];
+
+        return $item;
+
+    }
+
 }

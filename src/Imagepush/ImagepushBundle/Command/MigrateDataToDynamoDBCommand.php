@@ -40,7 +40,7 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
         $this->ddb = $this->getContainer()->get('aws.dynamodb');
 
         // Tables
-//        $tables = ["images", "latest_tags", "links", "processed_hashes", "tags", "votes"];
+//        $tables = ["images", "latest_tags", "links", "processed_hashes", "tags"];
 //        $createdTables = $ddb->listTables()->get('TableNames');
 //        $missingTables = array_diff($tables, $createdTables);
 //        \D::debug($missingTables);
@@ -51,8 +51,8 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
 
         printf("%s - Started\n", date(DATE_ATOM));
 
-        $this->importImages();
-//
+//        $this->importImages();
+
 //        $this->importTags();
 
 //        $this->importLatestTags();
@@ -60,9 +60,132 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
 //        $this->importImagesTags();
 
 //        $this->importLinks();
+
 //        $this->importProcessedHashes();
 
         printf("%s - Finished\n", date(DATE_ATOM));
+    }
+
+    public function importProcessedHashes()
+    {
+        $tableName = 'processed_hashes';
+        $items = [];
+        $count = 0;
+        $imported = [];
+
+        $hashes = $this->dm->createQueryBuilder('ImagepushBundle:ProcessedHash')
+            ->sort('hash', 'ASC')
+            ->getQuery()->toArray();
+
+        if (!count($hashes)) {
+            echo "OMG! No hashes found :)";
+
+            return;
+        }
+
+        printf("%s - Results: %d\n", date(DATE_ATOM), count($hashes));
+
+        foreach ($hashes as $hash) {
+            if (in_array($hash->getHash(), $imported)) {
+                echo "DUPLICATE HASH=".$hash->getLink()."\n";
+                continue;
+            }
+            $imported[] = $hash->getHash();
+            if (count($imported) > 2) {
+                array_shift($imported);
+            }
+
+            if ("" == $hash->getHash()) {
+                echo "empty hash".$hash->getMongoId()."\n";
+                continue;
+            }
+
+            if ($count++ % 100 == 0) {
+                echo "NUM=" . $count . " => " . strval($hash->getHash()) . "\n";
+            }
+
+            $item = [
+                'hash' => [
+                    'S' => strval($hash->getHash())
+                ],
+            ];
+
+            $items[] = [
+                'PutRequest' => [
+                    'Item' => $item
+                ]
+            ];
+
+            if (count($items) % 25 == 0) {
+                $this->batchWriteItem($tableName, $items, $hash->getHash());
+                $items = [];
+            }
+        }
+
+        // final save
+        if (count($items)) {
+            $this->batchWriteItem($tableName, $items);
+        }
+    }
+
+    public function importLinks()
+    {
+        $tableName = 'links';
+        $items = [];
+        $count = 0;
+        $imported = [];
+
+        $links = $this->dm->createQueryBuilder('ImagepushBundle:Link')
+            ->sort('link', 'ASC')
+            ->getQuery()->toArray();
+
+        if (!count($links)) {
+            echo "OMG! No links found :)";
+
+            return;
+        }
+
+        printf("%s - Results: %d\n", date(DATE_ATOM), count($links));
+
+        foreach ($links as $link) {
+            if (in_array($link->getLink(), $imported)) {
+                echo "DUPLICATE LINK=".$link->getLink()."\n";
+                continue;
+            }
+            $imported[] = $link->getLink();
+            if (count($imported) > 2) {
+                array_shift($imported);
+            }
+
+            if ($count++ % 100 == 0) {
+                echo "NUM=" . $count . " => " . strval($link->getLink()) . "\n";
+            }
+
+            $item = [
+                'link' => [
+                    'S' => strval($link->getLink())
+                ],
+                'status' => [
+                    'S' => strval($link->getStatus())
+                ],
+            ];
+
+            $items[] = [
+                'PutRequest' => [
+                    'Item' => $item
+                ]
+            ];
+
+            if (count($items) % 25 == 0) {
+                $this->batchWriteItem($tableName, $items, $link->getLink());
+                $items = [];
+            }
+        }
+
+        // final save
+        if (count($items)) {
+            $this->batchWriteItem($tableName, $items);
+        }
     }
 
     public function importLatestTags()
@@ -393,6 +516,27 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
         if (count($items)) {
             $this->batchWriteItem($tableName, $items);
         }
+
+        // Update counter table
+        $this->batchWriteItem("counter",
+            [
+                [
+                    'PutRequest' => [
+                        'Item' => [
+                            'key' => [
+                                'S' => 'images_max_id'
+                            ],
+                            'value' => [
+                                'N' => strval($importedId)
+                            ],
+                            'updatedAt' => [
+                                'N' => strval(time())
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        );
 
     }
 

@@ -2,10 +2,12 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
-use Imagepush\ImagepushBundle\Consumer\MessageTask;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\Link;
 use Imagepush\ImagepushBundle\Document\ProcessedHash;
+use Imagepush\ImagepushBundle\Repository\ImageRepository;
+use Imagepush\ImagepushBundle\Repository\LinkRepository;
+use Imagepush\ImagepushBundle\Repository\ProcessedHashRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,20 +22,56 @@ use Symfony\Component\HttpFoundation\Response;
  *   @todo: Processor\Config - handle all config vars
  *   Fetcher\Content - get link content
  */
-class Processor
+class ProcessorSource
 {
 
     /**
-     * @var Container $container
+     * @var ContainerInterface $container
      */
     public $container;
+
+    /**
+     * @var $ddb \Aws\DynamoDb\DynamoDbClient
+     */
+    protected $ddb;
+
+    /**
+     * @var $ddb \Aws\Sqs\SqsClient
+     */
+    protected $sqs;
+
+    /**
+     * @var $imageRepo ImageRepository
+     */
+    protected $imageRepo;
+
+    /**
+     * @var $linkRepo LinkRepository
+     */
+    protected $linkRepo;
+
+    /**
+     * @var $processedHashRepo ProcessedHashRepository
+     */
+    protected $processedHashRepo;
+
+    protected $sqsQueueUrlImages;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get('imagepush.processor_logger');
-        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
         $this->varnish = $container->get('imagepush.varnish');
+
+        $this->ddb = $container->get('aws.dynamodb');
+        $this->sqs = $container->get('aws.sqs');
+        $this->sqsQueueUrlImages = $container->getParameter('imagepush.sqs_queue_url_images');
+        $this->sqsQueueUrlFindTags = $container->getParameter('imagepush.sqs_queue_url_find_tags');
+
+        $this->imageRepo = $container->get('imagepush.repository.image');
+        $this->linkRepo = $container->get('imagepush.repository.link');
+        $this->processedHashRepo = $container->get('imagepush.repository.processed_hash');
+
     }
 
     /**
@@ -53,18 +91,39 @@ class Processor
         /**
          * Create image object based on unprocessed source
          */
-        $image = $this->dm->getRepository('ImagepushBundle:Image')->initUnprocessedSource();
+        $request = [
+            'MaxNumberOfMessages' => 1,
+            'QueueUrl' => $this->sqsQueueUrlImages,
+        ];
+        $messages = $this->sqs->receiveMessage($request);
 
-        if ($image) {
-            $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink()));
-        } else {
+        $messages = $messages->get('Messages');
+
+        if (0 == count($messages)) {
             $log = "Ok, but there is no unprocessed images to work on...";
             $this->logger->info($log);
 
             return $log;
         }
 
-        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($image->getLink())) {
+        $this->sqs->deleteMessage([
+            'QueueUrl' => $this->sqsQueueUrlImages,
+            'ReceiptHandle' => $messages[0]['ReceiptHandle']
+        ]);
+
+        $id = json_decode($messages[0]['Body']);
+
+        $image = $this->imageRepo->findOneBy($id, false);
+
+        if ($image) {
+            $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink()));
+        } else {
+            $this->logger->info(sprintf("ID: %d. Image record was no found in DB", $id));
+
+            return false;
+        }
+
+        if ($this->linkRepo->isIndexedOrFailed($image->getLink())) {
             return false;
         }
 
@@ -95,24 +154,17 @@ class Processor
 
             $this->logger->info(sprintf("ID: %d. Hash: %s.", $image->getId(), $content->getContentMd5()));
 
-            if ($this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $content->getContentMd5()))) {
+            if ($this->processedHashRepo->exists($content->getContentMd5())) {
                 $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $image->getLink()));
             } else {
 
                 $result = $this->processFoundImage($image, $content);
 
                 if ($result) {
+                    $processedHash = new ProcessedHash($content->getContentMd5());
+                    $this->processedHashRepo->save($processedHash);
 
-                    // Store processed hash
-                    try {
-                        $processedHash = new ProcessedHash($content->getContentMd5());
-                        $this->dm->persist($processedHash);
-                        $this->dm->flush();
-
-                        $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $content->getContentMd5()));
-                    } catch (\MongoCursorException $e) {
-                        $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $content->getContentMd5(), $e->getMessage()));
-                    }
+                    $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $content->getContentMd5()));
 
                     $this->logger->info(sprintf("ID: %d. Link %s has been processed as single image.", $image->getId(), $image->getLink()));
                 }
@@ -140,7 +192,7 @@ class Processor
 
                     foreach ($images as $url) {
 
-                        if ($this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($url)) {
+                        if ($this->linkRepo->isIndexedOrFailed($url)) {
                             continue;
                         }
 
@@ -153,7 +205,7 @@ class Processor
 
                         $this->logger->info(sprintf("ID: %d. Hash: %s.", $image->getId(), $contentInside->getContentMd5()));
 
-                        if ($this->dm->getRepository('ImagepushBundle:ProcessedHash')->findOneBy(array("hash" => $contentInside->getContentMd5()))) {
+                        if ($this->processedHashRepo->exists($contentInside->getContentMd5())) {
                             $this->logger->info(sprintf("ID: %d. Image %s has been already processed (hash found)", $image->getId(), $url));
 
                             continue;
@@ -162,23 +214,15 @@ class Processor
                         $result = $this->processFoundImage($image, $contentInside);
 
                         if ($result) {
+                            $processedHash = new ProcessedHash($contentInside->getContentMd5());
+                            $this->processedHashRepo->save($processedHash);
 
-                            // Store processed hash
-                            try {
-                                $processedHash = new ProcessedHash($contentInside->getContentMd5());
-                                $this->dm->persist($processedHash);
-                                $this->dm->flush();
-
-                                $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $contentInside->getContentMd5()));
-                            } catch (\MongoCursorException $e) {
-                                $this->logger->err(sprintf("ID: %d. ProcessedHash (hash: %s) is not saved. Error: %s", $image->getId(), $contentInside->getContentMd5(), $e->getMessage()));
-                            }
+                            $this->logger->info(sprintf("ID: %d. ProcessedHash (hash: %s) is saved.", $image->getId(), $contentInside->getContentMd5()));
 
                             $this->logger->info(sprintf("ID: %d. Link %s has been processed by function %s. Correct image url: %s", $image->getId(), $image->getLink(), $function, $url));
 
                             $link = new Link($url, Link::INDEXED);
-                            $this->dm->persist($link);
-                            $this->dm->flush();
+                            $this->linkRepo->save($link);
 
                             // Image has been found and saved. No need to search further.
                             break 2;
@@ -195,14 +239,12 @@ class Processor
             $log = sprintf("ID: %d. No images found, so link %s should be removed.", $image->getId(), $image->getLink());
             $this->logger->info($log);
 
-            // Remove image
-            $this->dm->remove($image);
-
             // Mark link as failed
             $link = new Link($image->getLink(), Link::FAILED);
-            $this->dm->persist($link);
+            $this->linkRepo->save($link);
 
-            $this->dm->flush();
+            // Remove image
+            $this->imageRepo->deleteById($image->getId());
 
             return $log;
         }
@@ -211,27 +253,43 @@ class Processor
          * Mark link as indexed
          */
         $link = new Link($image->getLink(), Link::INDEXED);
-        $this->dm->persist($link);
-        $this->dm->flush();
+        $this->linkRepo->save($link);
 
         /**
          * Find tags
          */
-        $this->producer = $this->container->get('old_sound_rabbit_mq.primary_producer');
-        $msg = array("image_id" => $image->getId(), "task" => MessageTask::FIND_TAGS_AND_MENTIONS);
-        $this->producer->publish(json_encode($msg));
-        $this->logger->info(sprintf("MESSAGE: %s", json_encode($msg)));
+        $entries = [];
+        $services = MessageTask::$services[MessageTask::FIND_TAGS_AND_MENTIONS];
+        foreach ($services as $i => $service) {
+            $message = json_encode(
+                [
+                    'id' => $image->getId(),
+                    'service' => $service
+                ]
+            );
 
-        // Old way:
-        //$this->logger->info(sprintf("ID: %d. Searching for tags.", $image->getId()));
-        //$tags = $this->container->get('imagepush.processor.tag')->processTags($image);
-        //$log = "Best tags: " . implode(", ", $tags) . "\n\n";
+            $entries[] = [
+                'Id' => $image->getId() . '-' . $service,
+                'MessageBody' => $message,
+            ];
+
+            $this->logger->info(sprintf("MESSAGE: %s", $message));
+
+            if (count($entries) == 10 || $i == count($services) - 1) {
+                $request = [
+                    'Entries' => $entries,
+                    'QueueUrl' => $this->sqsQueueUrlFindTags,
+                ];
+
+                $this->sqs->sendMessageBatch($request);
+                $entries = [];
+            }
+        }
 
         $log = sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);
 
-        $this->varnish->purgeWhenNewImagesSavedAsUpcoming();
-
+//        $this->varnish->purgeWhenNewImagesSavedAsUpcoming();
         return $log;
     }
 
@@ -271,11 +329,10 @@ class Processor
             $this->generateRequiredThumbs($image);
 
             // Update image object
-            $image->setIsInProcess(false);
-            $image->setIsAvailable(false);
+//            $image->setIsInProcess(false);
+//            $image->setIsAvailable(false);
 
-            $this->dm->persist($image);
-            $this->dm->flush();
+            $this->imageRepo->save($image);
 
             return true;
         } else {

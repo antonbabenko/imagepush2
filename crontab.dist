@@ -4,6 +4,9 @@ MAILTO="anton@imagepush.to"
 
 */5 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:process-source --env=prod
 
+# replacement for rabbitmq consumers
+*/5 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:process-tags --env=prod
+
 */6 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:update-tags --env=prod
 
 0 */4 * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:publish-image --env=prod
@@ -11,4 +14,4 @@ MAILTO="anton@imagepush.to"
 5 */4 * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod
 
 # Rerun rabbit consumers if needed
-10  * * * * cd /mnt/www/imagepush/current/ && ./bin/launch-rabbit-consumers.sh
+#10  * * * * cd /mnt/www/imagepush/current/ && ./bin/launch-rabbit-consumers.sh

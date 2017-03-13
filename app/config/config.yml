@@ -2,7 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: imagepush.yml }
-    - { resource: rabbitmq.yml }
+#    - { resource: rabbitmq.yml }
     - { resource: services.yml }
 
 framework:

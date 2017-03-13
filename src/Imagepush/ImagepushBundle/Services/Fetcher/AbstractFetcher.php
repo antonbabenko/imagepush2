@@ -2,6 +2,12 @@
 
 namespace Imagepush\ImagepushBundle\Services\Fetcher;
 
+use Imagepush\ImagepushBundle\Repository\CounterRepository;
+use Imagepush\ImagepushBundle\Repository\ImageRepository;
+use Imagepush\ImagepushBundle\Repository\LinkRepository;
+use Monolog\Logger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * AbstractFetcher
  */
@@ -26,8 +32,34 @@ class AbstractFetcher
      * @var Logger $logger
      */
     public $logger;
-    public $dm;
+
+    /**
+     * @var $ddb \Aws\DynamoDb\DynamoDbClient
+     */
+    protected $ddb;
+
+    /**
+     * @var $ddb \Aws\Sqs\SqsClient
+     */
+    protected $sqs;
+
+    /**
+     * @var $imageRepo ImageRepository
+     */
+    protected $imageRepo;
+
+    /**
+     * @var $linkRepo LinkRepository
+     */
+    protected $linkRepo;
+
+    /**
+     * @var $counterRepo CounterRepository
+     */
+    protected $counterRepo;
+
     public $parameters;
+    public $sqsQueueUrlImages;
 
     /**
      * @var string $fetcherType
@@ -38,12 +70,20 @@ class AbstractFetcher
      * AbstractFetcher
      *
      * @param ContainerInterface $container
+     * @param string             $fetcherType
+     *
+     * @throws \Exception
      */
-    public function __construct($container, $fetcherType = null)
+    public function __construct(ContainerInterface $container, $fetcherType = null)
     {
         $this->container = $container;
         $this->logger = $container->get('imagepush.fetcher_logger');
-        $this->dm = $container->get('doctrine.odm.mongodb.document_manager');
+        $this->ddb = $container->get('aws.dynamodb');
+        $this->sqs = $container->get('aws.sqs');
+
+        $this->imageRepo = $container->get('imagepush.repository.image');
+        $this->linkRepo = $container->get('imagepush.repository.link');
+        $this->counterRepo = $container->get('imagepush.repository.counter');
 
         if (!$this->fetcherType = $fetcherType) {
             throw new \Exception("AbstractFetcher should have fetcherType defined before construct");
@@ -52,6 +92,8 @@ class AbstractFetcher
         if ($container->hasParameter('imagepush.fetcher.' . $this->fetcherType)) {
             $this->parameters = $container->getParameter('imagepush.fetcher.' . $this->fetcherType);
         }
+
+        $this->sqsQueueUrlImages = $container->getParameter('imagepush.sqs_queue_url_images');
     }
 
     /**

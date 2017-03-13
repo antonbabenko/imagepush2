@@ -21,6 +21,18 @@ services:
         class: Imagepush\ImagepushBundle\Repository\LatestTagRepository
         arguments: [@aws.dynamodb]
 
+    imagepush.repository.link:
+        class: Imagepush\ImagepushBundle\Repository\LinkRepository
+        arguments: [@aws.dynamodb]
+
+    imagepush.repository.counter:
+        class: Imagepush\ImagepushBundle\Repository\CounterRepository
+        arguments: [@aws.dynamodb]
+
+    imagepush.repository.processed_hash:
+        class: Imagepush\ImagepushBundle\Repository\ProcessedHashRepository
+        arguments: [@aws.dynamodb]
+
     ##################
     # Robot services #
     ##################
@@ -42,51 +54,55 @@ services:
         arguments: [@service_container]
 
     # RabbitMQ consumers
-    imagepush.consumer_message:
-        class: Imagepush\ImagepushBundle\Consumer\Message
-        arguments: [@service_container, @imagepush.rabbitmq_logger]
+#    imagepush.consumer_message:
+#        class: Imagepush\ImagepushBundle\Consumer\Message
+#        arguments: [@service_container, @imagepush.rabbitmq_logger]
 
 
 
 
-    imagepush.consumer.primary:
-        class: Imagepush\ImagepushBundle\Consumer\PrimaryConsumer
-        arguments: [@service_container, @imagepush.rabbitmq_logger]
-
-    imagepush.consumer.twitter:
-        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-        arguments: [@service_container, "twitter"]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
-    imagepush.consumer.reddit:
-        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-        arguments: [@service_container, "reddit"]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
-    imagepush.consumer.delicious:
-        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-        arguments: [@service_container, "delicious"]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
-    imagepush.consumer.stumble_upon:
-        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-        arguments: [@service_container, "stumble_upon"]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
-    imagepush.consumer.source:
-        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-        arguments: [@service_container, "source"]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
+#    imagepush.consumer.primary:
+#        class: Imagepush\ImagepushBundle\Consumer\PrimaryConsumer
+#        arguments: [@service_container, @imagepush.rabbitmq_logger]
+#
+#    imagepush.consumer.twitter:
+#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+#        arguments: [@service_container, "twitter"]
+#        calls:
+#            - [ setLogger, [@imagepush.rabbitmq_logger]]
+#
+#    imagepush.consumer.reddit:
+#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+#        arguments: [@service_container, "reddit"]
+#        calls:
+#            - [ setLogger, [@imagepush.rabbitmq_logger]]
+#
+#    imagepush.consumer.delicious:
+#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+#        arguments: [@service_container, "delicious"]
+#        calls:
+#            - [ setLogger, [@imagepush.rabbitmq_logger]]
+#
+#    imagepush.consumer.stumble_upon:
+#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+#        arguments: [@service_container, "stumble_upon"]
+#        calls:
+#            - [ setLogger, [@imagepush.rabbitmq_logger]]
+#
+#    imagepush.consumer.source:
+#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
+#        arguments: [@service_container, "source"]
+#        calls:
+#            - [ setLogger, [@imagepush.rabbitmq_logger]]
 
 
     # Processor
-    imagepush.processor:
-        class: Imagepush\ImagepushBundle\Services\Processor\Processor
+    imagepush.processor.source:
+        class: Imagepush\ImagepushBundle\Services\Processor\ProcessorSource
+        arguments: [@service_container]
+
+    imagepush.processor.tag:
+        class: Imagepush\ImagepushBundle\Services\Processor\ProcessorTag
         arguments: [@service_container]
 
     imagepush.processor.content:
@@ -100,7 +116,7 @@ services:
         prototype: true
 
     # Tag
-    imagepush.processor.tag:
+    imagepush.processor.tag.tag:
         class: Imagepush\ImagepushBundle\Services\Processor\Tag\Tag
         arguments: [@service_container]
 

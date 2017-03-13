@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ProcessSourceCommand extends ContainerAwareCommand
+class ProcessTagsCommand extends ContainerAwareCommand
 {
 
     protected function configure()
@@ -14,9 +14,9 @@ class ProcessSourceCommand extends ContainerAwareCommand
         parent::configure();
 
         $this
-            ->setName('imagepush:process-source')
-            ->setDescription('Process one source')
-            ->setHelp('Find best image in source, find tags, make thumbs and save image as upcoming');
+            ->setName('imagepush:process-tags')
+            ->setDescription('Process tags for images from SQS queue')
+            ->setHelp('Find tags');
     }
 
     /**
@@ -25,7 +25,7 @@ class ProcessSourceCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->getContainer()->get('imagepush.processor.source')->processSource();
+        $content = $this->getContainer()->get('imagepush.processor.tag')->processTag();
 
         $output->writeLn($content, true);
     }

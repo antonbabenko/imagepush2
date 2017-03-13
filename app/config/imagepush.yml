@@ -9,6 +9,10 @@ imagepush:
     image.min_filesize: 20480   # 20KB in bytes
     image.max_filesize: 8388608 # 8MB in bytes
 
+    # SQS queue url
+    sqs_queue_url_images: "https://sqs.eu-west-1.amazonaws.com/307990089504/%kernel.environment%-imagepush-images"
+    sqs_queue_url_find_tags: "https://sqs.eu-west-1.amazonaws.com/307990089504/%kernel.environment%-imagepush-find-tags"
+
     # Thumbs (Array of thumbnails to generate during processing)
     thumbs: [["in", 463, 1548], ["out", 140, 140], ["in", 625, 2090]]
 
@@ -34,14 +38,14 @@ imagepush:
     fetcher.reddit:
       min_delay: 5  # Minimum delay between API requests (minimum allowed is 2 sec)
       min_score: 50 # Minumum score (ups - downs = score)
-      urls: 
+      urls:
         - "http://www.reddit.com/.json"
         - "http://www.reddit.com/r/Images/.json"
         - "http://www.reddit.com/r/technology/.json"
 
     # Publisher
     min_tags_to_publish_image: 6
-    
+
     # Tags
     twitter.min_title_length: 15
     reddit.min_subreddit_score: 5

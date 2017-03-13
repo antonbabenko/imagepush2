@@ -121,11 +121,21 @@ class Image
         $this->setSlug(array_values($data['slug'])[0]);
         $this->setTimestamp(array_values($data['timestamp'])[0]);
         $this->setLink(array_values($data['link'])[0]);
-        $this->setFile(array_values($data['file'])[0]);
-        $this->setMimeType(array_values($data['mimeType'])[0]);
         $this->setSourceType(array_values($data['sourceType'])[0]);
         $this->setIsAvailable(array_values($data['isAvailable'])[0]);
         $this->setIsInProcess(array_values($data['isInProcess'])[0]);
+
+        if (isset($data['file'])) {
+            $this->setFile(
+                array_values($data['file'])[0]
+            );
+        }
+
+        if (isset($data['mimeType'])) {
+            $this->setMimeType(
+                array_values($data['mimeType'])[0]
+            );
+        }
 
         if (isset($data['tags'])) {
             $this->setTags(
@@ -152,21 +162,113 @@ class Image
             $this->setThumbs($t);
         }
 
-//        \D::dump($data['thumbs']);
-//        \D::dump($this->getThumbs());
+        if (isset($data['tagsFound'])) {
+            $t = [];
+            foreach (array_values($data['tagsFound'])[0] as $tk => $tv) {
+                $tvv = [];
+                foreach (array_values($tv)[0] as $tvk => $tvvalue) {
+                    $tvv += [$tvk => $tvvalue];
+                }
+                $t += [$tk => $tvv];
+            }
 
-        // @todo: remaining types - only for latest images
-//        if ($image->getTagsFound()) {
-//            $t = [];
-//            foreach ($image->getTagsFound() as $tk => $tv) {
-//                $t += [$tk => ['SS' => array_values(array_unique(array_map('strval', array_keys($tv))))]];
-//            }
-//
-//            $item['tagsFound'] = [
-//                'M' => $t
-//            ];
-//
+            $this->setTagsFound($t);
+
+        }
+
+    }
+
+    public function toItem()
+    {
+
+//        if (!$image->getId() || !$image->getFile() || !$image->getSlug() || !$image->getLink(
+//            ) || !$image->getTimestamp() || !$image->getTitle() || !$image->getMimeType(
+//            ) || !$image->getSourceType()
+//        ) {
+//            continue;
 //        }
+
+        $item = [
+            'id' => [
+                'N' => strval($this->getId())
+            ],
+            'title' => [
+                'S' => strval($this->getTitle())
+            ],
+            'timestamp' => [
+                'N' => strval($this->getTimestamp())
+            ],
+            'link' => [
+                'S' => strval($this->getLink())
+            ],
+            'sourceType' => [
+                'S' => strval($this->getSourceType())
+            ],
+            'isAvailable' => [
+                'N' => strval((int) $this->getIsAvailable())
+            ],
+            'isInProcess' => [
+                'N' => strval((int) $this->getIsInProcess())
+            ],
+        ];
+
+        if ($this->getSlug()) {
+            $item['slug'] = [
+                'S' => strval($this->getSlug())
+            ];
+        }
+
+        if ($this->getFile()) {
+            $item['file'] = [
+                'S' => strval($this->getFile())
+            ];
+        }
+
+        if ($this->getMimeType()) {
+            $item['mimeType'] = [
+                'S' => strval($this->getMimeType())
+            ];
+        }
+
+        if ($this->getSourceTags()) {
+            $item['sourceTags'] = [
+                'SS' => array_values(array_unique(array_map('strval', (array) $this->getSourceTags())))
+            ];
+        }
+
+        if ($this->getTags()) {
+            $item['tags'] = [
+                'SS' => array_values(array_unique(array_map('strval', (array) $this->getTags())))
+            ];
+        }
+
+        if ($this->getTagsFound()) {
+            $t = [];
+            foreach ($this->getTagsFound() as $tk => $tv) {
+                $t += [$tk => ['SS' => array_values(array_unique(array_map('strval', array_keys($tv))))]];
+            }
+
+            $item['tagsFound'] = [
+                'M' => $t
+            ];
+        }
+
+        if ($this->getThumbs()) {
+            $t = [];
+            foreach ($this->getThumbs() as $tk => $tv) {
+                $tvv = [];
+                foreach ($tv as $tvk => $tvvalue) {
+                    $tvv += [$tvk => ['N' => strval($tvvalue)]];
+                }
+                $t += [$tk => ['M' => $tvv]];
+            }
+
+            $item['thumbs'] = [
+                'M' => $t
+            ];
+        }
+
+        return $item;
 
     }
 
@@ -346,7 +448,7 @@ class Image
     /**
      * Set sourceTags
      *
-     * @param collection $sourceTags
+     * @param array $sourceTags
      */
     public function setSourceTags($sourceTags)
     {
@@ -356,7 +458,7 @@ class Image
     /**
      * Get sourceTags
      *
-     * @return collection $sourceTags
+     * @return array $sourceTags
      */
     public function getSourceTags()
     {
@@ -366,7 +468,7 @@ class Image
     /**
      * Set tags
      *
-     * @param collection $tags
+     * @param array $tags
      */
     public function setTags($tags)
     {
@@ -376,7 +478,7 @@ class Image
     /**
      * Get tags
      *
-     * @return collection $tags
+     * @return array $tags
      */
     public function getTags()
     {
@@ -386,7 +488,7 @@ class Image
     /**
      * Set tagsFound
      *
-     * @param  collection $tagsFound
+     * @param  array  $tagsFound
      * @return \Image
      */
     public function setTagsFound($tagsFound)
@@ -399,7 +501,7 @@ class Image
     /**
      * Get tagsFound
      *
-     * @return collection $tagsFound
+     * @return array $tagsFound
      */
     public function getTagsFound()
     {

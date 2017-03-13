@@ -73,48 +73,6 @@ class ImageRepository extends AbstractRepository
      * @param  bool  $onlyAvailable
      * @return array
      */
-    public function findOneByOldAndSlow($id, $onlyAvailable = true)
-    {
-
-        $request = [
-            'TableName' => 'images',
-            'ExpressionAttributeValues' => [
-                ':id' => ['N' => strval((int) $id)],
-                ':isAvailable' => ['N' => strval(max(0, (int) $onlyAvailable))],
-                # Allow previews. 0 = any. 1 = only available
-            ],
-            'KeyConditionExpression' => 'id = :id',
-            'FilterExpression' => 'isAvailable >= :isAvailable',
-            'Limit' => 1
-        ];
-
-        $t1 = microtime(true);
-
-        $results = $this->getQueryResults($request, 1);
-
-        foreach ($results as & $result) {
-            $image = new Image();
-            $image->fromArray($result);
-
-            $result = $image;
-        }
-        $t2 = microtime(true);
-
-        echo (float) ($t2 - $t1);
-
-        if (count($results)) {
-            return $results[0];
-        } else {
-            return null;
-        }
-
-    }
-
-    /**
-     * @param $id
-     * @param  bool  $onlyAvailable
-     * @return array
-     */
     public function findOneBy($id, $onlyAvailable = true)
     {
 
@@ -249,50 +207,49 @@ class ImageRepository extends AbstractRepository
     }
 
     /**
-     * @return int|false
+     * @param  Image   $image
+     * @return boolean
      */
-    public function getNextId()
+    public function save(Image $image)
     {
-        $maxId = $this->createQueryBuilder()
-            ->sort('id', 'DESC')
-            ->limit(1)
-            ->getQuery()
-            ->getSingleResult();
 
-        if ($maxId && $maxId->getId()) {
-            return $maxId->getId() + 1;
-        } else {
-            return false;
-        }
+        $request = [
+            'TableName' => 'images',
+            'Item' => $image->toItem()
+        ];
+
+//        echo "\nInserting item:\n";
+//        \D::debug($request);
+
+        $result = $this->putItem($request);
+
+        return $result;
+
     }
-
     /**
-     * Get oldest unprocessed image and change status for it to "in process"
-     *
-     * @return Image|false
+     * @param  integer $id
+     * @return boolean
      */
-    public function initUnprocessedSource()
+    public function deleteById($id)
     {
-        $image = $this->createQueryBuilder()
-            ->field('isAvailable')->exists(false)
-            ->field('isInProcess')->notEqual(true)
-            ->sort('timestamp', 'ASC')
-            ->limit(1)
-            ->requireIndexes(false)
-            ->getQuery()
-            ->getSingleResult();
 
-        if ($image) {
-            $image->setIsInProcess(true);
-
-            $this->dm->persist($image);
-            $this->dm->flush();
-            $this->dm->refresh($image);
-
-            return $image;
-        } else {
-            return false;
+        if (empty($id)) {
+            return;
         }
+
+        $request = [
+            'TableName' => 'images',
+            'Key' => [
+                'id' => [
+                    'N' => strval($id)
+                ],
+            ]
+        ];
+
+        $result = $this->deleteItem($request);
+
+        return $result;
+
     }
 
 }
