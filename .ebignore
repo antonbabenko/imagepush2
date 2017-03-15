@@ -8,4 +8,6 @@ app/config/parameters.yml
 .idea
 composer.phar
 nohup.out
+vendor/
+.git/
 *~
