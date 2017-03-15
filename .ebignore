@@ -1,0 +1,11 @@
+web/new_uploads
+web/uploads
+web/i/*
+app/cache/*
+app/logs/*
+app/config/parameters.yml
+.DS_Store
+.idea
+composer.phar
+nohup.out
+*~

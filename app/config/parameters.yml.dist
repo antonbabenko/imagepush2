@@ -38,6 +38,9 @@ parameters:
     aws_secret_key: secret
     amazon_default_cache_config: apc
 
+    aws_dynamodb_key: key
+    aws_dynamodb_secret_key: secret
+
     apc_clear_host: http://dev-anton.imagepush.to
 
     bitly_username: ~
