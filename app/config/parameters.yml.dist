@@ -7,8 +7,8 @@ parameters:
 
     mailer_transport: gmail
     mailer_host: localhost
-    mailer_user: "%mailer_user%"
-    mailer_password: "%mailer_password%"
+    mailer_user: "%env.mailer_user%"
+    mailer_password: "%env.mailer_password%"
 
     old_sound_rabbit_mq.host: localhost
     old_sound_rabbit_mq.port: 5672
@@ -17,13 +17,13 @@ parameters:
     old_sound_rabbit_mq.vhost: "/"
 
     secret: 123sadglsjkg11lsjg
-    site_url: "%site_url%"
+    site_url: "%env.site_url%"
 
     # Varnish URL together with port (if not default)
     varnish_url: http://dev-anton.imagepush.to:8080
 
-    filesystems_images_adapter: "%filesystems_images_adapter%"
-    cdn_images_url: "%cdn_images_url%"
+    filesystems_images_adapter: "%env.filesystems_images_adapter%"
+    cdn_images_url: "%env.cdn_images_url%"
 
     # dev-anton
     #filesystems_images_adapter: anton_dev
@@ -36,14 +36,14 @@ parameters:
     s3_bucket_name: i.imagepush.to
     #s3_bucket_name: imagepushtest
 
-    aws_key:        "%aws_key%"
-    aws_secret_key: "%aws_secret_key%"
+    aws_key:        "%env.aws_key%"
+    aws_secret_key: "%env.aws_secret_key%"
     amazon_default_cache_config: apc
 
-    aws_dynamodb_key: "%aws_dynamodb_key%"
-    aws_dynamodb_secret_key: "%aws_dynamodb_secret_key%"
+    aws_dynamodb_key: "%env.aws_dynamodb_key%"
+    aws_dynamodb_secret_key: "%env.aws_dynamodb_secret_key%"
 
     apc_clear_host: http://dev-anton.imagepush.to
 
-    bitly_username: "%bitly_username%"
-    bitly_api_key: "%bitly_api_key%"
+    bitly_username: "%env.bitly_username%"
+    bitly_api_key: "%env.bitly_api_key%"
