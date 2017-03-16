@@ -1,17 +1,17 @@
 MAILTO="anton@imagepush.to"
 
-*/30 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:fetch-from-reddit --env=prod
+*/30 * * * * cd /var/app/current && ./app/console imagepush:fetch-from-reddit --env=prod
 
-*/5 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:process-source --env=prod
+*/5 * * * * cd /var/app/current && ./app/console imagepush:process-source --env=prod
 
 # replacement for rabbitmq consumers
-*/5 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:process-tags --env=prod
+*/5 * * * * cd /var/app/current && ./app/console imagepush:process-tags --env=prod
 
-*/6 * * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:update-tags --env=prod
+*/6 * * * * cd /var/app/current && ./app/console imagepush:update-tags --env=prod
 
-0 */4 * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:publish-image --env=prod
+0 */4 * * * cd /var/app/current && ./app/console imagepush:publish-image --env=prod
 
-5 */4 * * * cd /mnt/www/imagepush/current/ && ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod
+5 */4 * * * cd /var/app/current && ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod
 
 # Rerun rabbit consumers if needed
-#10  * * * * cd /mnt/www/imagepush/current/ && ./bin/launch-rabbit-consumers.sh
+#10  * * * * cd /var/app/current && ./bin/launch-rabbit-consumers.sh
