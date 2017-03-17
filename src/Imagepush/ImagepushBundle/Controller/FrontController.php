@@ -82,6 +82,7 @@ class FrontController extends Controller
         $isOppositeTypeExists = false;
 
         if (!is_null($tag)) {
+
             $tagObject = $this->get('imagepush.repository.tag')->findOneByText($tag);
 
             if (!$tagObject) {
@@ -96,8 +97,15 @@ class FrontController extends Controller
             $ids = $this->get('imagepush.repository.image')->findImagesIdByTag($tag, 30);
 
             $images = $this->get('imagepush.repository.image')->findManyByIds($ids, $type == 'current');
+
         } else {
-            $images = $this->get('imagepush.repository.image')->findUpcomingImages(20);
+
+            if ($type == 'current') {
+                $images = $this->get('imagepush.repository.image')->findCurrentImages(30);
+            } else {
+                $images = $this->get('imagepush.repository.image')->findUpcomingImages(30);
+            }
+
         }
 
         $result = [
