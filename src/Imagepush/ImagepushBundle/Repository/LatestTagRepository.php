@@ -16,12 +16,6 @@ class LatestTagRepository extends AbstractRepository
             return unserialize($latestTrends);
         }
 
-//        $tmpTags = $this->createQueryBuilder()
-//            ->sort('timestamp', 'DESC')
-//            ->limit($max * 20)
-//            ->getQuery()
-//            ->execute();
-
         // scan
         $request = [
             'TableName' => 'latest_tags',
@@ -32,12 +26,10 @@ class LatestTagRepository extends AbstractRepository
             'ExpressionAttributeValues' => [
                 ':t' => ['N' => strval(time()-12*3600)],
             ],
-            'FilterExpression' => '#t <> :t', # should be ">" after import of real data!!!!!!!!
+            'FilterExpression' => '#t <> :t', # @todo: should be ">" after data processing works again and data is real. This was broken since around 2014.
             'ProjectionExpression' => '#text',
             'Limit' => $max*10
         ];
-
-//        \D::dump($request);
 
         $results = $this->getScanResults($request, $max*10);
 

@@ -20,13 +20,15 @@ class AbstractRepository
     /**
      * @param $request array   Associative array with 'request' for scan command
      * @param $limit   integer Desired number of records
+     * @param $maxPages int     Max number of pages to try to scan. Set to small number to avoid large scan.
      *
      * @return array|null
      */
-    public function getScanResults(array $request, $limit)
+    public function getScanResults(array $request, $limit, $maxPages = 3)
     {
 
         $count = 0;
+        $page = 0;
         $results = [];
 
         # The Scan operation is paginated. Issue the Scan request multiple times.
@@ -42,7 +44,7 @@ class AbstractRepository
 
             $results = array_merge($results, $response['Items']);
         } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
-        while (isset($response['LastEvaluatedKey']) and $count < $limit);
+        while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
 
         if (count($results) > $limit) {
             $results = array_slice($results, 0, $limit);
@@ -52,15 +54,17 @@ class AbstractRepository
     }
 
     /**
-     * @param $request array   Associative array with 'request' for query command
-     * @param $limit   integer Desired number of records
+     * @param $request  array   Associative array with 'request' for query command
+     * @param $limit    integer Desired number of records
+     * @param $maxPages int     Max number of pages to try to scan. Set to small number to avoid large scan.
      *
      * @return array|null
      */
-    public function getQueryResults(array $request, $limit)
+    public function getQueryResults(array $request, $limit, $maxPages = 3)
     {
 
         $count = 0;
+        $page = 0;
         $results = [];
 
         # The Query operation is paginated. Issue the Query request multiple times.
@@ -78,7 +82,7 @@ class AbstractRepository
 
             $results = array_merge($results, $response['Items']);
         } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
-        while (isset($response['LastEvaluatedKey']) and $count < $limit);
+        while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
 
         if (count($results) > $limit) {
             $results = array_slice($results, 0, $limit);

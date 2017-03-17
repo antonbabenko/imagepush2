@@ -8,7 +8,6 @@ class ImageRepository extends AbstractRepository
 {
 
     /**
-     * @param $type
      * @param  int             $limit
      * @return array
      * @throws \ErrorException
@@ -26,6 +25,42 @@ class ImageRepository extends AbstractRepository
             'ScanIndexForward' => false,
             'Limit' => $limit
         ];
+
+        $results = $this->getQueryResults($request, $limit);
+
+        foreach ($results as & $result) {
+            $image = new Image();
+            $image->fromArray($result);
+
+            $result = $image;
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param  int             $limit
+     * @return array
+     * @throws \ErrorException
+     */
+    public function findUpcomingImages($limit = 20)
+    {
+
+        $request = [
+            'TableName' => 'images',
+            'IndexName' => 'isAvailable-timestamp-index',
+            'ExpressionAttributeValues' => [
+                ':isAvailable' => ['N' => '0'],
+            ],
+            'KeyConditionExpression' => 'isAvailable = :isAvailable ',
+            'ScanIndexForward' => false,
+            'Limit' => $limit
+        ];
+
+        // During long period of time there was a bug which didn't save `file` and `mimeType` attributes, if it could not find image.
+        // To prevent such images from showing we filter those without `mimeType` attribute.
+        // Later (after we fix this bug) we may clean-up database and sync it with files we have on S3.
+        $request['FilterExpression'] = 'attribute_exists(mimeType)';
 
         $results = $this->getQueryResults($request, $limit);
 

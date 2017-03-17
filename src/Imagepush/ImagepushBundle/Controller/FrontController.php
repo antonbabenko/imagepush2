@@ -92,11 +92,13 @@ class FrontController extends Controller
             $oppositeTypeField = 'getUsedIn' . ($type !== "current" ? "Available" : "Upcoming");
 
             $isOppositeTypeExists = (bool) $tagObject->{$oppositeTypeField}();
+
+            $ids = $this->get('imagepush.repository.image')->findImagesIdByTag($tag, 30);
+
+            $images = $this->get('imagepush.repository.image')->findManyByIds($ids, $type == 'current');
+        } else {
+            $images = $this->get('imagepush.repository.image')->findUpcomingImages(20);
         }
-
-        $ids = $this->get('imagepush.repository.image')->findImagesIdByTag($tag, 30);
-
-        $images = $this->get('imagepush.repository.image')->findManyByIds($ids, $type == 'current');
 
         $result = [
             "type" => $type,
