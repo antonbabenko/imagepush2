@@ -1,0 +1,30 @@
+{
+  "Table": {
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/counter", 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "key", 
+        "AttributeType": "S"
+      }
+    ], 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749007.081, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749015.445
+    }, 
+    "TableSizeBytes": 25, 
+    "TableName": "counter", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "57cbcacc-40c1-41b4-83d4-b690e150716c", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "key"
+      }
+    ], 
+    "ItemCount": 1, 
+    "CreationDateTime": 1485607117.816
+  }
+}

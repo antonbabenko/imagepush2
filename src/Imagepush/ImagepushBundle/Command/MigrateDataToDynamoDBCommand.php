@@ -51,13 +51,15 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
 
         printf("%s - Started\n", date(DATE_ATOM));
 
+        printf("%s - Allready imported!\n", date(DATE_ATOM));
+
 //        $this->importImages();
 
 //        $this->importTags();
 
-//        $this->importLatestTags();
-
 //        $this->importImagesTags();
+
+//        $this->importLatestTags();
 
 //        $this->importLinks();
 
@@ -399,7 +401,7 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
 //                ->field('id')->equals($importedId)
                 ->sort('id', 'ASC')
                 ->limit(25 * 10)
-//                ->skip(250*92)
+//                ->skip(250*324)
                 ->getQuery()->toArray();
 
             if (!count($images) || $runs++ >= 500000) {
@@ -416,9 +418,7 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
                     continue;
                 }
 
-                if (!$image->getId() || !$image->getFile() || !$image->getSlug() || !$image->getLink(
-                    ) || !$image->getTimestamp() || !$image->getTitle() || !$image->getMimeType(
-                    ) || !$image->getSourceType()
+                if (!$image->getId() || !$image->getSlug() || !$image->getLink() || !$image->getTimestamp() || !$image->getTitle() || !$image->getSourceType()
                 ) {
                     continue;
                 }
@@ -441,12 +441,6 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
                     'slug' => [
                         'S' => strval($image->getSlug())
                     ],
-                    'file' => [
-                        'S' => strval($image->getFile())
-                    ],
-                    'mimeType' => [
-                        'S' => strval($image->getMimeType())
-                    ],
                     'sourceType' => [
                         'S' => strval($image->getSourceType())
                     ],
@@ -457,6 +451,18 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
                         'N' => strval((int) $image->getIsInProcess())
                     ],
                 ];
+
+                if ($image->getFile()) {
+                    $item['file'] = [
+                        'S' => strval($image->getFile())
+                    ];
+                }
+
+                if ($image->getMimeType()) {
+                    $item['mimeType'] = [
+                        'S' => strval($image->getMimeType())
+                    ];
+                }
 
                 if ($image->getSourceTags()) {
                     $item['sourceTags'] = [

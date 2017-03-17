@@ -19,6 +19,12 @@ FILENAME=`date +%Y%m%d`
 #./dynamodump.py -m restore -r eu-west-1 -s $DUMP_DIR/images -d images_new --readCapacity 100 --writeCapacity 100
 #./dynamodump.py -m restore -r eu-west-1 -s $DUMP_DIR/tags -d tags_restored --readCapacity 100 --writeCapacity 100
 
+# Dump only schemas
+#./dynamodump.py -m backup -r eu-west-1 -s "*" --schemaOnly --skipThroughputUpdate
+
+# Restore only schema for single table (will also delete data in it!)
+./dynamodump.py -m restore -r eu-west-1 -s images -d images --schemaOnly --skipThroughputUpdate
+
 cd $DUMP_DIR
 
 tar -zcvf imagepush_$FILENAME.tar.gz .

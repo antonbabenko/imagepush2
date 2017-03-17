@@ -1,0 +1,30 @@
+{
+  "Table": {
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/links", 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "link", 
+        "AttributeType": "S"
+      }
+    ], 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749017.877, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749048.188
+    }, 
+    "TableSizeBytes": 11183964, 
+    "TableName": "links", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "157f84c5-53a9-4742-97cf-4449577312b0", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "link"
+      }
+    ], 
+    "ItemCount": 162637, 
+    "CreationDateTime": 1485613851.034
+  }
+}

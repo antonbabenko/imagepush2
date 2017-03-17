@@ -1,0 +1,30 @@
+{
+  "Table": {
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/tags", 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "text", 
+        "AttributeType": "S"
+      }
+    ], 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749014.743, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749019.505
+    }, 
+    "TableSizeBytes": 822689, 
+    "TableName": "tags", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "046f6e6e-0aec-4135-a9ec-a95f053a2fd7", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "text"
+      }
+    ], 
+    "ItemCount": 17921, 
+    "CreationDateTime": 1485101821.93
+  }
+}
