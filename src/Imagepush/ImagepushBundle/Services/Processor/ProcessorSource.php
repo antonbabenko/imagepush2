@@ -324,6 +324,10 @@ class ProcessorSource
                 ->get('imagepush.imagine.files.cache.resolver')
                 ->store(new Response($content->getContent()), 'i/' . $image->getFile(), "");
 
+            $this->logger->info(sprintf("ID: %d. Saved original file as: %s", $image->getId(), $image->getFile()));
+
+            $this->imageRepo->save($image);
+
             // Generate required thumbnails
             // Thumbnails won't be regenerated, if there is already same file exists
             $this->generateRequiredThumbs($image);
@@ -331,9 +335,6 @@ class ProcessorSource
             // Update image object
 //            $image->setIsInProcess(false);
 //            $image->setIsAvailable(false);
-
-            $this->imageRepo->save($image);
-
             return true;
         } else {
             return false;

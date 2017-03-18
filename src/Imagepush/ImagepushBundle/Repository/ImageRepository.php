@@ -106,7 +106,7 @@ class ImageRepository extends AbstractRepository
     /**
      * @param $id
      * @param  bool  $onlyAvailable
-     * @return array
+     * @return Image
      */
     public function findOneBy($id, $onlyAvailable = true)
     {

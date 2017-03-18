@@ -57,7 +57,7 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
      * @param string   $targetPath
      * @param string   $filter
      *
-     * @return Response
+     * @return array
      */
     public function store(Response $response, $targetPath, $filter)
     {
@@ -82,15 +82,16 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
             $bucket = $this->container->getParameter('s3_bucket_name');
             $opt['headers']['Cache-Control'] = "max-age=31536000, public";
 
-            $amazonS3 = $this->container->get('imagepush.amazon.s3');
+//            $amazonS3 = $this->container->get('imagepush.amazon.s3');
 
-            //\D::dump($amazonS3);
-            //\D::dump($bucket);
-            //\D::dump($targetPath);
+//            \D::debug($amazonS3);
+//            \D::debug($bucket);
+//            \D::debug($targetPath);
             //\D::dump(\AmazonS3::ACL_PUBLIC);
 
-            $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
-            $amazonS3->change_content_type($bucket, $targetPath, $contentType, $opt);
+            // These two functions produce seg fault, so skipping fixing them because this old aws-sdk will be obsolete soon
+//            $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
+//            $amazonS3->change_content_type($bucket, $targetPath, $contentType, $opt);
         }
 
         $response->setEtag(md5($targetPath));
