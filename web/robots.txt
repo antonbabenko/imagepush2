@@ -10,4 +10,4 @@ Disallow: /tag/*/upcoming
 User-agent: Mediapartners-Google
 Disallow:
 
-Sitemap: https://imagepush.to/sitemap.xml.gz
+Sitemap: https://cdn.imagepush.to/sitemap.xml.gz

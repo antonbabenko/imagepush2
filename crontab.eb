@@ -10,4 +10,4 @@ MAILTO="anton@imagepush.to"
 
 0 */4 * * *  cd /var/app/current && ./app/console imagepush:publish-image --env=prod
 
-5 */4 * * *  cd /var/app/current && ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod
+5 */6 * * *  cd /var/app/current && ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod && aws s3 cp web/sitemap.xml.gz s3://i.imagepush.to/
