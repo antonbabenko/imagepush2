@@ -2,6 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Repository;
 
+use Imagepush\ImagepushBundle\Document\LatestTag;
+
 class LatestTagRepository extends AbstractRepository
 {
 
@@ -43,6 +45,24 @@ class LatestTagRepository extends AbstractRepository
         apc_store('latest_trends_' . $max, serialize($results), 1800);
 
         return $results;
+    }
+
+    /**
+     * @param  LatestTag $tag
+     * @return bool
+     */
+    public function save(LatestTag $tag)
+    {
+
+        $request = [
+            'TableName' => 'latest_tags',
+            'Item' => $tag->toItem()
+        ];
+
+        $result = $this->putItem($request);
+
+        return $result;
+
     }
 
 }

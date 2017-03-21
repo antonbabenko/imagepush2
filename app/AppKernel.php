@@ -33,7 +33,7 @@ class AppKernel extends Kernel
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 //            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-            new Snc\RedisBundle\SncRedisBundle(),
+//            new Snc\RedisBundle\SncRedisBundle(),
             new Ornicar\ApcBundle\OrnicarApcBundle(),
             new Aws\Symfony\AwsBundle(),
 

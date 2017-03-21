@@ -8,12 +8,11 @@ class TagRepository extends AbstractRepository
 {
 
     /**
-     * @return array()
+     * @return array|null
      */
     public function findOneByText($text)
     {
 
-        // query
         $request = [
             'TableName' => 'tags',
             'ExpressionAttributeNames' => [
@@ -23,8 +22,6 @@ class TagRepository extends AbstractRepository
                 ':text' => ['S' => strval($text)],
             ],
             'KeyConditionExpression' => '#text = :text',
-//            'IndexName' => 'text-index',
-            'ScanIndexForward' => false,
             'Limit' => 1
         ];
 
@@ -45,6 +42,24 @@ class TagRepository extends AbstractRepository
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param  Tag     $tag
+     * @return boolean
+     */
+    public function save(Tag $tag)
+    {
+
+        $request = [
+            'TableName' => 'tags',
+            'Item' => $tag->toItem()
+        ];
+
+        $result = $this->putItem($request);
+
+        return $result;
+
     }
 
 }

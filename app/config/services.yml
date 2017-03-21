@@ -12,26 +12,38 @@ services:
     imagepush.repository.image:
         class: Imagepush\ImagepushBundle\Repository\ImageRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     imagepush.repository.tag:
         class: Imagepush\ImagepushBundle\Repository\TagRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     imagepush.repository.latest_tag:
         class: Imagepush\ImagepushBundle\Repository\LatestTagRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     imagepush.repository.link:
         class: Imagepush\ImagepushBundle\Repository\LinkRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     imagepush.repository.counter:
         class: Imagepush\ImagepushBundle\Repository\CounterRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     imagepush.repository.processed_hash:
         class: Imagepush\ImagepushBundle\Repository\ProcessedHashRepository
         arguments: [@aws.dynamodb]
+        calls:
+            - [ setLogger, [@imagepush.db_logger]]
 
     ##################
     # Robot services #
@@ -40,9 +52,7 @@ services:
     # Access control
     imagepush.access_control.service:
         class: Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess
-        arguments: [@snc_redis.default, %imagepush.services%]
-        calls:
-            - [ setLogger, [@imagepush.rabbitmq_logger]]
+        arguments: [@imagepush.repository.counter, %imagepush.services%]
 
     # Fetcher
     imagepush.fetcher.reddit:
@@ -105,6 +115,10 @@ services:
         class: Imagepush\ImagepushBundle\Services\Processor\ProcessorTag
         arguments: [@service_container]
 
+    imagepush.processor.update_tag:
+        class: Imagepush\ImagepushBundle\Services\Processor\UpdateTag
+        arguments: [@service_container]
+
     imagepush.processor.content:
         class: Imagepush\ImagepushBundle\Services\Processor\Content\Content
         arguments: [@service_container]
@@ -145,11 +159,6 @@ services:
         class: Imagepush\ImagepushBundle\Services\Publisher\Publisher
         arguments: [@service_container]
 
-    # Varnish
-    imagepush.varnish:
-        class: Imagepush\ImagepushBundle\Services\Varnish\Varnish
-        arguments: [@service_container]
-
     # Loggers
     imagepush.processor_logger:
         class: Monolog\Logger
@@ -165,11 +174,11 @@ services:
             - [pushHandler, [@imagepush.fetcher_log_handler]]
             - [pushProcessor, [@log_introspection_processor]]
 
-    imagepush.varnish_logger:
+    imagepush.db_logger:
         class: Monolog\Logger
-        arguments: [varnish]
+        arguments: [db]
         calls:
-            - [pushHandler, [@imagepush.varnish_log_handler]]
+            - [pushHandler, [@imagepush.db_log_handler]]
 
     imagepush.rabbitmq_logger:
         class: Monolog\Logger
@@ -185,9 +194,9 @@ services:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/fetcher_%kernel.environment%.log, 100]
 
-    imagepush.varnish_log_handler:
+    imagepush.db_log_handler:
         class: Monolog\Handler\StreamHandler
-        arguments: [%kernel.logs_dir%/varnish_%kernel.environment%.log, 100]
+        arguments: [%kernel.logs_dir%/db_%kernel.environment%.log, 100]
 
     imagepush.rabbitmq_log_handler:
         class: Monolog\Handler\StreamHandler

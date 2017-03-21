@@ -15,7 +15,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"}),
- *   @MongoDB\Index(keys={"isInProcess"="asc"}),
  *   @MongoDB\Index(keys={"sourceType"="asc"})
  * })
  */
@@ -59,48 +58,44 @@ class Image
 
     /**
      * @Gedmo\Slug(fields={"title"}, unique=false)
-     * @MongoDB\String
      */
     protected $slug;
 
     /**
-     * @MongoDB\String
+     * Source type
      */
     protected $sourceType;
 
     /**
-     * @MongoDB\Collection
+     * List of original tags fetched from the source
      */
     protected $sourceTags;
 
     /**
-     * @MongoDB\Collection
+     * List of final tags
      */
     protected $tags;
 
     /**
      * Hash of found tags (not finalized)
-     * @MongoDB\Hash
      */
     protected $tagsFound;
 
     /**
-     * @MongoDB\Collection
-     * @MongoDB\ReferenceMany(targetDocument="Tag")
+     * Count of found tags
      */
-    protected $tagsRef;
+    protected $tagsFoundCount;
+
+    /**
+     * Boolean. If true then this image has new tagsFound, so that tags for this image should to be updated.
+     */
+    protected $requireUpdateTags;
 
     /**
      * Available (published) or Upcoming
      * @MongoDB\Boolean
      */
     protected $isAvailable;
-
-    /**
-     * Is "in process"
-     * @MongoDB\Boolean
-     */
-    protected $isInProcess;
 
     /**
      * Created thumbs with actual dimensions
@@ -123,7 +118,18 @@ class Image
         $this->setLink(array_values($data['link'])[0]);
         $this->setSourceType(array_values($data['sourceType'])[0]);
         $this->setIsAvailable(array_values($data['isAvailable'])[0]);
-        $this->setIsInProcess(array_values($data['isInProcess'])[0]);
+
+        if (isset($data['requireUpdateTags'])) {
+            $this->setRequireUpdateTags(
+                array_values($data['requireUpdateTags'])[0]
+            );
+        }
+
+        if (isset($data['tagsFoundCount'])) {
+            $this->setTagsFoundCount(
+                array_values($data['tagsFoundCount'])[0]
+            );
+        }
 
         if (isset($data['file'])) {
             $this->setFile(
@@ -167,27 +173,18 @@ class Image
             foreach (array_values($data['tagsFound'])[0] as $tk => $tv) {
                 $tvv = [];
                 foreach (array_values($tv)[0] as $tvk => $tvvalue) {
-                    $tvv += [$tvk => $tvvalue];
+                    $tvv += [$tvk => intval(array_values($tvvalue)[0])];
                 }
                 $t += [$tk => $tvv];
             }
 
             $this->setTagsFound($t);
-
         }
 
     }
 
     public function toItem()
     {
-
-//        if (!$image->getId() || !$image->getFile() || !$image->getSlug() || !$image->getLink(
-//            ) || !$image->getTimestamp() || !$image->getTitle() || !$image->getMimeType(
-//            ) || !$image->getSourceType()
-//        ) {
-//            continue;
-//        }
-
         $item = [
             'id' => [
                 'N' => strval($this->getId())
@@ -207,14 +204,20 @@ class Image
             'isAvailable' => [
                 'N' => strval((int) $this->getIsAvailable())
             ],
-            'isInProcess' => [
-                'N' => strval((int) $this->getIsInProcess())
+            'requireUpdateTags' => [
+                'N' => strval((int) $this->getRequireUpdateTags())
             ],
         ];
 
         if ($this->getSlug()) {
             $item['slug'] = [
                 'S' => strval($this->getSlug())
+            ];
+        }
+
+        if ($this->getTagsFoundCount()) {
+            $item['tagsFoundCount'] = [
+                'N' => strval($this->getTagsFoundCount())
             ];
         }
 
@@ -245,7 +248,11 @@ class Image
         if ($this->getTagsFound()) {
             $t = [];
             foreach ($this->getTagsFound() as $tk => $tv) {
-                $t += [$tk => ['SS' => array_values(array_unique(array_map('strval', array_keys($tv))))]];
+                $tags = [];
+                foreach ($tv as $tag => $mentioned) {
+                    $tags[strval($tag)] = ['N' => strval($mentioned)];
+                }
+                $t += [$tk => ['M' => $tags]];
             }
 
             $item['tagsFound'] = [
@@ -488,8 +495,8 @@ class Image
     /**
      * Set tagsFound
      *
-     * @param  array  $tagsFound
-     * @return \Image
+     * @param  array $tagsFound
+     * @return Image
      */
     public function setTagsFound($tagsFound)
     {
@@ -509,33 +516,49 @@ class Image
     }
 
     /**
-     * Add tagsRef
+     * Set tagsFoundCount
      *
-     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     * @param  integer $tagsFoundCount
+     * @return Image
      */
-    public function addTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+    public function setTagsFoundCount($tagsFoundCount)
     {
-        $this->tagsRef[] = $tagsRef;
+        $this->tagsFoundCount = $tagsFoundCount;
+
+        return $this;
     }
 
     /**
-     * Get tagsRef
+     * Get tagsFoundCount
      *
-     * @return Doctrine\Common\Collections\Collection $tagsRef
+     * @return integer $tagsFoundCount
      */
-    public function getTagsRef()
+    public function getTagsFoundCount()
     {
-        return $this->tagsRef;
+        return $this->tagsFoundCount;
     }
 
     /**
-     * Remove tagsRef
+     * Set requireUpdateTags
      *
-     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     * @param  boolean $requireUpdateTags
+     * @return Image
      */
-    public function removeTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+    public function setRequireUpdateTags($requireUpdateTags)
     {
-        $this->tagsRef->removeElement($tagsRef);
+        $this->requireUpdateTags = (bool) $requireUpdateTags;
+
+        return $this;
+    }
+
+    /**
+     * Get requireUpdateTags
+     *
+     * @return bool $requireUpdateTags
+     */
+    public function getRequireUpdateTags()
+    {
+        return $this->requireUpdateTags;
     }
 
     /**
@@ -556,26 +579,6 @@ class Image
     public function getIsAvailable()
     {
         return $this->isAvailable;
-    }
-
-    /**
-     * Set isInProcess
-     *
-     * @param boolean $isInProcess
-     */
-    public function setIsInProcess($isInProcess)
-    {
-        $this->isInProcess = $isInProcess;
-    }
-
-    /**
-     * Get isInProcess
-     *
-     * @return boolean $isInProcess
-     */
-    public function getIsInProcess()
-    {
-        return $this->isInProcess;
     }
 
     /**

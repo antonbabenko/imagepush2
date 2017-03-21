@@ -98,7 +98,6 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
 
                 if ($result) {
 
-                    // @todo: add image id to queue to process. Make sure that isInProcess is not used.
                     $message = [
                         'MessageBody' => json_encode($image->getId()),
                         'MessageDeduplicationId' => 'image-' . $image->getId(),
@@ -106,7 +105,7 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
                     ];
                     $this->sqs->sendMessage($message);
 
-                    $updated = $this->counterRepo->updateValue('images_max_id', $image->getId());
+                    $updated = $this->counterRepo->updateToLargerValue('images_max_id', $image->getId());
                     if (false == $updated) {
                         throw new \Exception(sprintf("Can't update value of images_max_id to %d", $image->getId()));
                     }

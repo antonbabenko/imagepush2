@@ -61,7 +61,6 @@ class ProcessorSource
     {
         $this->container = $container;
         $this->logger = $container->get('imagepush.processor_logger');
-        $this->varnish = $container->get('imagepush.varnish');
 
         $this->ddb = $container->get('aws.dynamodb');
         $this->sqs = $container->get('aws.sqs');
@@ -289,7 +288,6 @@ class ProcessorSource
         $log = sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);
 
-//        $this->varnish->purgeWhenNewImagesSavedAsUpcoming();
         return $log;
     }
 

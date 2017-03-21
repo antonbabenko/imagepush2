@@ -4,9 +4,15 @@ namespace Imagepush\ImagepushBundle\Repository;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
+use Monolog\Logger;
 
 class AbstractRepository
 {
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
 
     /**
      * AbstractRepository constructor.
@@ -15,6 +21,14 @@ class AbstractRepository
     public function __construct(DynamoDbClient $ddb)
     {
         $this->ddb = $ddb;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger($logger = null)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -32,19 +46,23 @@ class AbstractRepository
         $results = [];
 
         # The Scan operation is paginated. Issue the Scan request multiple times.
-        do {
-            # Add the ExclusiveStartKey if we got one back in the previous response
-            if (isset($response) && isset($response['LastEvaluatedKey'])) {
-                $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
-            }
+        try {
+            do {
+                # Add the ExclusiveStartKey if we got one back in the previous response
+                if (isset($response) && isset($response['LastEvaluatedKey'])) {
+                    $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
+                }
 
-            $response = $this->ddb->scan($request);
+                $response = $this->ddb->scan($request);
 
-            $count += $response['Count'];
+                $count += $response['Count'];
 
-            $results = array_merge($results, $response['Items']);
-        } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
-        while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
+                $results = array_merge($results, $response['Items']);
+            } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
+            while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
+        } catch (DynamoDbException $e) {
+            $this->logger->error($e->__toString());
+        }
 
         if (count($results) > $limit) {
             $results = array_slice($results, 0, $limit);
@@ -68,21 +86,25 @@ class AbstractRepository
         $results = [];
 
         # The Query operation is paginated. Issue the Query request multiple times.
-        do {
-            # Add the ExclusiveStartKey if we got one back in the previous response
-            if (isset($response) && isset($response['LastEvaluatedKey'])) {
-                $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
-            }
+        try {
+            do {
+                # Add the ExclusiveStartKey if we got one back in the previous response
+                if (isset($response) && isset($response['LastEvaluatedKey'])) {
+                    $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
+                }
 
-            $response = $this->ddb->query($request);
+                $response = $this->ddb->query($request);
 
 //            \D::dump($response);
 
-            $count += $response['Count'];
+                $count += $response['Count'];
 
-            $results = array_merge($results, $response['Items']);
-        } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
-        while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
+                $results = array_merge($results, $response['Items']);
+            } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
+            while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
+        } catch (DynamoDbException $e) {
+            $this->logger->error($e->__toString());
+        }
 
         if (count($results) > $limit) {
             $results = array_slice($results, 0, $limit);
@@ -127,7 +149,6 @@ class AbstractRepository
                 $result = $this->ddb->batchGetItem(
                     [
                         'RequestItems' => $requestItems,
-                        'ReturnConsumedCapacity' => 'TOTAL',
                     ]
                 );
 
@@ -137,8 +158,12 @@ class AbstractRepository
                 throw new \Exception("Could not complete batchWriteItem after " . $attempts . " attempts!");
             }
         } catch (DynamoDbException $e) {
-//            \D::dump($e->getMessage());
+            $this->logger->error($e->__toString());
+
+            return [];
         } catch (\Exception $e) {
+            $this->logger->error($e->__toString());
+
             return [];
         }
 
@@ -159,10 +184,14 @@ class AbstractRepository
 
         $result = null;
 
-        $response = $this->ddb->getItem($request);
+        try {
+            $response = $this->ddb->getItem($request);
 
-        if (isset($response['Item'])) {
-            $result = $response['Item'];
+            if (isset($response['Item'])) {
+                $result = $response['Item'];
+            }
+        } catch (DynamoDbException $e) {
+            $this->logger->error($e->__toString());
         }
 
         return $result;
@@ -179,7 +208,8 @@ class AbstractRepository
         try {
             $this->ddb->putItem($request);
         } catch (DynamoDbException $e) {
-//            \D::debug($e->getMessage());
+            $this->logger->error($e->__toString());
+
             return false;
         }
 
@@ -197,7 +227,8 @@ class AbstractRepository
         try {
             $this->ddb->deleteItem($request);
         } catch (DynamoDbException $e) {
-//            \D::debug($e->getMessage());
+            $this->logger->error($e->__toString());
+
             return false;
         }
 
@@ -215,7 +246,8 @@ class AbstractRepository
         try {
             $this->ddb->updateItem($request);
         } catch (DynamoDbException $e) {
-//            \D::debug($e->getMessage());
+            $this->logger->error($e->__toString());
+
             return false;
         }
 

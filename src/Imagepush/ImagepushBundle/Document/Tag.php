@@ -61,8 +61,40 @@ class Tag
     public function fromArray(array $data)
     {
         $this->setText(array_values($data['text'])[0]);
-        $this->setUsedInAvailable(array_values($data['usedInAvailable'])[0]);
-        $this->setUsedInUpcoming(array_values($data['usedInUpcoming'])[0]);
+
+        if (isset($data['usedInAvailable'])) {
+            $this->setUsedInAvailable(
+                array_values($data['usedInAvailable'])[0]
+            );
+        } else {
+            $this->setUsedInAvailable(0);
+        }
+
+        if (isset($data['usedInUpcoming'])) {
+            $this->setUsedInUpcoming(
+                array_values($data['usedInUpcoming'])[0]
+            );
+        } else {
+            $this->setUsedInUpcoming(0);
+        }
+
+    }
+
+    public function toItem()
+    {
+        $item = [
+            'text' => [
+                'S' => strval($this->getText())
+            ],
+            'usedInAvailable' => [
+                'N' => strval((int) $this->getUsedInAvailable())
+            ],
+            'usedInUpcoming' => [
+                'N' => strval((int) $this->getUsedInUpcoming())
+            ],
+        ];
+
+        return $item;
     }
 
     /**
@@ -118,7 +150,7 @@ class Tag
     /**
      * Set usedInAvailable
      *
-     * @param increment $usedInAvailable
+     * @param integer $usedInAvailable
      */
     public function setUsedInAvailable($usedInAvailable)
     {
@@ -128,7 +160,7 @@ class Tag
     /**
      * Get usedInAvailable
      *
-     * @return increment $usedInAvailable
+     * @return integer $usedInAvailable
      */
     public function getUsedInAvailable()
     {
@@ -138,7 +170,7 @@ class Tag
     /**
      * Increment usedInAvailable
      *
-     * @param int $inc
+     * @param integer $inc
      */
     public function incUsedInAvailable($inc = 1)
     {
@@ -148,7 +180,7 @@ class Tag
     /**
      * Set usedInUpcoming
      *
-     * @param increment $usedInUpcoming
+     * @param integer $usedInUpcoming
      */
     public function setUsedInUpcoming($usedInUpcoming)
     {
@@ -158,7 +190,7 @@ class Tag
     /**
      * Get usedInUpcoming
      *
-     * @return increment $usedInUpcoming
+     * @return integer $usedInUpcoming
      */
     public function getUsedInUpcoming()
     {
@@ -168,31 +200,11 @@ class Tag
     /**
      * Increment usedInUpcoming
      *
-     * @param int $inc
+     * @param integer $inc
      */
     public function incUsedInUpcoming($inc = 1)
     {
         $this->usedInUpcoming += $inc;
-    }
-
-    /**
-     * Add imagesRef
-     *
-     * @param Imagepush\ImagepushBundle\Document\Image $imagesRef
-     */
-    public function addImagesRef(\Imagepush\ImagepushBundle\Document\Image $imagesRef)
-    {
-        $this->imagesRef[] = $imagesRef;
-    }
-
-    /**
-     * Get imagesRef
-     *
-     * @return Doctrine\Common\Collections\Collection $imagesRef
-     */
-    public function getImagesRef()
-    {
-        return $this->imagesRef;
     }
 
 }

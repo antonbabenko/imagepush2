@@ -39,19 +39,11 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
         $this->dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $this->ddb = $this->getContainer()->get('aws.dynamodb');
 
-        // Tables
-//        $tables = ["images", "latest_tags", "links", "processed_hashes", "tags"];
-//        $createdTables = $ddb->listTables()->get('TableNames');
-//        $missingTables = array_diff($tables, $createdTables);
-//        \D::debug($missingTables);
-
-//        foreach ($ddb->listTables()->get('TableNames') as $item) {
-//            \D::dump($item);
-//        }
-
         printf("%s - Started\n", date(DATE_ATOM));
 
         printf("%s - Allready imported!\n", date(DATE_ATOM));
+
+//        $this->fixImportedImages();
 
 //        $this->importImages();
 
@@ -543,6 +535,90 @@ class MigrateDataToDynamoDBCommand extends ContainerAwareCommand
                 ]
             ]
         );
+
+    }
+
+    /**
+     * Fixed:
+     * 1. Replace SS to M for tagsFound
+     * 2. Remove obsolete isInProcess attribute
+     */
+    public function fixImportedImages()
+    {
+        $importedId = 0;
+        $tableName = 'images';
+        $runs = 0;
+        $count = 0;
+
+        while (true) {
+            $images = $this->dm->createQueryBuilder('ImagepushBundle:Image')
+                ->field('id')->gt($importedId)
+                ->field('tagsFound')->exists(true)
+                ->sort('id', 'ASC')
+//                ->limit(1)
+                ->requireIndexes(false)
+                ->limit(25 * 10)
+//                ->skip(250*324)
+                ->getQuery()->toArray();
+
+            printf("Found images: %d\n", count($images));
+
+            if (!count($images) || $runs++ >= 500000) {
+                break;
+            }
+
+            printf("%s - Results: %d. Run: %d\n", date(DATE_ATOM), count($images), $runs);
+
+            foreach ($images as $image) {
+
+//                \D::debug($image->getTagsFound());
+
+                if (!$image->getId() || !$image->getTagsFound()) {
+                    continue;
+                }
+
+                echo (string) $image->getId() . "\n";
+
+                $t = [];
+                $tags = [];
+
+                foreach ($image->getTagsFound() as $tk => $tv) {
+                    $tv = array_unique($tv);
+                    foreach ($tv as $tag => $mentioned) {
+                        $tags[strval($tag)] = ['N' => strval($mentioned)];
+                    }
+                    $t += [$tk => ['M' => $tags]];
+                }
+
+                $tagsFound = [
+                    'M' => $t
+                ];
+
+                $request = [
+                    'TableName' => $tableName,
+                    'Key' => [
+                        'id' => [
+                            'N' => (string) $image->getId()
+                        ],
+                    ],
+                    'ExpressionAttributeValues' => [
+                        ':tagsFound' => $tagsFound,
+                    ],
+                    'UpdateExpression' => 'SET tagsFound = :tagsFound REMOVE isInProcess'
+                ];
+
+//                \D::debug($request);
+
+                $this->ddb->updateItem($request);
+
+                $importedId = $image->getId();
+
+                $count++;
+            }
+//            break;
+        }
+
+        sprintf("Done fixing %d images\n", $count);
 
     }
 

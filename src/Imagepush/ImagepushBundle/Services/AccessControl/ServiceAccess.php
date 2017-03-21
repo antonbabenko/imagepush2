@@ -2,7 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Services\AccessControl;
 
-use Snc\RedisBundle\Client\Phpredis\Client;
+use Imagepush\ImagepushBundle\Repository\CounterRepository;
 
 /**
  * Web-services access limits (delays, max attempts, status messages)
@@ -31,21 +31,18 @@ class ServiceAccess
     public $settings;
 
     /**
-     * @param Client $redis
-     * @param array  $settings
+     * @var $counterRepo CounterRepository
      */
-    public function __construct(Client $redis, $settings)
-    {
-        $this->redis = $redis;
-        $this->settings = $settings;
-    }
+    protected $counterRepo;
 
     /**
-     * @param Monolog\Logger $logger
+     * @param CounterRepository $counterRepo
+     * @param array             $settings
      */
-    public function setLogger($logger = null)
+    public function __construct(CounterRepository $counterRepo, $settings)
     {
-        $this->logger = $logger;
+        $this->counterRepo = $counterRepo;
+        $this->settings = $settings;
     }
 
     /**
@@ -86,7 +83,7 @@ class ServiceAccess
     public function getDelay()
     {
 
-        $lastAccess = (float) $this->redis->get('service_access_' . $this->key);
+        $lastAccess = (float) $this->counterRepo->getValue('service_access_' . $this->key);
 
         if ($this->serviceIsOK()) {
             $expDelay = $this->delay;
@@ -119,7 +116,7 @@ class ServiceAccess
      */
     public function updateLastAccess()
     {
-        $this->redis->set('service_access_' . $this->key, microtime(true));
+        $this->counterRepo->updateValue('service_access_' . $this->key, microtime(true));
     }
 
     /**
@@ -127,9 +124,9 @@ class ServiceAccess
      *
      * @param string $status "OK" or "FAIL" status message
      */
-    public function updateServiceStatus($status = self::OK)
+    public function updateServiceStatus($status = self::STATUS_OK)
     {
-        $this->redis->rpush('service_status_' . $this->key, $status);
+        $this->counterRepo->updateValue('service_status_' . $this->key, $status);
 
         // Update last access at the end to make sure that next delay will be correct.
         $this->updateLastAccess();
@@ -140,9 +137,9 @@ class ServiceAccess
      */
     public function serviceIsOK()
     {
-        $lastStatus = $this->redis->lrange('service_status_' . $this->key, -1, -1);
+        $lastStatus = $this->counterRepo->getValue('service_status_' . $this->key);
 
-        return (isset($lastStatus[0]) && self::STATUS_OK == $lastStatus[0]);
+        return self::STATUS_OK == $lastStatus;
     }
 
     /**
@@ -152,7 +149,12 @@ class ServiceAccess
      */
     public function getExpDelay()
     {
-        $extent = min(12, (int) $this->redis->incr('service_extent_' . $this->key));
+        $serviceExtent = (int) $this->counterRepo->getValue('service_extent_' . $this->key);
+
+        $extent = min(12, $serviceExtent);
+
+        // increment extent
+        $this->counterRepo->updateValue('service_extent_' . $this->key, $serviceExtent + 1);
 
         return max($this->delay, pow(2, $extent - 1));
     }
@@ -162,7 +164,7 @@ class ServiceAccess
      */
     public function resetExtentDelay()
     {
-        $this->redis->set('service_extent_' . $this->key, 0);
+        $this->counterRepo->updateValue('service_extent_' . $this->key, 0);
     }
 
 }

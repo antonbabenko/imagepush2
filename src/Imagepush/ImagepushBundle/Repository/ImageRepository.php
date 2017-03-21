@@ -242,6 +242,70 @@ class ImageRepository extends AbstractRepository
     }
 
     /**
+     * @param  int
+     * @return array
+     */
+    public function findImagesRequireUpdateTags($limit = 20)
+    {
+
+        $request = [
+            'TableName' => 'images',
+            'IndexName' => 'requireUpdateTags-timestamp-index',
+            'ExpressionAttributeValues' => [
+                ':requireUpdateTags' => ['N' => '1'],
+            ],
+            'KeyConditionExpression' => 'requireUpdateTags = :requireUpdateTags',
+            'ScanIndexForward' => false,
+            'Limit' => $limit
+        ];
+
+        $results = $this->getQueryResults($request, $limit);
+
+        foreach ($results as & $result) {
+            $image = new Image();
+            $image->fromArray($result);
+
+            $result = $image;
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param  integer $minTagsFound Minimum number of found tags required for image to be published
+     * @param  integer $limit
+     * @return array
+     */
+    public function findNotPublishedImagesWithMostTagsFound($minTagsFound, $limit = 10)
+    {
+
+        $request = [
+            'TableName' => 'images',
+            'IndexName' => 'isAvailable-tagsFoundCount-index',
+            'ExpressionAttributeValues' => [
+                ':isAvailable' => ['N' => '0'],
+                ':tagsFoundCount' => ['N' => strval($minTagsFound)],
+                ':requireUpdateTags' => ['N' => '0'], // Only include images which has all tags updated (finalized)
+            ],
+            'KeyConditionExpression' => 'isAvailable = :isAvailable AND tagsFoundCount >= :tagsFoundCount',
+            'FilterExpression' => 'requireUpdateTags = :requireUpdateTags',
+            'ScanIndexForward' => false,
+            'Limit' => $limit
+        ];
+
+        $results = $this->getQueryResults($request, $limit);
+
+        foreach ($results as & $result) {
+            $image = new Image();
+            $image->fromArray($result);
+
+            $result = $image;
+        }
+
+        return $results;
+    }
+
+    /**
      * @param  Image   $image
      * @return boolean
      */
@@ -253,7 +317,7 @@ class ImageRepository extends AbstractRepository
             'Item' => $image->toItem()
         ];
 
-//        echo "\nInserting item:\n";
+//        echo "\nInserting imageitem:\n";
 //        \D::debug($request);
 
         $result = $this->putItem($request);
@@ -261,6 +325,7 @@ class ImageRepository extends AbstractRepository
         return $result;
 
     }
+
     /**
      * @param  integer $id
      * @return boolean
