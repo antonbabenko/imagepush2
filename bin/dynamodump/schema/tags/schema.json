@@ -8,23 +8,23 @@
       }
     ], 
     "ProvisionedThroughput": {
-      "NumberOfDecreasesToday": 2, 
+      "NumberOfDecreasesToday": 0, 
       "WriteCapacityUnits": 1, 
-      "LastIncreaseDateTime": 1489749014.743, 
+      "LastIncreaseDateTime": 1490033667.583, 
       "ReadCapacityUnits": 1, 
-      "LastDecreaseDateTime": 1489749019.505
+      "LastDecreaseDateTime": 1490033679.713
     }, 
-    "TableSizeBytes": 822689, 
+    "TableSizeBytes": 844873, 
     "TableName": "tags", 
     "TableStatus": "ACTIVE", 
-    "TableId": "046f6e6e-0aec-4135-a9ec-a95f053a2fd7", 
+    "TableId": "0e15343c-c75c-43c5-b931-3488732a6eba", 
     "KeySchema": [
       {
         "KeyType": "HASH", 
         "AttributeName": "text"
       }
     ], 
-    "ItemCount": 17921, 
-    "CreationDateTime": 1485101821.93
+    "ItemCount": 18376, 
+    "CreationDateTime": 1489760172.221
   }
 }
