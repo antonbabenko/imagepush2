@@ -1,5 +1,5 @@
 branch-defaults:
-  odm_to_dynamodb:
+  master:
     environment: prod-eb
 global:
   application_name: imagepush2
