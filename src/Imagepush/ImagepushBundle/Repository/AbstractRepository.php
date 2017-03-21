@@ -40,45 +40,29 @@ class AbstractRepository
      */
     public function getScanResults(array $request, $limit, $maxPages = 3)
     {
-
-        $count = 0;
-        $page = 0;
-        $results = [];
-
-        # The Scan operation is paginated. Issue the Scan request multiple times.
-        try {
-            do {
-                # Add the ExclusiveStartKey if we got one back in the previous response
-                if (isset($response) && isset($response['LastEvaluatedKey'])) {
-                    $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
-                }
-
-                $response = $this->ddb->scan($request);
-
-                $count += $response['Count'];
-
-                $results = array_merge($results, $response['Items']);
-            } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
-            while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
-        } catch (DynamoDbException $e) {
-            $this->logger->error($e->__toString());
-        }
-
-        if (count($results) > $limit) {
-            $results = array_slice($results, 0, $limit);
-        }
-
-        return $results;
+        return $this->getResults('scan', $request, $limit, $maxPages);
     }
 
     /**
-     * @param $request  array   Associative array with 'request' for query command
-     * @param $limit    integer Desired number of records
+     * @param $request array   Associative array with 'request' for scan command
+     * @param $limit   integer Desired number of records
      * @param $maxPages int     Max number of pages to try to scan. Set to small number to avoid large scan.
      *
      * @return array|null
      */
     public function getQueryResults(array $request, $limit, $maxPages = 3)
+    {
+        return $this->getResults('query', $request, $limit, $maxPages);
+    }
+
+    /**
+     * @param $command  string  DynamoDB command to call ('query' or 'scan')
+     * @param $request  array   Associative array with 'request' for query command
+     * @param $limit    integer Desired number of records
+     * @param $maxPages int     Max number of pages to try to scan. Set to small number to avoid large scan.
+     * @return array|null
+     */
+    protected function getResults($command, array $request, $limit, $maxPages)
     {
 
         $count = 0;
@@ -93,14 +77,18 @@ class AbstractRepository
                     $request['ExclusiveStartKey'] = $response['LastEvaluatedKey'];
                 }
 
-                $response = $this->ddb->query($request);
+                if ('query' == $command) {
+                    $response = $this->ddb->query($request);
+                } else {
+                    $response = $this->ddb->scan($request);
+                }
 
 //            \D::dump($response);
 
                 $count += $response['Count'];
 
                 $results = array_merge($results, $response['Items']);
-            } # If there is no LastEvaluatedKey in the response, there are no more items matching this Scan
+            } # If there is no LastEvaluatedKey in the response, there are no more items matching this request
             while (isset($response['LastEvaluatedKey']) and $count < $limit and $page++ < $maxPages);
         } catch (DynamoDbException $e) {
             $this->logger->error($e->__toString());

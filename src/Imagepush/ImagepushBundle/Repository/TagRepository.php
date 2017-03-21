@@ -25,8 +25,6 @@ class TagRepository extends AbstractRepository
             'Limit' => 1
         ];
 
-//        \D::dump($request);
-
         $results = $this->getQueryResults($request, 1);
 
         foreach ($results as & $result) {
@@ -34,7 +32,6 @@ class TagRepository extends AbstractRepository
             $tag->fromArray($result);
 
             $result = $tag;
-//            \D::dump($tag);
         }
 
         if (count($results)) {

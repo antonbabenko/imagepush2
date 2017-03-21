@@ -3,7 +3,7 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Gedmo\Mapping\Annotation as Gedmo;
+//use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Image
@@ -57,7 +57,7 @@ class Image
     protected $title;
 
     /**
-     * @Gedmo\Slug(fields={"title"}, unique=false)
+     * @ Gedmo\Slug(fields={"title"}, unique=false)
      */
     protected $slug;
 
