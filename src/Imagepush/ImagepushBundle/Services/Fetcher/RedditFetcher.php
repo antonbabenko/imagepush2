@@ -33,9 +33,8 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
             $item->over_18 != true &&
             isset($item->is_self) &&
             $item->is_self != true &&
-            false === (bool) $this->dm->getRepository('ImagepushBundle:Link')->isIndexedOrFailed($item->url) &&
-            false === (bool) $this->dm->getRepository('ImagepushBundle:Image')->findOneBy(array("link" => $item->url))
-            );
+            false === (bool) $this->linkRepo->isIndexedOrFailed($item->url)
+        );
         // @codingStandardsIgnoreEnd
 
         if ($worthToSave) {
@@ -87,17 +86,30 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
 
             try {
                 // increment id
-                $nextId = $this->dm->getRepository('ImagepushBundle:Image')->getNextId();
+                $maxId = $this->counterRepo->getValue('images_max_id');
 
-                if ($nextId) {
-                    $image->setId($nextId);
+                if ($maxId) {
+                    $image->setId($maxId + 1);
                 } else {
-                    throw new \Exception("Can't find max image ID to increment");
+                    throw new \Exception("Can't find value of images_max_id");
                 }
 
-                $this->dm->persist($image);
-                $this->dm->flush();
-                $this->dm->refresh($image);
+                $result = $this->imageRepo->save($image);
+
+                if ($result) {
+
+                    $message = [
+                        'MessageBody' => json_encode($image->getId()),
+                        'MessageDeduplicationId' => 'image-' . $image->getId(),
+                        'QueueUrl' => $this->sqsQueueUrlImages,
+                    ];
+                    $this->sqs->sendMessage($message);
+
+                    $updated = $this->counterRepo->updateToLargerValue('images_max_id', $image->getId());
+                    if (false == $updated) {
+                        throw new \Exception(sprintf("Can't update value of images_max_id to %d", $image->getId()));
+                    }
+                }
 
                 $this->savedCounter++;
             } catch (\Exception $e) {
@@ -107,7 +119,7 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
     }
 
     /**
-     * @return type
+     * @return array
      */
     public function run()
     {
@@ -155,9 +167,18 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
         }
 
         if ($this->fetchedCounter && $this->savedCounter) {
-            $this->output[] = sprintf("[Reddit] %s: %d of %d items have been saved.", date(DATE_RSS), $this->savedCounter, $this->fetchedCounter);
+            $this->output[] = sprintf(
+                "[Reddit] %s: %d of %d items have been saved.",
+                date(DATE_RSS),
+                $this->savedCounter,
+                $this->fetchedCounter
+            );
         } elseif ($this->fetchedCounter && !$this->savedCounter) {
-            $this->output[] = sprintf("[Reddit] %s: %d sources received, but nothing has been saved (all filtered out).", date(DATE_RSS), $this->fetchedCounter);
+            $this->output[] = sprintf(
+                "[Reddit] %s: %d sources received, but nothing has been saved (all filtered out).",
+                date(DATE_RSS),
+                $this->fetchedCounter
+            );
         } else {
             $this->output[] = sprintf("[Reddit] %s: Reddit replied with error", date(DATE_RSS));
         }

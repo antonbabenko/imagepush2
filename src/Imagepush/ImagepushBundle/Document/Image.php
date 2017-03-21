@@ -3,8 +3,7 @@
 namespace Imagepush\ImagepushBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
-use Gedmo\Mapping\Annotation as Gedmo;
+//use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Image
@@ -16,7 +15,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *   @MongoDB\Index(keys={"timestamp"="desc"}),
  *   @MongoDB\Index(keys={"tags"="asc"}),
  *   @MongoDB\Index(keys={"isAvailable"="asc"}),
- *   @MongoDB\Index(keys={"isInProcess"="asc"}),
  *   @MongoDB\Index(keys={"sourceType"="asc"})
  * })
  */
@@ -59,49 +57,45 @@ class Image
     protected $title;
 
     /**
-     * @Gedmo\Slug(fields={"title"}, unique=false)
-     * @MongoDB\String
+     * @ Gedmo\Slug(fields={"title"}, unique=false)
      */
     protected $slug;
 
     /**
-     * @MongoDB\String
+     * Source type
      */
     protected $sourceType;
 
     /**
-     * @MongoDB\Collection
+     * List of original tags fetched from the source
      */
     protected $sourceTags;
 
     /**
-     * @MongoDB\Collection
+     * List of final tags
      */
     protected $tags;
 
     /**
      * Hash of found tags (not finalized)
-     * @MongoDB\Hash
      */
     protected $tagsFound;
 
     /**
-     * @MongoDB\Collection
-     * @MongoDB\ReferenceMany(targetDocument="Tag")
+     * Count of found tags
      */
-    protected $tagsRef;
+    protected $tagsFoundCount;
+
+    /**
+     * Boolean. If true then this image has new tagsFound, so that tags for this image should to be updated.
+     */
+    protected $requireUpdateTags;
 
     /**
      * Available (published) or Upcoming
      * @MongoDB\Boolean
      */
     protected $isAvailable;
-
-    /**
-     * Is "in process"
-     * @MongoDB\Boolean
-     */
-    protected $isInProcess;
 
     /**
      * Created thumbs with actual dimensions
@@ -113,6 +107,176 @@ class Image
     {
         $this->tagsRef = new \Doctrine\Common\Collections\ArrayCollection();
         $this->thumbs = array();
+    }
+
+    public function fromArray(array $data)
+    {
+        $this->setId(intval(array_values($data['id'])[0]));
+        $this->setTitle(array_values($data['title'])[0]);
+        $this->setSlug(array_values($data['slug'])[0]);
+        $this->setTimestamp(array_values($data['timestamp'])[0]);
+        $this->setLink(array_values($data['link'])[0]);
+        $this->setSourceType(array_values($data['sourceType'])[0]);
+        $this->setIsAvailable(array_values($data['isAvailable'])[0]);
+
+        if (isset($data['requireUpdateTags'])) {
+            $this->setRequireUpdateTags(
+                array_values($data['requireUpdateTags'])[0]
+            );
+        }
+
+        if (isset($data['tagsFoundCount'])) {
+            $this->setTagsFoundCount(
+                array_values($data['tagsFoundCount'])[0]
+            );
+        }
+
+        if (isset($data['file'])) {
+            $this->setFile(
+                array_values($data['file'])[0]
+            );
+        }
+
+        if (isset($data['mimeType'])) {
+            $this->setMimeType(
+                array_values($data['mimeType'])[0]
+            );
+        }
+
+        if (isset($data['tags'])) {
+            $this->setTags(
+                array_values($data['tags'])[0]
+            );
+        }
+
+        if (isset($data['sourceTags'])) {
+            $this->setSourceTags(
+                array_values($data['sourceTags'])[0]
+            );
+        }
+
+        if (isset($data['thumbs'])) {
+            $t = [];
+            foreach (array_values($data['thumbs'])[0] as $tk => $tv) {
+                $tvv = [];
+                foreach (array_values($tv)[0] as $tvk => $tvvalue) {
+                    $tvv += [$tvk => intval(array_values($tvvalue)[0])];
+                }
+                $t += [$tk => $tvv];
+            }
+
+            $this->setThumbs($t);
+        }
+
+        if (isset($data['tagsFound'])) {
+            $t = [];
+            foreach (array_values($data['tagsFound'])[0] as $tk => $tv) {
+                $tvv = [];
+                foreach (array_values($tv)[0] as $tvk => $tvvalue) {
+                    $tvv += [$tvk => intval(array_values($tvvalue)[0])];
+                }
+                $t += [$tk => $tvv];
+            }
+
+            $this->setTagsFound($t);
+        }
+
+    }
+
+    public function toItem()
+    {
+        $item = [
+            'id' => [
+                'N' => strval($this->getId())
+            ],
+            'title' => [
+                'S' => strval($this->getTitle())
+            ],
+            'timestamp' => [
+                'N' => strval($this->getTimestamp())
+            ],
+            'link' => [
+                'S' => strval($this->getLink())
+            ],
+            'sourceType' => [
+                'S' => strval($this->getSourceType())
+            ],
+            'isAvailable' => [
+                'N' => strval((int) $this->getIsAvailable())
+            ],
+            'requireUpdateTags' => [
+                'N' => strval((int) $this->getRequireUpdateTags())
+            ],
+        ];
+
+        if ($this->getSlug()) {
+            $item['slug'] = [
+                'S' => strval($this->getSlug())
+            ];
+        }
+
+        if ($this->getTagsFoundCount()) {
+            $item['tagsFoundCount'] = [
+                'N' => strval($this->getTagsFoundCount())
+            ];
+        }
+
+        if ($this->getFile()) {
+            $item['file'] = [
+                'S' => strval($this->getFile())
+            ];
+        }
+
+        if ($this->getMimeType()) {
+            $item['mimeType'] = [
+                'S' => strval($this->getMimeType())
+            ];
+        }
+
+        if ($this->getSourceTags()) {
+            $item['sourceTags'] = [
+                'SS' => array_values(array_unique(array_map('strval', (array) $this->getSourceTags())))
+            ];
+        }
+
+        if ($this->getTags()) {
+            $item['tags'] = [
+                'SS' => array_values(array_unique(array_map('strval', (array) $this->getTags())))
+            ];
+        }
+
+        if ($this->getTagsFound()) {
+            $t = [];
+            foreach ($this->getTagsFound() as $tk => $tv) {
+                $tags = [];
+                foreach ($tv as $tag => $mentioned) {
+                    $tags[strval($tag)] = ['N' => strval($mentioned)];
+                }
+                $t += [$tk => ['M' => $tags]];
+            }
+
+            $item['tagsFound'] = [
+                'M' => $t
+            ];
+        }
+
+        if ($this->getThumbs()) {
+            $t = [];
+            foreach ($this->getThumbs() as $tk => $tv) {
+                $tvv = [];
+                foreach ($tv as $tvk => $tvvalue) {
+                    $tvv += [$tvk => ['N' => strval($tvvalue)]];
+                }
+                $t += [$tk => ['M' => $tvv]];
+            }
+
+            $item['thumbs'] = [
+                'M' => $t
+            ];
+        }
+
+        return $item;
+
     }
 
     /**
@@ -200,9 +364,12 @@ class Image
      */
     public function getDatetime()
     {
-        return new \DateTime("@" . $this->timestamp->__toString());
         // done... @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
-        //return $this->timestamp instanceof \MongoTimestamp ? new \DateTime("@" . $this->timestamp->__toString()) : new \DateTime;
+        if ($this->timestamp instanceof \MongoTimestamp) {
+            return new \DateTime("@" . $this->timestamp->__toString());
+        } else {
+            return new \DateTime("@" . $this->timestamp);
+        }
     }
 
     /**
@@ -288,7 +455,7 @@ class Image
     /**
      * Set sourceTags
      *
-     * @param collection $sourceTags
+     * @param array $sourceTags
      */
     public function setSourceTags($sourceTags)
     {
@@ -298,7 +465,7 @@ class Image
     /**
      * Get sourceTags
      *
-     * @return collection $sourceTags
+     * @return array $sourceTags
      */
     public function getSourceTags()
     {
@@ -308,7 +475,7 @@ class Image
     /**
      * Set tags
      *
-     * @param collection $tags
+     * @param array $tags
      */
     public function setTags($tags)
     {
@@ -318,7 +485,7 @@ class Image
     /**
      * Get tags
      *
-     * @return collection $tags
+     * @return array $tags
      */
     public function getTags()
     {
@@ -328,8 +495,8 @@ class Image
     /**
      * Set tagsFound
      *
-     * @param  collection $tagsFound
-     * @return \Image
+     * @param  array $tagsFound
+     * @return Image
      */
     public function setTagsFound($tagsFound)
     {
@@ -341,7 +508,7 @@ class Image
     /**
      * Get tagsFound
      *
-     * @return collection $tagsFound
+     * @return array $tagsFound
      */
     public function getTagsFound()
     {
@@ -349,33 +516,49 @@ class Image
     }
 
     /**
-     * Add tagsRef
+     * Set tagsFoundCount
      *
-     * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
+     * @param  integer $tagsFoundCount
+     * @return Image
      */
-    public function addTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+    public function setTagsFoundCount($tagsFoundCount)
     {
-        $this->tagsRef[] = $tagsRef;
+        $this->tagsFoundCount = $tagsFoundCount;
+
+        return $this;
     }
 
     /**
-     * Get tagsRef
+     * Get tagsFoundCount
      *
-     * @return Doctrine\Common\Collections\Collection $tagsRef
+     * @return integer $tagsFoundCount
      */
-    public function getTagsRef()
+    public function getTagsFoundCount()
     {
-        return $this->tagsRef;
+        return $this->tagsFoundCount;
     }
 
     /**
-    * Remove tagsRef
-    *
-    * @param Imagepush\ImagepushBundle\Document\Tag $tagsRef
-    */
-    public function removeTagsRef(\Imagepush\ImagepushBundle\Document\Tag $tagsRef)
+     * Set requireUpdateTags
+     *
+     * @param  boolean $requireUpdateTags
+     * @return Image
+     */
+    public function setRequireUpdateTags($requireUpdateTags)
     {
-        $this->tagsRef->removeElement($tagsRef);
+        $this->requireUpdateTags = (bool) $requireUpdateTags;
+
+        return $this;
+    }
+
+    /**
+     * Get requireUpdateTags
+     *
+     * @return bool $requireUpdateTags
+     */
+    public function getRequireUpdateTags()
+    {
+        return $this->requireUpdateTags;
     }
 
     /**
@@ -396,26 +579,6 @@ class Image
     public function getIsAvailable()
     {
         return $this->isAvailable;
-    }
-
-    /**
-     * Set isInProcess
-     *
-     * @param boolean $isInProcess
-     */
-    public function setIsInProcess($isInProcess)
-    {
-        $this->isInProcess = $isInProcess;
-    }
-
-    /**
-     * Get isInProcess
-     *
-     * @return boolean $isInProcess
-     */
-    public function getIsInProcess()
-    {
-        return $this->isInProcess;
     }
 
     /**
@@ -458,7 +621,7 @@ class Image
         $file = floor($this->getId() / 10000) . "/";
         $file .= floor($this->getId() / 1000) . "/";
         $file .= floor($this->getId() / 100) . "/";
-        $file .= ( $this->getId() % 100) . "." . $fileExt;
+        $file .= ($this->getId() % 100) . "." . $fileExt;
 
         $this->setFile($file);
 
@@ -468,7 +631,7 @@ class Image
     /**
      * Set thumbs
      *
-     * @param hash $thumbs
+     * @param array $thumbs
      *
      * @return Image
      */
@@ -492,11 +655,11 @@ class Image
     /**
      * Add created thumb.
      *
-     * @param type $filter       Filter name ("in", "out")
-     * @param type $size         Filter size (eg, "120x150")
-     * @param type $actualWidth  Actual width
-     * @param type $actualHeight Actual height
-     * @param type $filesize     File size
+     * @param string  $filter       Filter name ("in", "out")
+     * @param string  $size         Filter size (eg, "120x150")
+     * @param integer $actualWidth  Actual width
+     * @param integer $actualHeight Actual height
+     * @param integer $filesize     File size
      */
     public function addThumbs($filter, $size, $actualWidth = 0, $actualHeight = 0, $filesize = 0)
     {

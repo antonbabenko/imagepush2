@@ -1,0 +1,59 @@
+{
+  "Table": {
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/latest_tags", 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "id", 
+        "AttributeType": "B"
+      }, 
+      {
+        "AttributeName": "timestamp", 
+        "AttributeType": "N"
+      }
+    ], 
+    "LocalSecondaryIndexes": [
+      {
+        "IndexSizeBytes": 211415, 
+        "IndexName": "id-timestamp-index", 
+        "Projection": {
+          "ProjectionType": "ALL"
+        }, 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "id"
+          }, 
+          {
+            "KeyType": "RANGE", 
+            "AttributeName": "timestamp"
+          }
+        ], 
+        "IndexArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/latest_tags/index/id-timestamp-index", 
+        "ItemCount": 3480
+      }
+    ], 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749010.777, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749015.42
+    }, 
+    "TableSizeBytes": 211415, 
+    "TableName": "latest_tags", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "72312b26-ebe9-4c10-b5ce-756463069c47", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "id"
+      }, 
+      {
+        "KeyType": "RANGE", 
+        "AttributeName": "timestamp"
+      }
+    ], 
+    "ItemCount": 3480, 
+    "CreationDateTime": 1485116722.874
+  }
+}

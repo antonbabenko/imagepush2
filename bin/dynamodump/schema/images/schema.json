@@ -1,0 +1,128 @@
+{
+  "Table": {
+    "GlobalSecondaryIndexes": [
+      {
+        "IndexSizeBytes": 58796718, 
+        "IndexName": "isAvailable-timestamp-index", 
+        "Projection": {
+          "ProjectionType": "ALL"
+        }, 
+        "IndexStatus": "ACTIVE", 
+        "ProvisionedThroughput": {
+          "NumberOfDecreasesToday": 0, 
+          "WriteCapacityUnits": 5, 
+          "LastIncreaseDateTime": 1490031647.388, 
+          "ReadCapacityUnits": 1, 
+          "LastDecreaseDateTime": 1490041840.647
+        }, 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "isAvailable"
+          }, 
+          {
+            "KeyType": "RANGE", 
+            "AttributeName": "timestamp"
+          }
+        ], 
+        "IndexArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images/index/isAvailable-timestamp-index", 
+        "ItemCount": 163234
+      }, 
+      {
+        "IndexSizeBytes": 1410, 
+        "IndexName": "requireUpdateTags-timestamp-index", 
+        "Projection": {
+          "ProjectionType": "ALL"
+        }, 
+        "IndexStatus": "ACTIVE", 
+        "ProvisionedThroughput": {
+          "NumberOfDecreasesToday": 0, 
+          "WriteCapacityUnits": 1, 
+          "LastIncreaseDateTime": 1490031649.53, 
+          "ReadCapacityUnits": 1, 
+          "LastDecreaseDateTime": 1490040477.77
+        }, 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "requireUpdateTags"
+          }, 
+          {
+            "KeyType": "RANGE", 
+            "AttributeName": "timestamp"
+          }
+        ], 
+        "IndexArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images/index/requireUpdateTags-timestamp-index", 
+        "ItemCount": 3
+      }, 
+      {
+        "IndexSizeBytes": 901, 
+        "IndexName": "isAvailable-tagsFoundCount-index", 
+        "Projection": {
+          "ProjectionType": "ALL"
+        }, 
+        "IndexStatus": "ACTIVE", 
+        "ProvisionedThroughput": {
+          "NumberOfDecreasesToday": 0, 
+          "WriteCapacityUnits": 1, 
+          "ReadCapacityUnits": 1, 
+          "LastDecreaseDateTime": 1490042127.672
+        }, 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "isAvailable"
+          }, 
+          {
+            "KeyType": "RANGE", 
+            "AttributeName": "tagsFoundCount"
+          }
+        ], 
+        "IndexArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images/index/isAvailable-tagsFoundCount-index", 
+        "ItemCount": 2
+      }
+    ], 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "id", 
+        "AttributeType": "N"
+      }, 
+      {
+        "AttributeName": "isAvailable", 
+        "AttributeType": "N"
+      }, 
+      {
+        "AttributeName": "requireUpdateTags", 
+        "AttributeType": "N"
+      }, 
+      {
+        "AttributeName": "tagsFoundCount", 
+        "AttributeType": "N"
+      }, 
+      {
+        "AttributeName": "timestamp", 
+        "AttributeType": "N"
+      }
+    ], 
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images", 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 0, 
+      "WriteCapacityUnits": 5, 
+      "LastIncreaseDateTime": 1490033661.151, 
+      "ReadCapacityUnits": 10, 
+      "LastDecreaseDateTime": 1490041840.624
+    }, 
+    "TableSizeBytes": 58796809, 
+    "TableName": "images", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "31a90f56-28c3-4dee-a38d-063439644fc8", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "id"
+      }
+    ], 
+    "ItemCount": 163236, 
+    "CreationDateTime": 1489759006.856
+  }
+}

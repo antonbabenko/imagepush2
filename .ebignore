@@ -1,0 +1,16 @@
+web/bundles/
+web/new_uploads/
+web/uploads/
+web/i/
+web/extra/
+app/cache/
+app/logs/
+app/config/parameters.yml
+.DS_Store
+.idea
+composer.phar
+nohup.out
+vendor/
+.git/
+.elasticbeanstalk/
+*~

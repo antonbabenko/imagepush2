@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FetchFromDiggCommand extends ContainerAwareCommand
+class ProcessTagsCommand extends ContainerAwareCommand
 {
 
     protected function configure()
@@ -14,10 +14,9 @@ class FetchFromDiggCommand extends ContainerAwareCommand
         parent::configure();
 
         $this
-            ->setName('imagepush:fetch-from-digg')
-            ->setDescription('Fetch new sources from Digg')
-            ->setHelp('Fetch from Digg and save as unprocessed sources');
-
+            ->setName('imagepush:process-tags')
+            ->setDescription('Process tags for images from SQS queue')
+            ->setHelp('Find tags');
     }
 
     /**
@@ -26,7 +25,7 @@ class FetchFromDiggCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->getContainer()->get('imagepush.fetcher.digg')->run();
+        $content = $this->getContainer()->get('imagepush.processor.tag')->processTag();
 
         $output->writeLn($content, true);
     }

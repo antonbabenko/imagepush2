@@ -65,4 +65,17 @@ class ProcessedHash
         return $this->hash;
     }
 
+    public function toItem()
+    {
+
+        $item = [
+            'hash' => [
+                'S' => strval($this->getHash())
+            ]
+        ];
+
+        return $item;
+
+    }
+
 }

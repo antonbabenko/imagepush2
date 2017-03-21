@@ -1,0 +1,30 @@
+{
+  "Table": {
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/processed_hashes", 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "hash", 
+        "AttributeType": "S"
+      }
+    ], 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749012.4, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749021.961
+    }, 
+    "TableSizeBytes": 2760696, 
+    "TableName": "processed_hashes", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "58f21839-9814-4cf1-ac52-97c5d72d8851", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "hash"
+      }
+    ], 
+    "ItemCount": 76686, 
+    "CreationDateTime": 1485614817.189
+  }
+}

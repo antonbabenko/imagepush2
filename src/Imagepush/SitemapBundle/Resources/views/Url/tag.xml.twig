@@ -1,2 +1,2 @@
-<loc>{{ path('viewByTag', {'tag': tag.text|url_encode})|sitemap_url_absolute }}</loc>
+<loc>{{ path('viewByTag', {'tag': tag.text.S|url_encode})|sitemap_url_absolute }}</loc>
 <changefreq>daily</changefreq>

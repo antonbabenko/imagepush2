@@ -5,9 +5,7 @@ function user_has_access()
   if (preg_match("/^dev/", $_SERVER['HTTP_HOST'])) {
     define('SF_ENVIRONMENT', 'dev');
     define('SF_DEBUG', true);
-    $allowed_ips = array('127.0.0.1', '::1',
-      '10.0.0.2', '10.0.0.38', '80.203.227.145', // Anton
-      );
+    $allowed_ips = array('127.0.0.1', '::1');
   } else {
     define('SF_ENVIRONMENT', 'prod');
     define('SF_DEBUG', false);

@@ -25,7 +25,7 @@ class ProcessSourceCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $content = $this->getContainer()->get('imagepush.processor')->processSource();
+        $content = $this->getContainer()->get('imagepush.processor.source')->processSource();
 
         $output->writeLn($content, true);
     }

@@ -2,7 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Controller;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
+use Imagepush\ImagepushBundle\Repository\ImageRepository;
 use Imagine\Image\ImagineInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
@@ -34,12 +34,12 @@ class ImagineController
     protected $cacheManager;
 
     /**
-     * @var DocumentManager
+     * @var ImageRepository
      */
-    protected $dm;
+    protected $imageRepo;
 
     /**
-     * @var Imagine\Image\ImagineInterface
+     * @var \Imagine\Image\ImagineInterface
      */
     private $imagine;
 
@@ -56,17 +56,17 @@ class ImagineController
      * @param DataManager      $dataManager
      * @param FilterManager    $filterManager
      * @param CacheManager     $cacheManager
-     * @param DocumentManager  $dm
+     * @param ImageRepository  $imageRepo
      * @param ImagineInterface $imagine
      * @param Logger           $logger
      * @param boolean          $debug
      */
-    public function __construct(DataManager $dataManager, FilterManager $filterManager, CacheManager $cacheManager, DocumentManager $dm, ImagineInterface $imagine, Logger $logger, $debug)
+    public function __construct(DataManager $dataManager, FilterManager $filterManager, CacheManager $cacheManager, ImageRepository $imageRepo, ImagineInterface $imagine, Logger $logger, $debug)
     {
         $this->dataManager = $dataManager;
         $this->filterManager = $filterManager;
         $this->cacheManager = $cacheManager;
-        $this->dm = $dm;
+        $this->imageRepo = $imageRepo;
         $this->imagine = $imagine;
         $this->logger = $logger;
         $this->debug = $debug;
@@ -154,9 +154,8 @@ class ImagineController
 
             // Update image thumbs in database to prevent it from generating again
             if (!empty($imageId)) {
-                $image = $this->dm
-                    ->getRepository('ImagepushBundle:Image')
-                    ->findOneBy(array("id" => (int) $imageId));
+                $image = $this->imageRepo->findOneBy((int) $imageId, 0);
+
                 if ($image) {
                     // try to get real image size
                     try {
@@ -164,8 +163,7 @@ class ImagineController
 
                         $image->addThumbs($filter, $width . 'x' . $height, $resized->getSize()->getWidth(), $resized->getSize()->getHeight(), $filesize);
 
-                        $this->dm->persist($image);
-                        $this->dm->flush();
+                        $this->imageRepo->save($image);
 
                         //$this->logger->err(sprintf("[Imagine] Size_content %d; size_file: %d", strlen($response->getContent()), $filesize));
                     } catch (\Exception $e) {

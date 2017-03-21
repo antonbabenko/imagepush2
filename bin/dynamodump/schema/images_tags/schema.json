@@ -1,0 +1,70 @@
+{
+  "Table": {
+    "GlobalSecondaryIndexes": [
+      {
+        "IndexSizeBytes": 222765, 
+        "IndexName": "tag-id-index", 
+        "Projection": {
+          "ProjectionType": "ALL"
+        }, 
+        "IndexStatus": "ACTIVE", 
+        "ProvisionedThroughput": {
+          "NumberOfDecreasesToday": 0, 
+          "WriteCapacityUnits": 1, 
+          "ReadCapacityUnits": 1, 
+          "LastDecreaseDateTime": 1485703380.5
+        }, 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "tag"
+          }, 
+          {
+            "KeyType": "RANGE", 
+            "AttributeName": "id"
+          }
+        ], 
+        "IndexArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images_tags/index/tag-id-index", 
+        "ItemCount": 5861
+      }
+    ], 
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "id", 
+        "AttributeType": "N"
+      }, 
+      {
+        "AttributeName": "key", 
+        "AttributeType": "B"
+      }, 
+      {
+        "AttributeName": "tag", 
+        "AttributeType": "S"
+      }
+    ], 
+    "TableArn": "arn:aws:dynamodb:eu-west-1:307990089504:table/images_tags", 
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 2, 
+      "WriteCapacityUnits": 1, 
+      "LastIncreaseDateTime": 1489749009.248, 
+      "ReadCapacityUnits": 1, 
+      "LastDecreaseDateTime": 1489749015.433
+    }, 
+    "TableSizeBytes": 222765, 
+    "TableName": "images_tags", 
+    "TableStatus": "ACTIVE", 
+    "TableId": "be943d2f-225a-4f50-9756-bc7b1f7c610d", 
+    "KeySchema": [
+      {
+        "KeyType": "HASH", 
+        "AttributeName": "key"
+      }, 
+      {
+        "KeyType": "RANGE", 
+        "AttributeName": "id"
+      }
+    ], 
+    "ItemCount": 5861, 
+    "CreationDateTime": 1485203321.167
+  }
+}

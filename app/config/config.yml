@@ -2,7 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: imagepush.yml }
-    - { resource: rabbitmq.yml }
+#    - { resource: rabbitmq.yml }
     - { resource: services.yml }
 
 framework:
@@ -64,7 +64,8 @@ doctrine_mongodb:
                 connect: true
     proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
     hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
-    default_database: imagepush_%kernel.environment%
+    default_database: imagepush_imported
+#    default_database: imagepush_%kernel.environment%
     document_managers:
         default:
             metadata_cache_driver: array # apc
@@ -121,22 +122,37 @@ knp_gaufrette:
             adapter:    %filesystems_images_adapter%
 
 # Redis
-snc_redis:
-    clients:
-        default:
-            #type: predis
-            type: phpredis
-            alias: default
-            dsn: redis://%redis_host%:%redis_port%/%redis_db%
-            logging: %kernel.debug%
-            options:
-                profile: 2.6
-                connection_timeout: 10
-                connection_persistent: true
-                read_write_timeout: 30
-                iterable_multibulk: false
-                throw_errors: true
+#snc_redis:
+#    clients:
+#        default:
+#            #type: predis
+#            type: phpredis
+#            alias: default
+#            dsn: redis://%redis_host%:%redis_port%/%redis_db%
+#            logging: %kernel.debug%
+#            options:
+#                profile: 2.6
+#                connection_timeout: 10
+#                connection_persistent: true
+#                read_write_timeout: 30
+#                iterable_multibulk: false
+#                throw_errors: true
 
+# AWS
+aws:
+    version: latest
+    region: eu-west-1
+    credentials: # these should be separate keys during development
+        key: "%aws_dynamodb_key%"
+        secret: "%aws_dynamodb_secret_key%"
+    DynamoDb:
+        region: eu-west-1
+    S3:
+        version: '2006-03-01'
+#    Sqs:
+#        credentials: "@a_service"
+
+# APC
 ornicar_apc:
     host: %apc_clear_host%
     web_dir: %kernel.root_dir%/../web

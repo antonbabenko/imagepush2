@@ -3,6 +3,10 @@
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
+// Remove these defines when amazonwebservices/aws-sdk-for-php and gaufrette is updated. This raise noticeexception in PHP 5.6.
+define('CURLOPT_CLOSEPOLICY', 1);
+define('CURLCLOSEPOLICY_LEAST_RECENTLY_USED', 1);
+
 class AppKernel extends Kernel
 {
 
@@ -28,9 +32,10 @@ class AppKernel extends Kernel
             new Liip\ImagineBundle\LiipImagineBundle(),
             new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
-            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-            new Snc\RedisBundle\SncRedisBundle(),
+//            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+//            new Snc\RedisBundle\SncRedisBundle(),
             new Ornicar\ApcBundle\OrnicarApcBundle(),
+            new Aws\Symfony\AwsBundle(),
 
             // Project bundles
             new Imagepush\ImagepushBundle\ImagepushBundle(),
