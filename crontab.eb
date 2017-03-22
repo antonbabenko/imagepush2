@@ -2,12 +2,12 @@ MAILTO="anton@imagepush.to"
 
 */30 * * * * . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:fetch-from-reddit --env=prod
 
-*/5 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-source --env=prod
+*/2 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-source --env=prod
 
-*/5 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-tags --env=prod
+*/2 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-tags --env=prod
 
-*/6 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:update-tags --env=prod
+*/5 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:update-tags --env=prod
 
-0 */4 * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:publish-image --env=prod
+0 */2 * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:publish-image --env=prod
 
 5 */6 * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:generate:sitemap --spaceless=1 --env=prod && aws s3 cp web/sitemap.xml.gz s3://i.imagepush.to/
