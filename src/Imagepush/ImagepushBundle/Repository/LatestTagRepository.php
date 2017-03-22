@@ -28,12 +28,12 @@ class LatestTagRepository extends AbstractRepository
             'ExpressionAttributeValues' => [
                 ':t' => ['N' => strval(time()-12*3600)],
             ],
-            'FilterExpression' => '#t <> :t', # @todo: should be ">" after data processing works again and data is real. This was broken since around 2014.
+            'FilterExpression' => '#t > :t',
             'ProjectionExpression' => '#text',
             'Limit' => $max*10
         ];
 
-        $results = $this->getScanResults($request, $max*10);
+        $results = $this->getScanResults($request, $max*10, 50);
 
         foreach ($results as & $result) {
             $result = strval(array_values($result['text'])[0]);
