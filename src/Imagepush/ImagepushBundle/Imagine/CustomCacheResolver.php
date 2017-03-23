@@ -2,13 +2,11 @@
 
 namespace Imagepush\ImagepushBundle\Imagine;
 
-use Symfony\Component\HttpFoundation\Response,
-    Symfony\Component\HttpFoundation\Request,
-    Symfony\Component\HttpFoundation\RedirectResponse,
-    Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver,
-    Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface,
-    Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver;
+use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
 use Gaufrette\Filesystem;
 
 class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareInterface
@@ -62,10 +60,6 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
     public function store(Response $response, $targetPath, $filter)
     {
 
-        //\D::dump($response->headers->get('Content-Type'));
-        //$targetPath = $filter . "/". $targetPath;
-        //\D::dump($targetPath);
-
         $contentType = $response->headers->get('Content-Type', "image/jpeg");
 
         // max-age=31536000 -> 1 year
@@ -76,23 +70,6 @@ class CustomCacheResolver extends WebPathResolver implements CacheManagerAwareIn
         );
 
         $filesize = $this->fs->write($targetPath, $response->getContent(), true, $metadata);
-
-        // Set ACL to public, if using Amazon S3
-        if ($this->fs->getAdapter() instanceof \Gaufrette\Adapter\AmazonS3) {
-            $bucket = $this->container->getParameter('s3_bucket_name');
-            $opt['headers']['Cache-Control'] = "max-age=31536000, public";
-
-//            $amazonS3 = $this->container->get('imagepush.amazon.s3');
-
-//            \D::debug($amazonS3);
-//            \D::debug($bucket);
-//            \D::debug($targetPath);
-            //\D::dump(\AmazonS3::ACL_PUBLIC);
-
-            // These two functions produce seg fault, so skipping fixing them because this old aws-sdk will be obsolete soon
-//            $amazonS3->set_object_acl($bucket, $targetPath, \AmazonS3::ACL_PUBLIC);
-//            $amazonS3->change_content_type($bucket, $targetPath, $contentType, $opt);
-        }
 
         $response->setEtag(md5($targetPath));
         $response->setLastModified(new \DateTime("now"));

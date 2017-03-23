@@ -23,10 +23,6 @@ parameters:
 
     aws_key:        "%env.aws_key%"
     aws_secret_key: "%env.aws_secret_key%"
-    amazon_default_cache_config: apc
-
-    aws_dynamodb_key: "%env.aws_dynamodb_key%"
-    aws_dynamodb_secret_key: "%env.aws_dynamodb_secret_key%"
 
     bitly_username: "%env.bitly_username%"
     bitly_api_key: "%env.bitly_api_key%"

@@ -23,8 +23,7 @@
 
         "incenteev/composer-parameter-handler": "~2.0",
         "liip/imagine-bundle":           "dev-master",
-        "amazonwebservices/aws-sdk-for-php": "1.5.10",
-        "knplabs/knp-gaufrette-bundle":  "0.1.4",
+        "knplabs/knp-gaufrette-bundle":  "~0.3",
         "guzzlehttp/guzzle":             "dev-master",
         "aws/aws-sdk-php-symfony":       "^1.2"
 
