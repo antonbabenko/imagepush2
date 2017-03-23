@@ -2,7 +2,7 @@ MAILTO="anton@imagepush.to"
 
 */30 * * * * . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:fetch-from-reddit --env=prod
 
-*/1 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-source --env=prod
+*/1 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-source --number=20 --env=prod
 
 */2 * * * *  . /opt/elasticbeanstalk/support/envvars && /var/app/current/app/console imagepush:process-tags --env=prod
 

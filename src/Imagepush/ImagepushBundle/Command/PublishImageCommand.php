@@ -26,9 +26,6 @@ class PublishImageCommand extends ContainerAwareCommand
     {
         $content = $this->getContainer()->get('imagepush.publisher')->publishImageWithMostTagsFound();
 
-        // This was used before 30.03.2013:
-        // $content = $this->getContainer()->get('imagepush.publisher')->publishLatestUpcomingImage();
-
         $output->writeLn($content, true);
     }
 
