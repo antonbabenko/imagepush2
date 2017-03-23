@@ -2,53 +2,31 @@
 
 namespace Imagepush\ImagepushBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-
 /**
  * Processed image hashes (in order to not index same images more then once)
- *
- * @MongoDB\Document(collection="processedHash", repositoryClass="Imagepush\ImagepushBundle\Document\ProcessedHashRepository")
- * @MongoDB\Indexes({
- *   @MongoDB\UniqueIndex(keys={"hash"="asc"}, safe=true)
- * })
  */
 class ProcessedHash
 {
 
     /**
-     * @MongoDB\Id(strategy="AUTO")
-     */
-    protected $mongoId;
-
-    /**
-     * @MongoDB\String
+     * @var string
      */
     protected $hash;
 
     /**
-     * Get mongoId
+     * ProcessedHash constructor.
      *
-     * @return id $mongoId
+     * @param string $hash
      */
-    public function __construct($hash = "")
+    public function __construct($hash)
     {
         $this->hash = $hash;
     }
 
     /**
-     * Get mongoId
-     *
-     * @return id $mongoId
-     */
-    public function getMongoId()
-    {
-        return $this->mongoId;
-    }
-
-    /**
      * Set hash
      *
-     * @param string $hash
+     * @param string
      */
     public function setHash($hash)
     {
@@ -58,13 +36,16 @@ class ProcessedHash
     /**
      * Get hash
      *
-     * @return string $hash
+     * @return string
      */
     public function getHash()
     {
         return $this->hash;
     }
 
+    /**
+     * @return array
+     */
     public function toItem()
     {
 

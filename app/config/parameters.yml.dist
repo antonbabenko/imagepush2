@@ -1,26 +1,11 @@
 parameters:
-    mongodb_connection: mongodb://localhost:27017
-
-    redis_host: localhost
-    redis_port: 6379
-    redis_db: 3
-
     mailer_transport: gmail
     mailer_host: localhost
     mailer_user: "%env.mailer_user%"
     mailer_password: "%env.mailer_password%"
 
-    old_sound_rabbit_mq.host: localhost
-    old_sound_rabbit_mq.port: 5672
-    old_sound_rabbit_mq.user: guest
-    old_sound_rabbit_mq.password: guest
-    old_sound_rabbit_mq.vhost: "/"
-
     secret: 123sadglsjkg11lsjg
     site_url: "%env.site_url%"
-
-    # Varnish URL together with port (if not default)
-    varnish_url: http://dev-anton.imagepush.to:8080
 
     filesystems_images_adapter: "%env.filesystems_images_adapter%"
     cdn_images_url: "%env.cdn_images_url%"
@@ -42,8 +27,6 @@ parameters:
 
     aws_dynamodb_key: "%env.aws_dynamodb_key%"
     aws_dynamodb_secret_key: "%env.aws_dynamodb_secret_key%"
-
-    apc_clear_host: http://dev-anton.imagepush.to
 
     bitly_username: "%env.bitly_username%"
     bitly_api_key: "%env.bitly_api_key%"

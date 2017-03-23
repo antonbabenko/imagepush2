@@ -3,7 +3,7 @@
 function user_has_access()
 {
 
-    if (preg_match("/^dev/", $_SERVER['HTTP_HOST']) && !preg_match("/elasticbeanstalk\.com$/", $_SERVER['HTTP_HOST'])) {
+    if (preg_match("/^dev/", @$_SERVER['HTTP_HOST']) && !preg_match("/elasticbeanstalk\.com/", @$_SERVER['HTTP_HOST'])) {
         define('SF_ENVIRONMENT', 'dev');
         define('SF_DEBUG', true);
         $allowed_ips = array('127.0.0.1', '::1');

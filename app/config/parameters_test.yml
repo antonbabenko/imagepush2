@@ -1,11 +1,2 @@
 parameters:
-    database_host:     localhost
-    database_port:     3307
-    database_name:     imagepush_test
-    database_user:     root
-    database_password: root37
-
-    redis_host: localhost
-    redis_port: 6379
-    redis_default_db: 13
-    redis_doctrine_db: 14
+    site_url: http://localhost/
