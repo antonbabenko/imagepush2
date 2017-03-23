@@ -83,10 +83,12 @@ knp_gaufrette:
                 directory:  /Users/Bob/Sites/imagepush2/web/new_uploads
                 create:     true
         prod:         # S3 prod server
-            amazon_s3:
-                amazon_s3_id: imagepush.amazon.s3
+            aws_s3:
+                service_id: imagepush.aws.s3
                 bucket_name:  %s3_bucket_name%
-                create:       true
+                options:
+                    acl:    public-read
+                    create: true
     filesystems:
         images:
             adapter:    %filesystems_images_adapter%
@@ -96,8 +98,8 @@ aws:
     version: latest
     region: eu-west-1
     credentials: # these should be separate keys during development
-        key: "%aws_dynamodb_key%"
-        secret: "%aws_dynamodb_secret_key%"
+        key: "%aws_key%"
+        secret: "%aws_secret_key%"
     DynamoDb:
         region: eu-west-1
     S3:
