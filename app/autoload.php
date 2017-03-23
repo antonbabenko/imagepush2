@@ -22,10 +22,4 @@ EOF;
 
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
-// AWS SDK needs a special autoloader
-//require_once __DIR__.'/../vendor/amazonwebservices/aws-sdk-for-php/sdk.class.php';
-
-// Load Amazon credentials config
-//include_once __DIR__ . '/config/amazon_config.inc.php';
-
 return $loader;
