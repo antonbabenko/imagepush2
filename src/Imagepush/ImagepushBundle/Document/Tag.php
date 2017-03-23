@@ -2,62 +2,30 @@
 
 namespace Imagepush\ImagepushBundle\Document;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-
 /**
  * Tag
- *
- * @MongoDB\Document(collection="tags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\TagRepository")
- * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"text"="asc"}),
- *   @MongoDB\Index(keys={"usedInAvailable"="asc"}),
- *   @MongoDB\Index(keys={"usedInUpcoming"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"text"="asc"}, dropDups=true)
- * })
  */
 class Tag
 {
 
     /**
-     * @MongoDB\Id(strategy="AUTO")
-     */
-    protected $mongoId;
-
-    /**
-     * @MongoDB\String
+     * @var string
      */
     protected $text;
 
     /**
-     * Don't rely on it, because it is used only to import from redis db.
-     * Remove this field after import.
-     *
-     * @MongoDB\String
-     */
-    protected $legacyKey;
-
-    /**
-     * @MongoDB\Increment
+     * @var integer
      */
     protected $usedInAvailable;
 
     /**
-     * @MongoDB\Increment
+     * @var integer
      */
     protected $usedInUpcoming;
 
     /**
-     * @MongoDB\Collection
-     * @MongoDB\ReferenceMany(targetDocument="Image")
+     * @param array $data
      */
-    protected $imagesRef;
-
-    public function __construct()
-    {
-        $this->imagesRef = new ArrayCollection();
-    }
-
     public function fromArray(array $data)
     {
         $this->setText(array_values($data['text'])[0]);
@@ -80,6 +48,9 @@ class Tag
 
     }
 
+    /**
+     * @return array
+     */
     public function toItem()
     {
         $item = [
@@ -98,19 +69,9 @@ class Tag
     }
 
     /**
-     * Get mongoId
-     *
-     * @return id $mongoId
-     */
-    public function getMongoId()
-    {
-        return $this->mongoId;
-    }
-
-    /**
      * Set text
      *
-     * @param string $text
+     * @param string
      */
     public function setText($text)
     {
@@ -120,7 +81,7 @@ class Tag
     /**
      * Get text
      *
-     * @return string $text
+     * @return string
      */
     public function getText()
     {
@@ -128,29 +89,9 @@ class Tag
     }
 
     /**
-     * Set legacyKey
-     *
-     * @param string $legacyKey
-     */
-    public function setLegacyKey($legacyKey)
-    {
-        $this->legacyKey = $legacyKey;
-    }
-
-    /**
-     * Get legacyKey
-     *
-     * @return string $legacyKey
-     */
-    public function getLegacyKey()
-    {
-        return $this->legacyKey;
-    }
-
-    /**
      * Set usedInAvailable
      *
-     * @param integer $usedInAvailable
+     * @param integer
      */
     public function setUsedInAvailable($usedInAvailable)
     {
@@ -160,7 +101,7 @@ class Tag
     /**
      * Get usedInAvailable
      *
-     * @return integer $usedInAvailable
+     * @return integer
      */
     public function getUsedInAvailable()
     {
@@ -170,7 +111,7 @@ class Tag
     /**
      * Increment usedInAvailable
      *
-     * @param integer $inc
+     * @param integer
      */
     public function incUsedInAvailable($inc = 1)
     {
@@ -180,7 +121,7 @@ class Tag
     /**
      * Set usedInUpcoming
      *
-     * @param integer $usedInUpcoming
+     * @param integer
      */
     public function setUsedInUpcoming($usedInUpcoming)
     {
@@ -190,7 +131,7 @@ class Tag
     /**
      * Get usedInUpcoming
      *
-     * @return integer $usedInUpcoming
+     * @return integer
      */
     public function getUsedInUpcoming()
     {
@@ -200,7 +141,7 @@ class Tag
     /**
      * Increment usedInUpcoming
      *
-     * @param integer $inc
+     * @param integer
      */
     public function incUsedInUpcoming($inc = 1)
     {

@@ -2,72 +2,51 @@
 
 namespace Imagepush\ImagepushBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-//use Gedmo\Mapping\Annotation as Gedmo;
-
-/**
- * Image
- *
- * @MongoDB\Document(collection="images", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\ImageRepository")
- * @MongoDB\Indexes({
- *   @MongoDB\UniqueIndex(keys={"id"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true),
- *   @MongoDB\Index(keys={"timestamp"="desc"}),
- *   @MongoDB\Index(keys={"tags"="asc"}),
- *   @MongoDB\Index(keys={"isAvailable"="asc"}),
- *   @MongoDB\Index(keys={"sourceType"="asc"})
- * })
- */
 class Image
 {
 
     /**
-     * @MongoDB\Id(strategy="AUTO")
-     */
-    protected $mongoId;
-
-    /**
-     * @MongoDB\Int
+     * @var integer
      */
     protected $id;
 
     /**
-     * @MongoDB\String
+     * @var string
      */
     protected $link;
 
     /**
-     * @MongoDB\Timestamp
+     * @var integer
      */
     protected $timestamp;
 
     /**
-     * @MongoDB\String
+     * @var string
      */
     protected $file;
 
     /**
-     * @MongoDB\String
+     * @var string
      */
     protected $mimeType;
 
     /**
-     * @MongoDB\String
+     * @var string
      */
     protected $title;
 
     /**
-     * @ Gedmo\Slug(fields={"title"}, unique=false)
+     * @var string
      */
     protected $slug;
 
     /**
-     * Source type
+     * @var string
      */
     protected $sourceType;
 
     /**
-     * List of original tags fetched from the source
+     * @var array
      */
     protected $sourceTags;
 
@@ -78,37 +57,48 @@ class Image
 
     /**
      * Hash of found tags (not finalized)
+     *
+     * @var array
      */
     protected $tagsFound;
 
     /**
-     * Count of found tags
+     * @var integer
      */
     protected $tagsFoundCount;
 
     /**
-     * Boolean. If true then this image has new tagsFound, so that tags for this image should to be updated.
+     * If true then this image has new tagsFound, so that tags for this image should to be updated.
+     *
+     * @var boolean
      */
     protected $requireUpdateTags;
 
     /**
      * Available (published) or Upcoming
-     * @MongoDB\Boolean
+     *
+     * @var boolean
      */
     protected $isAvailable;
 
     /**
-     * Created thumbs with actual dimensions
-     * @MongoDB\Hash
+     * Hash of created thumbs with actual dimensions
+     *
+     * @var array
      */
     protected $thumbs;
 
+    /**
+     * Image constructor.
+     */
     public function __construct()
     {
-        $this->tagsRef = new \Doctrine\Common\Collections\ArrayCollection();
         $this->thumbs = array();
     }
 
+    /**
+     * @param array $data
+     */
     public function fromArray(array $data)
     {
         $this->setId(intval(array_values($data['id'])[0]));
@@ -183,6 +173,9 @@ class Image
 
     }
 
+    /**
+     * @return array
+     */
     public function toItem()
     {
         $item = [
@@ -288,16 +281,6 @@ class Image
     }
 
     /**
-     * Get mongoId
-     *
-     * @return id $mongoId
-     */
-    public function getMongoId()
-    {
-        return $this->mongoId;
-    }
-
-    /**
      * Set id
      *
      * @param int $id
@@ -340,7 +323,7 @@ class Image
     /**
      * Set timestamp
      *
-     * @param \MongoTimestamp $timestamp
+     * @param integer
      */
     public function setTimestamp($timestamp)
     {
@@ -350,7 +333,7 @@ class Image
     /**
      * Get timestamp
      *
-     * @return \MongoTimestamp $timestamp
+     * @return integer
      */
     public function getTimestamp()
     {
@@ -364,12 +347,7 @@ class Image
      */
     public function getDatetime()
     {
-        // done... @todo: check after import if all timestamps are \MongoTimestamp, then remove the if
-        if ($this->timestamp instanceof \MongoTimestamp) {
-            return new \DateTime("@" . $this->timestamp->__toString());
-        } else {
-            return new \DateTime("@" . $this->timestamp);
-        }
+        return new \DateTime("@" . $this->timestamp);
     }
 
     /**
@@ -705,8 +683,6 @@ class Image
     {
 
         $key = $filter . "/" . $width . "x" . $height;
-
-        //\D::dump($key);
 
         if (array_key_exists($key, $this->thumbs)) {
 

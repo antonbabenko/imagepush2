@@ -62,49 +62,8 @@ services:
     imagepush.fetcher.content:
         class: Imagepush\ImagepushBundle\Services\Fetcher\ContentFetcher
         arguments: [@service_container]
-
-    # RabbitMQ consumers
-#    imagepush.consumer_message:
-#        class: Imagepush\ImagepushBundle\Consumer\Message
-#        arguments: [@service_container, @imagepush.rabbitmq_logger]
-
-
-
-
-#    imagepush.consumer.primary:
-#        class: Imagepush\ImagepushBundle\Consumer\PrimaryConsumer
-#        arguments: [@service_container, @imagepush.rabbitmq_logger]
-#
-#    imagepush.consumer.twitter:
-#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-#        arguments: [@service_container, "twitter"]
-#        calls:
-#            - [ setLogger, [@imagepush.rabbitmq_logger]]
-#
-#    imagepush.consumer.reddit:
-#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-#        arguments: [@service_container, "reddit"]
-#        calls:
-#            - [ setLogger, [@imagepush.rabbitmq_logger]]
-#
-#    imagepush.consumer.delicious:
-#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-#        arguments: [@service_container, "delicious"]
-#        calls:
-#            - [ setLogger, [@imagepush.rabbitmq_logger]]
-#
-#    imagepush.consumer.stumble_upon:
-#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-#        arguments: [@service_container, "stumble_upon"]
-#        calls:
-#            - [ setLogger, [@imagepush.rabbitmq_logger]]
-#
-#    imagepush.consumer.source:
-#        class: Imagepush\ImagepushBundle\Consumer\WebServiceConsumer
-#        arguments: [@service_container, "source"]
-#        calls:
-#            - [ setLogger, [@imagepush.rabbitmq_logger]]
-
+        calls:
+            - [ setLogger, [@imagepush.content_fetcher_logger]]
 
     # Processor
     imagepush.processor.source:
@@ -165,14 +124,19 @@ services:
         arguments: [processor]
         calls:
             - [pushHandler, [@imagepush.processor_log_handler]]
-            - [pushProcessor, [@log_introspection_processor]]
 
     imagepush.fetcher_logger:
         class: Monolog\Logger
         arguments: [fetcher]
         calls:
             - [pushHandler, [@imagepush.fetcher_log_handler]]
-            - [pushProcessor, [@log_introspection_processor]]
+#            - [pushProcessor, [@log_introspection_processor]]
+
+    imagepush.content_fetcher_logger:
+        class: Monolog\Logger
+        arguments: [content_fetcher]
+        calls:
+            - [pushHandler, [@imagepush.content_fetcher_log_handler]]
 
     imagepush.db_logger:
         class: Monolog\Logger
@@ -193,6 +157,10 @@ services:
     imagepush.fetcher_log_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/fetcher_%kernel.environment%.log, 100]
+
+    imagepush.content_fetcher_log_handler:
+        class: Monolog\Handler\StreamHandler
+        arguments: [%kernel.logs_dir%/content_fetcher_%kernel.environment%.log, 100]
 
     imagepush.db_log_handler:
         class: Monolog\Handler\StreamHandler
@@ -244,15 +212,18 @@ services:
         arguments: [@service_container]
         tags:
             - { name: twig.extension }
+
     twig.extension.sitemap:
         class: Imagepush\SitemapBundle\Twig\Extension\SitemapExtension
         tags:
             - { name: twig.extension }
         arguments: ["%site_url%"]
+
     twig.extension.debug:
-        class: Twig_Extensions_Extension_Debug
+        class: Twig_Extension_Debug
         tags:
             - { name: twig.extension }
+
     twig.extension.text:
         class: Twig_Extensions_Extension_Text
         tags:

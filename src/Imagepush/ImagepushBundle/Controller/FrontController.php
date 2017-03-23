@@ -16,8 +16,7 @@ class FrontController extends Controller
     /**
      * @Route("/", name="index")
      * @Template()
-     * @Cache(expires="+10 minutes")
-     * @Cache(smaxage="3600")
+     * @Cache(expires="+10 minutes", smaxage="3600")
      */
     public function indexAction()
     {
@@ -67,8 +66,7 @@ class FrontController extends Controller
      * Universal function to show images by tags/ by type (upcoming/current)
      *
      * @Template()
-     * @Cache(expires="+5 minutes")
-     * @Cache(smaxage="300")
+     * @Cache(expires="+5 minutes", smaxage="300")
      */
     public function viewMultipleAction($type, $tag = null)
     {
@@ -124,8 +122,7 @@ class FrontController extends Controller
      * @Route("/p/{id}", requirements={"id"="\d+"}, defaults={"slug"="", "preview"="1"}, name="previewImage")
      * @Route("/i/{id}/{slug}", requirements={"id"="\d+", "slug"=".*"}, defaults={"preview"="0"}, name="viewImage")
      * @Template()
-     * @Cache(expires="+1 hour")
-     * @Cache(smaxage="86400")
+     * @Cache(expires="+1 hour", smaxage="86400")
      */
     public function viewImageAction($id, $slug, $preview)
     {
@@ -164,8 +161,7 @@ class FrontController extends Controller
      * @Route("/rss2", name="rss2Feed", defaults={"_format"="rss2"})
      * @Route("/rss", name="rssFeed", defaults={"_format"="rss"})
      * @Route("/atom", name="atomFeed", defaults={"_format"="atom"})
-     * @Cache(expires="+10 minutes")
-     * @Cache(maxage="1800")
+     * @Cache(expires="+10 minutes", maxage="1800")
      */
     public function latestImagesFeedAction($_format)
     {
@@ -449,8 +445,7 @@ class FrontController extends Controller
     /**
      * @Route("/about", name="about")
      * @Template()
-     * @Cache(expires="+1 hour")
-     * @Cache(smaxage="86400")
+     * @Cache(expires="+1 hour", smaxage="86400")
      */
     public function aboutAction()
     {

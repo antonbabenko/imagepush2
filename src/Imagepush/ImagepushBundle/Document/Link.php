@@ -2,17 +2,8 @@
 
 namespace Imagepush\ImagepushBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-
 /**
- * Original links (indexed, failed, blocked).
- *
- * @MongoDB\Document(collection="link", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LinkRepository")
- * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"link"="asc"}),
- *   @MongoDB\Index(keys={"status"="asc"}),
- *   @MongoDB\UniqueIndex(keys={"link"="asc"}, dropDups=true)
- * })
+ * Original links (indexed, failed, blocked)
  */
 class Link
 {
@@ -22,18 +13,14 @@ class Link
     const BLOCKED = "blocked";
 
     /**
-     * @MongoDB\Id(strategy="AUTO")
-     */
-    protected $mongoId;
-
-    /**
-     * @MongoDB\String
+     * @var string
      */
     protected $link;
 
     /**
      * Link status - indexed, failed, blocked
-     * @MongoDB\String
+     *
+     * @var string
      */
     protected $status;
 
@@ -48,19 +35,9 @@ class Link
     }
 
     /**
-     * Get mongoId
-     *
-     * @return id $mongoId
-     */
-    public function getMongoId()
-    {
-        return $this->mongoId;
-    }
-
-    /**
      * Set link
      *
-     * @param string $link
+     * @param string
      */
     public function setLink($link)
     {
@@ -70,7 +47,7 @@ class Link
     /**
      * Get link
      *
-     * @return string $link
+     * @return string
      */
     public function getLink()
     {
@@ -80,7 +57,7 @@ class Link
     /**
      * Set status
      *
-     * @param string $status
+     * @param string
      */
     public function setStatus($status)
     {
@@ -90,13 +67,16 @@ class Link
     /**
      * Get status
      *
-     * @return string $status
+     * @return string
      */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * @return array
+     */
     public function toItem()
     {
 

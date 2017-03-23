@@ -19,6 +19,6 @@
   </div>
 </section>
 
-{% render "ImagepushBundle:Front:_thumbBox" with {'withAd': false} %}
+{{ render (controller('ImagepushBundle:Front:_thumbBox')) }}
 
 {% endblock %}

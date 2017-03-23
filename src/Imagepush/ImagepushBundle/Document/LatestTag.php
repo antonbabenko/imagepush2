@@ -2,39 +2,29 @@
 
 namespace Imagepush\ImagepushBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-
 /**
- * Sequence of latest tags, which is used to show as latest trend
- *
- * @MongoDB\Document(collection="latestTags", requireIndexes=true, repositoryClass="Imagepush\ImagepushBundle\Document\LatestTagRepository")
- * @MongoDB\Indexes({
- *   @MongoDB\Index(keys={"timestamp"="desc"}),
- *   @MongoDB\Index(keys={"text"="asc"})
- * })
+ * Latest tags to use when show latest trend
  */
 class LatestTag
 {
 
     /**
-     * @MongoDB\Id(strategy="AUTO")
+     * @var string
      */
     protected $id;
 
     /**
-     * @MongoDB\Timestamp
+     * @var integer
      */
     protected $timestamp;
 
     /**
-     * @MongoDB\String
+     * @var string
      */
     protected $text;
 
     /**
-     * Get id
-     *
-     * @return id $id
+     * @return string
      */
     public function getId()
     {
@@ -42,9 +32,7 @@ class LatestTag
     }
 
     /**
-     * Set timestamp
-     *
-     * @param timestamp $timestamp
+     * @param integer
      */
     public function setTimestamp($timestamp)
     {
@@ -52,9 +40,7 @@ class LatestTag
     }
 
     /**
-     * Get timestamp
-     *
-     * @return timestamp $timestamp
+     * @return integer
      */
     public function getTimestamp()
     {
@@ -62,9 +48,7 @@ class LatestTag
     }
 
     /**
-     * Set text
-     *
-     * @param string $text
+     * @param string
      */
     public function setText($text)
     {
@@ -72,15 +56,16 @@ class LatestTag
     }
 
     /**
-     * Get text
-     *
-     * @return string $text
+     * @return string
      */
     public function getText()
     {
         return $this->text;
     }
 
+    /**
+     * @return array
+     */
     public function toItem()
     {
         $item = [

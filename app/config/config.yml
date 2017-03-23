@@ -2,7 +2,6 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: imagepush.yml }
-#    - { resource: rabbitmq.yml }
     - { resource: services.yml }
 
 framework:
@@ -44,8 +43,6 @@ twig:
 
 # Assetic Configuration
 assetic:
-    #read_from: %kernel.root_dir%/web
-    #write_to:  %kernel.root_dir%/web
     debug:          %kernel.debug%
     use_controller: false
     filters:
@@ -55,24 +52,6 @@ assetic:
         # yui_css:
         #     jar: %kernel.root_dir%/java/yuicompressor-2.4.2.jar
 
-# Doctrine Configuration
-doctrine_mongodb:
-    connections:
-        default:
-            server: %mongodb_connection%
-            options:
-                connect: true
-    proxy_dir:            %kernel.cache_dir%/doctrine/odm/mongodb/Proxies
-    hydrator_dir:         %kernel.cache_dir%/doctrine/odm/mongodb/Hydrators
-    default_database: imagepush_imported
-#    default_database: imagepush_%kernel.environment%
-    document_managers:
-        default:
-            metadata_cache_driver: array # apc
-            auto_mapping: true
-            mappings:
-                StofDoctrineExtensionsBundle: false
-
 # Swiftmailer Configuration
 swiftmailer:
     transport: %mailer_transport%
@@ -80,20 +59,11 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
 
-stof_doctrine_extensions:
-    default_locale: en_US
-    mongodb:
-        default:
-          timestampable: true
-          sluggable: true
-
 # Imagine
 liip_imagine:
     web_root:     %kernel.root_dir%/../web
     cache_prefix: cache
-    #cache:        true
     cache:        custom_cache_resolver
-    #loader:       ~
     data_loader:  custom_data_loader
     driver:       imagick
     controller_action: imagepush.imagine.controller:filterAction
@@ -121,23 +91,6 @@ knp_gaufrette:
         images:
             adapter:    %filesystems_images_adapter%
 
-# Redis
-#snc_redis:
-#    clients:
-#        default:
-#            #type: predis
-#            type: phpredis
-#            alias: default
-#            dsn: redis://%redis_host%:%redis_port%/%redis_db%
-#            logging: %kernel.debug%
-#            options:
-#                profile: 2.6
-#                connection_timeout: 10
-#                connection_persistent: true
-#                read_write_timeout: 30
-#                iterable_multibulk: false
-#                throw_errors: true
-
 # AWS
 aws:
     version: latest
@@ -151,21 +104,3 @@ aws:
         version: '2006-03-01'
 #    Sqs:
 #        credentials: "@a_service"
-
-# APC
-ornicar_apc:
-    host: %apc_clear_host%
-    web_dir: %kernel.root_dir%/../web
-
-# Not in use (19.7.2012), because purge did not work with Symfony 2.0
-#liip_cache_control:
-#    rules:
-#        # the controls section values are used in a call to Response::setCache();
-#        #- { path: ^/test, reverse_proxy_ttl: 30, controls: { public: true, max_age: 10, s_maxage: 20, last_modified: "now" }, vary: [Accept-Encoding, Accept-Language] }
-#        #- { path: ^/varnishtest, reverse_proxy_ttl: 30, controls: { public: true, max_age: 10, s_maxage: 20, last_modified: "now" }, vary: [Accept-Encoding, Accept-Language] }
-#        # - { path: ^/, reverse_proxy_ttl: 300, controls: { public: true }, vary: [Accept-Encoding, Accept-Language] }
-#        - { path: ^/, controls: { public: true } }
-#    varnish:
-#        domain: %site_url%     # http://imagepush.to
-#        ips: 127.0.0.1         # comma separated list of ips, or an array of ips
-#        port: 80               # port varnish is listening on for incoming web connections
