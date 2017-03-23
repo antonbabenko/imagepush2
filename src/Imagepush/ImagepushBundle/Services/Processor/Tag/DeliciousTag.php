@@ -10,14 +10,16 @@ class DeliciousTag extends Tag implements TagInterface
     /**
      * Delicious tags
      *
-     * Get tags for URL - http://feeds.delicious.com/v2/json/urlinfo/data?hash=md5(http://...)
+     * Get tags for URL - http://feeds.del.icio.us/v2/json/urlinfo/{md5 url}
+     *
+     * Documentation: https://del.icio.us/rss
      *
      * @return array|false Array of found tags; Empty array if no tags found; False - if error or not indexed
      */
     public function find(Image $image)
     {
 
-        $url = "http://feeds.delicious.com/v2/json/urlinfo/data?hash=" . md5($image->getLink());
+        $url = "http://feeds.del.icio.us/v2/json/urlinfo/" . md5($image->getLink());
 
         $content = $this->container->get('imagepush.processor.content');
         $content->get($url);

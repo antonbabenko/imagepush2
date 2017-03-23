@@ -10,19 +10,25 @@ class TwitterTag extends Tag implements TagInterface
     /**
      * Twitter
      *
-     * Twitter search for hashtags
-     * Search for url or exact title - https://dev.twitter.com/docs/api/1/get/search
+     * Twitter search for hashtags (search for url and exact title)
+     *
+     * Documentation: https://dev.twitter.com/oauth/application-only
+     *
+     * @todo: Implement OAuth to be able to call API.
      *
      * @return array|false Array of found tags; False - if error or not indexed
      */
     public function find(Image $image)
     {
 
-        $urls[] = "http://search.twitter.com/search.json?rpp=100&result_type=mixed&q=" . urlencode($image->getLink());
+        // @todo
+        return [];
+
+        $urls[] = "https://api.twitter.com/1.1/search/tweets.json?result_type=recent&q=" . urlencode($image->getLink());
 
         // Search by title can very unspecific, when title is short
         if (mb_strlen($image->getTitle()) >= $this->container->getParameter('imagepush.twitter.min_title_length', 15)) {
-            $urls[] = "http://search.twitter.com/search.json?rpp=100&result_type=mixed&q=" . urlencode('"' . $image->getTitle() . '"');
+            $urls[] = "https://api.twitter.com/1.1/search/tweets.json?result_type=recent&q=" . urlencode('"' . $image->getTitle() . '"');
         }
 
         $tags = array();
