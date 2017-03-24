@@ -100,7 +100,6 @@ class RedditFetcher extends AbstractFetcher implements FetcherInterface
 
                     $message = [
                         'MessageBody' => json_encode($image->getId()),
-                        'MessageDeduplicationId' => 'image-' . $image->getId(),
                         'QueueUrl' => $this->sqsQueueUrlImages,
                     ];
                     $this->sqs->sendMessage($message);

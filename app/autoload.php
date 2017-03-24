@@ -1,24 +1,12 @@
 <?php
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Composer\Autoload\ClassLoader;
 
-if (!$loader = @include __DIR__ . '/../vendor/autoload.php') {
-
-    $message = <<< EOF
-<p>You must set up the project dependencies by running the following commands:</p>
-<pre>
-    curl -s http://getcomposer.org/installer | php
-    php composer.phar install
-</pre>
-
-EOF;
-
-    if (PHP_SAPI === 'cli') {
-        $message = strip_tags($message);
-    }
-
-    die($message);
-}
+/**
+ * @var ClassLoader $loader
+ */
+$loader = require __DIR__.'/../vendor/autoload.php';
 
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 

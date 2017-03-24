@@ -18,7 +18,7 @@
 {# <script type="text/javascript" src="{{ asset('js/jquery.lazyload.min.js') }}"></script> #}
 <script type="text/javascript" src="{{ asset('js/base.js') }}"></script>
 
-{% raw %}
+{% verbatim %}
 <script type="text/javascript">
     var addthis_share = {
         templates: {
@@ -31,10 +31,10 @@
             }
         },
         shorteners: {
-            bitly: { username: '{% endraw %}{{ bitly_username }}{% raw %}', apiKey: '{% endraw %}{{ bitly_api_key }}{% raw %}' }
+            bitly: { username: '{% endverbatim %}{{ bitly_username }}{% verbatim %}', apiKey: '{% endverbatim %}{{ bitly_api_key }}{% verbatim %}' }
         }
     };
     var addthis_config = { data_ga_property: 'UA-20823942-1', data_track_clickback: true, data_track_addressbar: true, ui_508_compliant: true, services_exclude: 'print', ui_use_image_picker : true };
 </script>
 <script src="//s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d873ef60de2660d&domready=1"></script>
-{% endraw %}
+{% endverbatim %}

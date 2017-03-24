@@ -15,8 +15,8 @@ class SitemapExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'sitemap_url_absolute' => new \Twig_Filter_Method($this, 'absoluteUrl'),
-            'sitemap_date' => new \Twig_Filter_Method($this, 'formatDate'),
+            new \Twig_SimpleFilter('sitemap_url_absolute', [$this, 'absoluteUrl']),
+            new \Twig_SimpleFilter('sitemap_date', [$this, 'formatDate']),
         );
     }
 

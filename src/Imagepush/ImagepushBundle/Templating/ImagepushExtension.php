@@ -29,8 +29,8 @@ class ImagepushExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'imagepush_filter' => new \Twig_Filter_Method($this, 'imagepushFilter'),
-            'cdn_imagepush_filter' => new \Twig_Filter_Method($this, 'cdnImagepushFilter'),
+            new \Twig_SimpleFilter('imagepush_filter', [$this, 'imagepushFilter']),
+            new \Twig_SimpleFilter('cdn_imagepush_filter', [$this, 'cdnImagepushFilter']),
         );
     }
 

@@ -4,8 +4,8 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
 // Remove these defines when amazonwebservices/aws-sdk-for-php and gaufrette is updated. This raise noticeexception in PHP 5.6.
-define('CURLOPT_CLOSEPOLICY', 1);
-define('CURLCLOSEPOLICY_LEAST_RECENTLY_USED', 1);
+//define('CURLOPT_CLOSEPOLICY', 1);
+//define('CURLCLOSEPOLICY_LEAST_RECENTLY_USED', 1);
 
 class AppKernel extends Kernel
 {
@@ -35,6 +35,7 @@ class AppKernel extends Kernel
             );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
+            $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
@@ -47,7 +48,7 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__ . '/config/config_' . $this->getEnvironment() . '.yml');
+        $loader->load($this->getRootDir() . '/config/config_' . $this->getEnvironment() . '.yml');
     }
 
 }
