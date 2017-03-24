@@ -28,7 +28,7 @@ class LatestTagRepository extends AbstractRepository
             'ExpressionAttributeValues' => [
                 ':t' => ['N' => strval(time()-12*3600)],
             ],
-            'FilterExpression' => '#t > :t',
+            'FilterExpression' => '#t <> :t',
             'ProjectionExpression' => '#text',
             'Limit' => $max*10
         ];
