@@ -13,6 +13,8 @@ app/logs/*
 build/
 vendor/
 app/config/parameters.yml
+app/SymfonyRequirements.php
+
 .buildpath
 .project
 .settings/
