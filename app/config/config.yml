@@ -93,16 +93,15 @@ knp_gaufrette:
         images:
             adapter:    %filesystems_images_adapter%
 
-# AWS
+# AWS credentials should be set using env variables (during development locally) and using EC2 instance profile (when running on EC2).
+#
+# Example in dev (http://symfony.com/doc/2.7/configuration/external_parameters.html#environment-variables):
+# fastcgi_param AWS_ACCESS_KEY_ID 'value';
+# fastcgi_param AWS_SECRET_ACCESS_KEY 'secret_value';
 aws:
     version: latest
     region: eu-west-1
-    credentials: # these should be separate keys during development
-        key: "%aws_key%"
-        secret: "%aws_secret_key%"
     DynamoDb:
         region: eu-west-1
     S3:
         version: '2006-03-01'
-#    Sqs:
-#        credentials: "@a_service"

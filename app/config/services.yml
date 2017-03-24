@@ -1,11 +1,5 @@
 services:
 
-#    a_service:
-#        class: Aws\Credentials\Credentials
-#        arguments:
-#            - a-different-fake-key
-#            - a-different-fake-secret
-
     ##################
     # DynamoDB repository
     ##################
@@ -191,9 +185,6 @@ services:
             -
                 version: latest
                 region: eu-west-1
-                credentials:
-                    key: %aws_key%
-                    secret: %aws_secret_key%
 
     #
     imagepush.imagine.controller:

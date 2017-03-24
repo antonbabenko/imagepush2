@@ -21,8 +21,5 @@ parameters:
     s3_bucket_name: i.imagepush.to
     #s3_bucket_name: imagepushtest
 
-    aws_key:        "%env.aws_key%"
-    aws_secret_key: "%env.aws_secret_key%"
-
     bitly_username: "%env.bitly_username%"
     bitly_api_key: "%env.bitly_api_key%"
