@@ -14,7 +14,7 @@ class TwitterTag extends Tag implements TagInterface
      *
      * Documentation: https://dev.twitter.com/oauth/application-only
      *
-     * @todo: Implement OAuth to be able to call API.
+     * @todo: Implement OAuth to be able to call API. http://derekmd.com/2015/06/updating-twitter-oauth-in-symfony-for-guzzle-6-0/
      *
      * @return array|false Array of found tags; False - if error or not indexed
      */
