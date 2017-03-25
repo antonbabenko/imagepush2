@@ -2,6 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Command;
 
+use Imagepush\ImagepushBundle\Services\Processor\ProcessorStatusCode;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,8 +17,7 @@ class ProcessSourceCommand extends ContainerAwareCommand
 
         $this
             ->setName('imagepush:process-source')
-            ->setDescription('Process one source')
-            ->setHelp('Find best image in source link, find source tags, make thumbs and save image as upcoming')
+            ->setDescription('Process one or multiple sources: find best image in the source link, find source tags, make thumbs and save image as upcoming')
             ->setDefinition(
                 array(
                     new InputOption(
@@ -47,9 +47,17 @@ class ProcessSourceCommand extends ContainerAwareCommand
         }
 
         do {
-            $content = $this->getContainer()->get('imagepush.processor.source')->processSource();
+            $result = $this->getContainer()->get('imagepush.processor.source')->processSource();
 
-            $output->writeLn($content, true);
+            $output->writeLn($result['log']);
+
+            // no need to proceed
+            if (ProcessorStatusCode::NO_ITEMS_CODE == $result['code']) {
+                $output->writeLn('Exiting now. Please try again later.');
+
+                break;
+            }
+
         } while (++$i < $number);
     }
 

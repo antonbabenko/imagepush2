@@ -2,12 +2,16 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
+use Aws\DynamoDb\DynamoDbClient;
+use Aws\Sqs\Exception\SqsException;
+use Aws\Sqs\SqsClient;
 use Imagepush\ImagepushBundle\Document\Image;
 use Imagepush\ImagepushBundle\Document\Link;
 use Imagepush\ImagepushBundle\Document\ProcessedHash;
 use Imagepush\ImagepushBundle\Repository\ImageRepository;
 use Imagepush\ImagepushBundle\Repository\LinkRepository;
 use Imagepush\ImagepushBundle\Repository\ProcessedHashRepository;
+use Monolog\Logger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,31 +35,41 @@ class ProcessorSource
     public $container;
 
     /**
-     * @var $ddb \Aws\DynamoDb\DynamoDbClient
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * @var DynamoDbClient
      */
     protected $ddb;
 
     /**
-     * @var $ddb \Aws\Sqs\SqsClient
+     * @var SqsClient
      */
     protected $sqs;
 
     /**
-     * @var $imageRepo ImageRepository
+     * @var ImageRepository
      */
     protected $imageRepo;
 
     /**
-     * @var $linkRepo LinkRepository
+     * @var LinkRepository
      */
     protected $linkRepo;
 
     /**
-     * @var $processedHashRepo ProcessedHashRepository
+     * @var ProcessedHashRepository
      */
     protected $processedHashRepo;
 
     protected $sqsQueueUrlImages;
+
+    /**
+     * @var string Receipt id to use when delete message from SQS
+     */
+    protected $sqsMessageReceiptHandle;
 
     public function __construct(ContainerInterface $container)
     {
@@ -71,6 +85,37 @@ class ProcessorSource
         $this->linkRepo = $container->get('imagepush.repository.link');
         $this->processedHashRepo = $container->get('imagepush.repository.processed_hash');
 
+        $this->sqsMessageReceiptHandle = '';
+    }
+
+    /**
+     * Finalize process by removing SQS message and return valid result code
+     * @param  string $code Result code
+     * @param  string $log  Log string
+     * @return array
+     */
+    public function done($code, $log = '')
+    {
+
+        if ('' != $this->sqsMessageReceiptHandle) {
+            try {
+                $this->sqs->deleteMessage(
+                    [
+                        'QueueUrl' => $this->sqsQueueUrlImages,
+                        'ReceiptHandle' => $this->sqsMessageReceiptHandle
+                    ]
+                );
+            } catch (SqsException $e) {
+                $this->logger->error($e->__toString());
+                $log = $log . "\n\nSqsException => " . $e->__toString();
+            }
+
+        }
+
+        return [
+            'code' => $code,
+            'log' => $log,
+        ];
     }
 
     /**
@@ -99,31 +144,33 @@ class ProcessorSource
         $messages = $messages->get('Messages');
 
         if (0 == count($messages)) {
-            $log = "Ok, but there is no unprocessed images to work on...";
+            $log = "Ok, but there are no unprocessed images to work on...";
             $this->logger->info($log);
 
-            return $log;
+            return $this->done(ProcessorStatusCode::NO_ITEMS_CODE, $log);
         }
 
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->sqsQueueUrlImages,
-            'ReceiptHandle' => $messages[0]['ReceiptHandle']
-        ]);
+        $this->sqsMessageReceiptHandle = $messages[0]['ReceiptHandle'];
 
         $id = json_decode($messages[0]['Body']);
 
         $image = $this->imageRepo->findOneBy($id, false);
 
         if ($image) {
-            $this->logger->info(sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink()));
+            $log = sprintf("ID: %d. Source link to process: %s", $image->getId(), $image->getLink());
+            $this->logger->info($log);
         } else {
-            $this->logger->info(sprintf("ID: %d. Image record was no found in DB", $id));
+            $log = sprintf("ID: %d. Image record was no found in DB", $id);
+            $this->logger->info($log);
 
-            return false;
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         if ($this->linkRepo->isIndexedOrFailed($image->getLink())) {
-            return false;
+            $log = sprintf("ID: %d. Source link: %s has been already indexed or failed", $image->getId(), $image->getLink());
+            $this->logger->info($log);
+
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         /*
@@ -141,9 +188,10 @@ class ProcessorSource
         $content->get($image->getLink());
 
         if (!$content->isSuccessStatus()) {
-            $this->logger->info(sprintf("ID: %d. Link %s returned status code %d", $image->getId(), $image->getLink(), $content->getData()));
+            $log = sprintf("ID: %d. Link %s returned status code %d", $image->getId(), $image->getLink(), $content->getData());
+            $this->logger->info($log);
 
-            return false;
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         /**
@@ -183,9 +231,6 @@ class ProcessorSource
             foreach ($functions as $function) {
 
                 $images = $content->htmlContent->$function();
-
-                //\D::dump($function);
-                //\D::dump($images);
 
                 if ($images) {
 
@@ -245,7 +290,7 @@ class ProcessorSource
             // Remove image
             $this->imageRepo->deleteById($image->getId());
 
-            return $log;
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         /**
@@ -288,7 +333,7 @@ class ProcessorSource
         $log = sprintf("ID: %d. Source processed.", $image->getId());
         $this->logger->info($log);
 
-        return $log;
+        return $this->done(ProcessorStatusCode::OK_CODE, $log);
     }
 
     /**

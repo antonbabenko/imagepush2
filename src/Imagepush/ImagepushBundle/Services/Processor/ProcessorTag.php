@@ -2,6 +2,7 @@
 
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
+use Aws\Sqs\Exception\SqsException;
 use Imagepush\ImagepushBundle\Repository\ImageRepository;
 use Imagepush\ImagepushBundle\Services\AccessControl\ServiceAccess;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,6 +30,11 @@ class ProcessorTag
 
     protected $sqsQueueUrlFindTags;
 
+    /**
+     * @var string Receipt id to use when delete message from SQS
+     */
+    protected $sqsMessageReceiptHandle;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -38,6 +44,38 @@ class ProcessorTag
         $this->sqsQueueUrlFindTags = $container->getParameter('imagepush.sqs_queue_url_find_tags');
 
         $this->imageRepo = $container->get('imagepush.repository.image');
+
+        $this->sqsMessageReceiptHandle = '';
+    }
+
+    /**
+     * Finalize process by removing SQS message and return valid result code
+     * @param  string $code Result code
+     * @param  string $log  Log string
+     * @return array
+     */
+    public function done($code, $log = '')
+    {
+
+        if ('' != $this->sqsMessageReceiptHandle) {
+            try {
+                $this->sqs->deleteMessage(
+                    [
+                        'QueueUrl' => $this->sqsQueueUrlFindTags,
+                        'ReceiptHandle' => $this->sqsMessageReceiptHandle
+                    ]
+                );
+            } catch (SqsException $e) {
+                $this->logger->error($e->__toString());
+                $log = $log . "\n\nSqsException => " . $e->__toString();
+            }
+
+        }
+
+        return [
+            'code' => $code,
+            'log' => $log,
+        ];
     }
 
     public function processTag()
@@ -54,16 +92,13 @@ class ProcessorTag
         $messages = $messages->get('Messages');
 
         if (0 == count($messages)) {
-            $log = "Ok, but there is no unprocessed images to work on...";
+            $log = "Ok, but there are no unprocessed images to work on...";
             $this->logger->info($log);
 
-            return $log;
+            return $this->done(ProcessorStatusCode::NO_ITEMS_CODE, $log);
         }
 
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->sqsQueueUrlFindTags,
-            'ReceiptHandle' => $messages[0]['ReceiptHandle']
-        ]);
+        $this->sqsMessageReceiptHandle = $messages[0]['ReceiptHandle'];
 
         $this->logger->info(sprintf('SQS message: %s', $messages[0]['Body']));
         $body = json_decode($messages[0]['Body'], true);
@@ -75,9 +110,10 @@ class ProcessorTag
         $processor = $this->container->get("imagepush.processor.tag." . $serviceKey, ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
         if (null === $processor) {
-            $this->logger->crit(sprintf("Unknown processor tag service: %s", "imagepush.processor.tag." . $serviceKey));
+            $log = sprintf("Unknown processor tag service: %s", "imagepush.processor.tag." . $serviceKey);
+            $this->logger->crit($log);
 
-            return true;
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         $statusCode = ProcessorStatusCode::OK;
@@ -87,9 +123,10 @@ class ProcessorTag
         $image = $this->imageRepo->findOneBy($id, false);
 
         if (!$image) {
-            $this->logger->info(sprintf("ID: %d. Image was no found in DB", $id));
+            $log = sprintf("ID: %d. Image was no found in DB", $id);
+            $this->logger->info($log);
 
-            return true;
+            return $this->done(ProcessorStatusCode::OK_CODE, $log);
         }
 
         // Should service be accessed now or sleep?
@@ -104,7 +141,6 @@ class ProcessorTag
         $service->updateLastAccess();
 
         // Get result from task specific action
-
         try {
             $result = $processor->find($image);
 //            $result = json_decode('{"world news":1,"worldnewshub":1,"news":1,"chapotraphouse":1,"law":1,"technology":1,"newsofthestupid":1,"todayilearned":1}', true);
@@ -148,7 +184,7 @@ class ProcessorTag
         // Update service status
         $service->updateServiceStatus($serviceOk ? ServiceAccess::STATUS_OK : ServiceAccess::STATUS_FAIL);
 
-        return true;
+        return $this->done(ProcessorStatusCode::OK_CODE, json_encode($result));
     }
 
 }

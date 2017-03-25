@@ -3,7 +3,7 @@
 namespace Imagepush\ImagepushBundle\Services\Processor;
 
 /**
- * Constants for Processor status codes to return and for WebServiceConsumer to check
+ * Constants for Processor status codes
  */
 class ProcessorStatusCode
 {
@@ -14,11 +14,6 @@ class ProcessorStatusCode
     const OK = 0;
 
     /**
-     * Retry the same request in service specific interval (normal).
-     */
-    const RETRY_REQUEST_AGAIN = 1;
-
-    /**
      * Don't retry the same request. It was an error. Skip it.
      */
     const WRONG_REQUEST = 2;
@@ -27,5 +22,11 @@ class ProcessorStatusCode
      * Don't retry this service at all now. Service is down. Retry when service is back.
      */
     const SERVICE_IS_DOWN = 3;
+
+    /**
+     * Result codes
+     */
+    const OK_CODE = 'OK';
+    const NO_ITEMS_CODE = 'NO_ITEMS';
 
 }
