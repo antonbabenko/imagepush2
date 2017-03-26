@@ -1,11 +1,13 @@
 #!/bin/bash
 
-S3BUCKET="s3://backups-anton-server/dynamodb/"
+readonly S3BUCKET="s3://backups-anton-server/dynamodb/"
 
-TMP_DIR=$(mktemp -d)
-TGZ_FILENAME="$(date +%Y%m%d_%H).imagepush.tgz"
+readonly TMP_DIR=$(mktemp -d)
+readonly TGZ_FILENAME="$(date +%Y%m%d_%H).imagepush.tgz"
 
-./dynamodump.py -m backup -r eu-west-1 -s "*" --readCapacity 100 --dumpPath "$TMP_DIR"
+readonly SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+"${SCRIPT_PATH}/dynamodump.py" -m backup -r eu-west-1 -s "*" --readCapacity 200 --dumpPath "$TMP_DIR"
 
 cd "$TMP_DIR"
 
