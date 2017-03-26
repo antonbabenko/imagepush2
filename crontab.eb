@@ -13,4 +13,4 @@ HOME=/var/app/current
 
 5 */6 * * *  ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod && aws s3 cp web/sitemap.xml.gz s3://i.imagepush.to/
 
-4 */6 * * *  ./bin/dynamodump/backup_dynamodb.sh
+4  3  * * *  ./bin/dynamodump/backup_dynamodb.sh

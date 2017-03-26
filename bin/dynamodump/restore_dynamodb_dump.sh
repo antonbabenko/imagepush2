@@ -1,48 +1,28 @@
 #!/bin/bash
 
-exit 0
+# Dynamodb dump restore script.
+#
+# Make sure that IAM user has enough permissions to be able to restore DynamoDB!
 
-S3BUCKET="s3://backups-anton-server/dynamodb/"
+readonly S3_DUMP_TGZ_FILENAME="s3://backups-anton-server/dynamodb/20170326_08.imagepush.tgz"
 
-TMP_DIR=$(mktemp -d)
-TGZ_FILENAME="$(date +%Y%m%d_%H).imagepush.tgz"
+#####
 
+readonly TMP_DIR=$(mktemp -d)
 
-./dynamodump.py -m backup -r eu-west-1 -s "*" --readCapacity 100 --dumpPath "$TMP_DIR"
+readonly SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+aws s3 cp "$S3_DUMP_TGZ_FILENAME" "$TMP_DIR/dynamodbdymp.tgz"
 
 cd "$TMP_DIR"
 
-tar -zcvf "/tmp/$TGZ_FILENAME" .
+tar -xf "$TMP_DIR/dynamodbdymp.tgz"
 
-aws s3 cp "/tmp/$TGZ_FILENAME" "$S3BUCKET"
+#####
+# This will restore "images" table from backup into "images_restored"
 
-rm -rf "$TMP_DIR" "/tmp/$TGZ_FILENAME"
+"${SCRIPT_PATH}/dynamodump.py" -m restore -r eu-west-1 -s images -d images_restored --writeCapacity 100
 
-exit 0
+#####
 
-
-mkdir -p $DUMP_DIR
-
-rm "$DUMP_DIR/*tar.gz" > /dev/null 2>&1
-
-echo "Dumping DynamoDB databases"
-FILENAME=`date +%Y%m%d`
-
-# Dump all tables (including: counter, images, images_tags, latest_tags, links, processed_hashes, tags)
-./dynamodump.py -m backup -r eu-west-1 -s "*" --dumpPath $DUMP_DIR --readCapacity 100 --writeCapacity 20
-
-# Restore tables (one by one)
-#./dynamodump.py -m restore -r eu-west-1 -s $DUMP_DIR/images -d images_new --readCapacity 100 --writeCapacity 100
-#./dynamodump.py -m restore -r eu-west-1 -s $DUMP_DIR/tags -d tags_restored --readCapacity 100 --writeCapacity 100
-
-# Dump only schemas
-#./dynamodump.py -m backup -r eu-west-1 -s "*" --schemaOnly --skipThroughputUpdate
-
-# Restore only schema for single table (will also delete data in it!)
-./dynamodump.py -m restore -r eu-west-1 -s images -d images --schemaOnly --skipThroughputUpdate
-
-cd $DUMP_DIR
-
-tar -zcvf imagepush_$FILENAME.tar.gz .
-
-s3cmd put -f -rr --acl-public "imagepush_$FILENAME.tar.gz" "$S3BUCKET/imagepush_$FILENAME.tar.gz" 1>/dev/null
+rm -rf "$TMP_DIR"
