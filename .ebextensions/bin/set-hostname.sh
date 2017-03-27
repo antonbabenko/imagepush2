@@ -13,3 +13,5 @@ echo -e "$NEW_HOSTNAME" | sudo tee /etc/hostname
 
 # Restart newrelic, if present
 chkconfig --list newrelic-sysmond &> /dev/null && sudo service newrelic-sysmond restart
+
+exit 0
