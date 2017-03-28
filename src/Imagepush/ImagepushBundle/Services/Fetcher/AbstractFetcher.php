@@ -115,7 +115,7 @@ class AbstractFetcher
      */
     public function isAllowedToPerformAPICall()
     {
-        /* $lastAPICallTime = (int) apc_fetch($this->fetcherType . "_last_api_call_time");
+        /* $lastAPICallTime = (int) apcu_fetch($this->fetcherType . "_last_api_call_time");
           if ($lastAPICallTime + $this->getParameter("min_delay", 60) >= time()) {
           return false;
           }
@@ -136,7 +136,7 @@ class AbstractFetcher
           sleep($this->getParameter("min_delay", 60));
           }
 
-          apc_store($this->fetcherType . "_last_api_call_time", time());
+          apcu_store($this->fetcherType . "_last_api_call_time", time());
          */
     }
 

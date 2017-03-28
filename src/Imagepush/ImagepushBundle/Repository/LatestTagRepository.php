@@ -12,7 +12,7 @@ class LatestTagRepository extends AbstractRepository
      */
     public function getLatestTrends($max)
     {
-        $latestTrends = apc_fetch('latest_trends_' . $max, $inCache);
+        $latestTrends = apcu_fetch('latest_trends_' . $max, $inCache);
 
         if (false !== $inCache) {
             return unserialize($latestTrends);
@@ -55,7 +55,7 @@ class LatestTagRepository extends AbstractRepository
 
         $results = array_keys(array_slice($results, 0, $max, true));
 
-        apc_store('latest_trends_' . $max, serialize($results), 1800);
+        apcu_store('latest_trends_' . $max, serialize($results), 1800);
 
         return $results;
     }

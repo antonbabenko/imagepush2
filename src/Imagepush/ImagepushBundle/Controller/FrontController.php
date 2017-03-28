@@ -71,7 +71,7 @@ class FrontController extends Controller
     public function viewMultipleAction($type, $tag = null)
     {
         $cacheKey = 'view_multiple_' . md5($type.$tag);
-        $result = apc_fetch($cacheKey, $inCache);
+        $result = apcu_fetch($cacheKey, $inCache);
 
         if (false !== $inCache) {
             return unserialize($result);
@@ -113,7 +113,7 @@ class FrontController extends Controller
             "isOppositeTypeExists" => $isOppositeTypeExists
         ];
 
-        apc_store($cacheKey, serialize($result), 60);
+        apcu_store($cacheKey, serialize($result), 60);
 
         return $result;
     }
@@ -127,7 +127,7 @@ class FrontController extends Controller
     public function viewImageAction($id, $slug, $preview)
     {
         $cacheKey = 'view_image_' . md5($id.$preview);
-        $result = apc_fetch($cacheKey, $inCache);
+        $result = apcu_fetch($cacheKey, $inCache);
 
         if (false !== $inCache) {
             return unserialize($result);
@@ -149,7 +149,7 @@ class FrontController extends Controller
 
         $result = ["image" => $image, "nextImage" => $nextImage, "prevImage" => $prevImage];
 
-        apc_store($cacheKey, serialize($result), 3600);
+        apcu_store($cacheKey, serialize($result), 3600);
 
         return $result;
 
@@ -257,7 +257,7 @@ class FrontController extends Controller
     public function _thumbBoxAction($initialTags = array(), $skipImageId = false)
     {
         $cacheKey = 'thumb_box_' . md5(json_encode($initialTags) . json_encode($skipImageId));
-        $response = apc_fetch($cacheKey, $inCache);
+        $response = apcu_fetch($cacheKey, $inCache);
 
         if (false !== $inCache) {
             return unserialize($response);
@@ -415,7 +415,7 @@ class FrontController extends Controller
         $response = $this->render('ImagepushBundle:Front:_thumbBox.html.twig', $parameters);
         $response->setSharedMaxAge(86400);
 
-        apc_store($cacheKey, serialize($response), 1800);
+        apcu_store($cacheKey, serialize($response), 1800);
 
         return $response;
     }
