@@ -20,8 +20,9 @@
         "twig/extensions":               "~1.0",
         "sensio/distribution-bundle":    "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
-
         "incenteev/composer-parameter-handler": "~2.0",
+
+        "symfony/var-dumper":            "dev-master",
         "liip/imagine-bundle":           "dev-master",
         "knplabs/knp-gaufrette-bundle":  "~0.3",
         "guzzlehttp/guzzle":             "dev-master",

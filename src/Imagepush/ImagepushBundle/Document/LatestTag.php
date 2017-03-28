@@ -19,6 +19,13 @@ class LatestTag
     protected $timestamp;
 
     /**
+     * Timeslot is number of hours since epoch (intdiv(timestamp, 3600))
+     *
+     * @var integer
+     */
+    protected $timeslot;
+
+    /**
      * @var string
      */
     protected $text;
@@ -48,6 +55,22 @@ class LatestTag
     }
 
     /**
+     * @param integer
+     */
+    public function setTimeslot($timeslot)
+    {
+        $this->timeslot = $timeslot;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getTimeslot()
+    {
+        return $this->timeslot;
+    }
+
+    /**
      * @param string
      */
     public function setText($text)
@@ -74,6 +97,9 @@ class LatestTag
             ],
             'timestamp' => [
                 'N' => strval($this->getTimestamp())
+            ],
+            'timeslot' => [
+                'N' => strval(intdiv($this->getTimestamp(), 3600))
             ],
             'text' => [
                 'S' => strval($this->getText())

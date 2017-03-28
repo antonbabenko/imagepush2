@@ -18,28 +18,41 @@ class LatestTagRepository extends AbstractRepository
             return unserialize($latestTrends);
         }
 
-        // scan
-        $request = [
-            'TableName' => 'latest_tags',
-            'ExpressionAttributeNames' => [
-                '#t' => 'timestamp',
-                '#text' => 'text',
-            ],
-            'ExpressionAttributeValues' => [
-                ':t' => ['N' => strval(time()-12*3600)],
-            ],
-            'FilterExpression' => '#t <> :t',
-            'ProjectionExpression' => '#text',
-            'Limit' => $max*10
-        ];
+        $slot = 0;
+        $maxSlots = 12;
+        $results = [];
 
-        $results = $this->getScanResults($request, $max*10, 50);
+        do {
+            $timeslot = intdiv(time() - $slot * 3600, 3600);
 
-        foreach ($results as & $result) {
-            $result = strval(array_values($result['text'])[0]);
-        }
+            $request = [
+                'TableName' => 'latest_tags',
+                'IndexName' => 'timeslot-index',
+                'ExpressionAttributeNames' => [
+                    '#text' => 'text',
+                ],
+                'ExpressionAttributeValues' => [
+                    ':timeslot' => ['N' => strval($timeslot)],
+                ],
+                'ProjectionExpression' => '#text',
+                'KeyConditionExpression' => 'timeslot = :timeslot',
+                'Limit' => $max
+            ];
+
+            $tmpResults = $this->getQueryResults($request, $max);
+
+            foreach ($tmpResults as & $result) {
+                $result = strval(array_values($result['text'])[0]);
+            }
+
+            $results = array_merge($results, $tmpResults);
+
+        } while (++$slot < $maxSlots);
+
         $results = array_count_values($results);
+
         arsort($results);
+
         $results = array_keys(array_slice($results, 0, $max, true));
 
         apc_store('latest_trends_' . $max, serialize($results), 1800);

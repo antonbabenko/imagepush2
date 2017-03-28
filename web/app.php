@@ -8,9 +8,14 @@ require_once __DIR__.'/access_config.php';
 
 if (!user_has_access()) die();
 
-require_once __DIR__.'/../app/bootstrap.php.cache';
-require_once __DIR__.'/../app/AppKernel.php';
-//require_once __DIR__.'/../app/AppCache.php';
+/** @var \Composer\Autoload\ClassLoader $loader */
+$loader = require __DIR__.'/../app/autoload.php';
+
+if (defined('SF_DEBUG') && SF_DEBUG == true) {
+    \Symfony\Component\Debug\Debug::enable();
+} else {
+    include_once __DIR__.'/../app/bootstrap.php.cache';
+}
 
 $kernel = new AppKernel(SF_ENVIRONMENT, SF_DEBUG);
 $kernel->loadClassCache();
