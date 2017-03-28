@@ -26,7 +26,6 @@ assetic:
     use_controller: true
 
 # Settings to use in templates
-# PS (29.07.2011): Some weird happens when using |default(true) in templates for globals
 twig:
   globals:
     settings:
