@@ -10,7 +10,7 @@ This site is running on AWS using Elastic Beanstalk in eu-west-1.
 
 Typical command to deploy new code is:
 
-```$ eb deploy prod-eb```
+```$ eb deploy prod7-eb```
 
 ## License
 
