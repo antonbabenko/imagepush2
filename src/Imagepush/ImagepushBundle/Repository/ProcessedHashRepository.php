@@ -19,9 +19,6 @@ class ProcessedHashRepository extends AbstractRepository
             'Item' => $hash->toItem()
         ];
 
-//        echo "\nInserting item:\n";
-//        \D::debug($request);
-
         $result = $this->putItem($request);
 
         return $result;
@@ -52,7 +49,7 @@ class ProcessedHashRepository extends AbstractRepository
             'ConsistentRead' => true
         ];
 
-        $result = $this->getItemResult($request, 1);
+        $result = $this->getItemResult($request);
 
         if ($result == null) {
             return false;
