@@ -3,6 +3,7 @@
 namespace Imagepush\ImagepushBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +13,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
 class FrontController extends Controller
 {
+
+    use ContainerAwareTrait;
 
     /**
      * @Route("/", name="index")
@@ -70,6 +73,9 @@ class FrontController extends Controller
      */
     public function viewMultipleAction($type, $tag = null)
     {
+        $context = $this->container->get('router')->getContext();
+        $context->setHost(parse_url($this->container->getParameter('site_url'), PHP_URL_HOST));
+
         $cacheKey = 'view_multiple_' . md5($type.$tag);
         $result = apcu_fetch($cacheKey, $inCache);
 
