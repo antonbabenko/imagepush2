@@ -1,4 +1,4 @@
-MAILTO="anton@imagepush.to"
+MAILTO=""
 HOME=/var/app/current
 
 */30 * * * * ./app/console imagepush:fetch-from-reddit --env=prod
@@ -9,7 +9,7 @@ HOME=/var/app/current
 
 */5 * * * *  ./app/console imagepush:update-tags --env=prod
 
-0 */2 * * *  ./app/console imagepush:publish-image --env=prod
+0 */1 * * *  ./app/console imagepush:publish-image --env=prod
 
 5 */6 * * *  ./app/console imagepush:generate:sitemap --spaceless=1 --env=prod && aws s3 cp web/sitemap.xml.gz s3://i.imagepush.to/
 
