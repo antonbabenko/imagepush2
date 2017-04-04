@@ -32,3 +32,8 @@ nohup.out
 .elasticbeanstalk/*
 !.elasticbeanstalk/config.yml
 !.elasticbeanstalk/*.global.yml
+
+# Terraform
+.terraform
+*tfstate*
+crash.log

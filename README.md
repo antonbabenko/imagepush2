@@ -12,6 +12,8 @@ Typical command to deploy new code is:
 
 ```$ eb deploy prod7-eb```
 
+Before running it you need to create AWS infrastructure. Check [terraform](./terraform) directory for code.
+
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
