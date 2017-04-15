@@ -17,3 +17,7 @@ Before running it you need to create AWS infrastructure. Check [terraform](./ter
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/antonbabenko/imagepush2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
