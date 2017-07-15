@@ -1,8 +1,6 @@
 branch-defaults:
-  dev:
-    environment: dev-eb
   master:
-    environment: prod-eb
+    environment: prod7-eb
 global:
   application_name: imagepush2
   branch: null
