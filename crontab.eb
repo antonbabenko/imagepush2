@@ -1,13 +1,11 @@
 MAILTO=""
 HOME=/var/app/current
 
-*/30 * * * * ./app/console imagepush:fetch-from-reddit --env=prod
+*/30 * * * * flock -xn /tmp/imagepush_reddit.lock -c "cd $HOME && ./app/console imagepush:fetch-from-reddit --env=prod"
 
-*/5 * * * *  ./app/console imagepush:process-source --number=20 --env=prod
+*/2 * * * *  flock -xn /tmp/imagepush.lock -c "cd $HOME && ./app/console imagepush:process-source --number=4 --env=prod && ./app/console imagepush:process-tags --number=5 --env=prod"
 
-*/2 * * * *  ./app/console imagepush:process-tags --number=10 --env=prod
-
-*/5 * * * *  ./app/console imagepush:update-tags --env=prod
+*/5 * * * *  flock -xn /tmp/imagepush.lock -c "cd $HOME && ./app/console imagepush:update-tags --env=prod"
 
 0 */1 * * *  ./app/console imagepush:publish-image --env=prod
 
