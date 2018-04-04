@@ -5,7 +5,7 @@ global:
   application_name: imagepush2
   branch: null
   default_ec2_keyname: anton-server
-  default_platform: PHP 5.6
+  default_platform: PHP 7.0
   default_region: eu-west-1
   instance_profile: null
   platform_name: null
