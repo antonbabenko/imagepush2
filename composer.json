@@ -11,7 +11,7 @@
     "require": {
         "php":                           ">=5.3.9",
 
-        "symfony/symfony":               "2.8.*",
+        "symfony/symfony":               "2.8.18",
         "twig/twig":                     "^1.0||^2.0",
         "symfony/assetic-bundle":        "~2.3",
         "symfony/monolog-bundle":        "^3.0.2",
@@ -22,8 +22,7 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
 
-        "symfony/var-dumper":            "dev-master",
-        "liip/imagine-bundle":           "dev-master",
+        "liip/imagine-bundle":           "0.21.1",
         "knplabs/knp-gaufrette-bundle":  "~0.3",
         "guzzlehttp/guzzle":             "dev-master",
         "aws/aws-sdk-php-symfony":       "^1.2"
@@ -58,10 +57,6 @@
             "": "src/"
         },
         "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
-    },
-
-    "autoload-dev": {
-        "files": [ "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
 
     "config": {
