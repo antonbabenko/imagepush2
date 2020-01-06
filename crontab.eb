@@ -3,7 +3,7 @@ HOME=/var/app/current
 
 */30 * * * * flock -xn /tmp/imagepush_reddit.lock -c "cd $HOME && ./app/console imagepush:fetch-from-reddit --env=prod"
 
-*/2 * * * *  flock -xn /tmp/imagepush1.lock -c "cd $HOME && ./app/console imagepush:process-source --number=50 --env=prod"
+*/2 * * * *  cd $HOME && ./app/console imagepush:process-source --number=30 --env=prod
 
 */2 * * * *  flock -xn /tmp/imagepush2.lock -c "cd $HOME && ./app/console imagepush:process-tags --number=15 --env=prod"
 
